@@ -7,3 +7,4 @@ Y. -W. Tai, P. Tan and M. S. Brown, "Richardson-Lucy Deblurring for Scenes under
 ## References
 * [Richardson-Lucy Deblurring for Scenes under a Projective Motion Path](https://ieeexplore.ieee.org/document/5674049)
 * [Paper PDF](http://www.cse.yorku.ca/~mbrown/pdf/pami_projectivedeblur_final.pdf)
+* <https://github.com/topics/comp4411>
