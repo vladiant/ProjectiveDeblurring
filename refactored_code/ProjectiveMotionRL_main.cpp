@@ -1,5 +1,6 @@
 #include <cmath>
 #include <ctime>
+#include <string>
 
 #include "ImResize.h"
 #include "ProjectiveMotionRL.h"
@@ -10,12 +11,12 @@ int main(int argc, char* argv[]) {
 
   int width, height;
   float* fImg[3];
-  char prefix[256] = "doll";
+  std::string prefix = "doll";
   // memcpy(prefix, argv[1], strlen(argv[1])+1);
-  char fname[256];
-  sprintf(fname, "%s.bmp", prefix);
-  printf("Load Image: %s\n", fname);
-  readBMP(fname, fImg[0], fImg[1], fImg[2], width, height);
+  std::string fname;
+  fname = prefix + ".bmp";
+  printf("Load Image: %s\n", fname.c_str());
+  readBMP(fname.c_str(), fImg[0], fImg[1], fImg[2], width, height);
   int blurwidth = width, blurheight = height;
 
   float* bImg[3];
@@ -114,9 +115,10 @@ int main(int argc, char* argv[]) {
        m_ProjectiveMotionRL.ComputeRMSError(fImg[1], bImg[1], width, height) +
        m_ProjectiveMotionRL.ComputeRMSError(fImg[2], bImg[2], width, height)) /
       3.0f;
-  sprintf(fname, "%s_blur_%.6f.bmp", prefix, RMSError * 255.0f);
-  printf("Save Blurred Image to: %s\n", fname);
-  writeBMP(fname, blurwidth, blurheight, bImg[0], bImg[1], bImg[2]);
+//   sprintf(fname, "%s_blur_%.6f.bmp", prefix, RMSError * 255.0f);
+  fname = prefix + "_blur_" + std::to_string(RMSError * 255.0f) + ".bmp";
+  printf("Save Blurred Image to: %s\n", fname.c_str());
+  writeBMP(fname.c_str(), blurwidth, blurheight, bImg[0], bImg[1], bImg[2]);
 
   // Add noise
   float sigma = 2.0f;
@@ -128,10 +130,10 @@ int main(int argc, char* argv[]) {
        m_ProjectiveMotionRL.ComputeRMSError(fImg[1], bImg[1], width, height) +
        m_ProjectiveMotionRL.ComputeRMSError(fImg[2], bImg[2], width, height)) /
       3.0f;
-  sprintf(fname, "%s_blur_noise_sigma%.2f_%.6f.bmp", prefix, sigma,
-          RMSError * 255.0f);
-  printf("Save Blurred Image to: %s\n", fname);
-  writeBMP(fname, blurwidth, blurheight, bImg[0], bImg[1], bImg[2]);
+//   sprintf(fname, "%s_blur_noise_sigma%.2f_%.6f.bmp", prefix, sigma, RMSError * 255.0f);
+  fname = prefix + "_blur_noise_sigma" + std::to_string(sigma) + "_" + std::to_string(RMSError * 255.0f) + ".bmp";
+  printf("Save Blurred Image to: %s\n", fname.c_str());
+  writeBMP(fname.c_str(), blurwidth, blurheight, bImg[0], bImg[1], bImg[2]);
 
   ///////////////////////////////////
   // Main Deblurring algorithm
@@ -175,9 +177,10 @@ int main(int argc, char* argv[]) {
               m_ProjectiveMotionRL.ComputeRMSError(fImg[2], deblurImg[2], width,
                                                    height)) /
              3.0f;
-  sprintf(fname, "%s_deblurBasic_%f.bmp", prefix, RMSError * 255.0f);
+//   sprintf(fname, "%s_deblurBasic_%f.bmp", prefix, RMSError * 255.0f);
+  fname = prefix + "_deblurBasic_" + std::to_string(RMSError * 255.0f) + ".bmp";
   printf("Done, RMS Error: %f\n", RMSError * 255.0f);
-  writeBMP(fname, width, height, deblurImg[0], deblurImg[1], deblurImg[2]);
+  writeBMP(fname.c_str(), width, height, deblurImg[0], deblurImg[1], deblurImg[2]);
 
   printf("TV Regularization Algorithm:\n");
   memcpy(deblurImg[0], intermediatedeblurImg[0],
@@ -215,9 +218,10 @@ int main(int argc, char* argv[]) {
               m_ProjectiveMotionRL.ComputeRMSError(fImg[2], deblurImg[2], width,
                                                    height)) /
              3.0f;
-  sprintf(fname, "%s_deblurTVReg_%f.bmp", prefix, RMSError * 255.0f);
+//   sprintf(fname, "%s_deblurTVReg_%f.bmp", prefix, RMSError * 255.0f);
+  fname = prefix + "_deblurTVReg_" + std::to_string(RMSError * 255.0f) + ".bmp";
   printf("Done, RMS Error: %f\n", RMSError * 255.0f);
-  writeBMP(fname, width, height, deblurImg[0], deblurImg[1], deblurImg[2]);
+  writeBMP(fname.c_str(), width, height, deblurImg[0], deblurImg[1], deblurImg[2]);
 
   printf("Laplacian Regularization Algorithm:\n");
   memcpy(deblurImg[0], intermediatedeblurImg[0],
@@ -252,9 +256,10 @@ int main(int argc, char* argv[]) {
               m_ProjectiveMotionRL.ComputeRMSError(fImg[2], deblurImg[2], width,
                                                    height)) /
              3.0f;
-  sprintf(fname, "%s_deblurSpsReg_%f.bmp", prefix, RMSError * 255.0f);
+//   sprintf(fname, "%s_deblurSpsReg_%f.bmp", prefix, RMSError * 255.0f);
+  fname = prefix + "_deblurSpsReg_" + std::to_string(RMSError * 255.0f) + ".bmp";
   printf("Done, RMS Error: %f\n", RMSError * 255.0f);
-  writeBMP(fname, width, height, deblurImg[0], deblurImg[1], deblurImg[2]);
+  writeBMP(fname.c_str(), width, height, deblurImg[0], deblurImg[1], deblurImg[2]);
 
   printf("Bilateral Regularization Algorithm:\n");
   memcpy(deblurImg[0], intermediatedeblurImg[0],
@@ -289,9 +294,10 @@ int main(int argc, char* argv[]) {
               m_ProjectiveMotionRL.ComputeRMSError(fImg[2], deblurImg[2], width,
                                                    height)) /
              3.0f;
-  sprintf(fname, "%s_deblurBilateralReg_%f.bmp", prefix, RMSError * 255.0f);
+//   sprintf(fname, "%s_deblurBilateralReg_%f.bmp", prefix, RMSError * 255.0f);
+  fname = prefix + "_deblurBilateralReg_" + std::to_string(RMSError * 255.0f) + ".bmp";
   printf("Done, RMS Error: %f\n", RMSError * 255.0f);
-  writeBMP(fname, width, height, deblurImg[0], deblurImg[1], deblurImg[2]);
+  writeBMP(fname.c_str(), width, height, deblurImg[0], deblurImg[1], deblurImg[2]);
 
   printf("Bilateral Laplacian Regularization Algorithm:\n");
   memcpy(deblurImg[0], intermediatedeblurImg[0],
@@ -326,9 +332,10 @@ int main(int argc, char* argv[]) {
               m_ProjectiveMotionRL.ComputeRMSError(fImg[2], deblurImg[2], width,
                                                    height)) /
              3.0f;
-  sprintf(fname, "%s_deblurBilateralLapReg_%f.bmp", prefix, RMSError * 255.0f);
+//   sprintf(fname, "%s_deblurBilateralLapReg_%f.bmp", prefix, RMSError * 255.0f);
+  fname = prefix + "_deblurBilateralLapReg_" + std::to_string(RMSError * 255.0f) + ".bmp";
   printf("Done, RMS Error: %f\n", RMSError * 255.0f);
-  writeBMP(fname, width, height, deblurImg[0], deblurImg[1], deblurImg[2]);
+  writeBMP(fname.c_str(), width, height, deblurImg[0], deblurImg[1], deblurImg[2]);
 
   /*	printf("Testing for Convergence\n");
           memcpy(deblurImg[0], intermediatedeblurImg[0],
