@@ -209,7 +209,7 @@ class ProjectiveMotionRL {
     //	}
     //	for(i = t+1; i < 256; i++){
     //		BilateralTable[i] = (exp(-pow(i/255.0f,powD) / noiseVar) *
-    //pow(i/255.0f,powD-1.0f) ) / minWeight;
+    // pow(i/255.0f,powD-1.0f) ) / minWeight;
     //	}
   }
   void SetGroundTruthImg(float* GroundTruth, int width, int height) {

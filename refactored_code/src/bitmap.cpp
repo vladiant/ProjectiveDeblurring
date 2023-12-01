@@ -12,10 +12,40 @@
 
 #include "bitmap.h"
 
+#include <iostream>
+
+namespace {
+constexpr auto BMP_BI_RGB = 0L;
+
+typedef uint16_t BMP_WORD;
+typedef uint32_t BMP_DWORD;
+typedef int32_t BMP_LONG;
+
+typedef struct {
+  BMP_WORD bfType;
+  BMP_DWORD bfSize;
+  BMP_WORD bfReserved1;
+  BMP_WORD bfReserved2;
+  BMP_DWORD bfOffBits;
+} BMP_BITMAPFILEHEADER;
+
+typedef struct {
+  BMP_DWORD biSize;
+  BMP_LONG biWidth;
+  BMP_LONG biHeight;
+  BMP_WORD biPlanes;
+  BMP_WORD biBitCount;
+  BMP_DWORD biCompression;
+  BMP_DWORD biSizeImage;
+  BMP_LONG biXPelsPerMeter;
+  BMP_LONG biYPelsPerMeter;
+  BMP_DWORD biClrUsed;
+  BMP_DWORD biClrImportant;
+} BMP_BITMAPINFOHEADER;
+}  // namespace
+
 BMP_BITMAPFILEHEADER bmfh;
 BMP_BITMAPINFOHEADER bmih;
-
-#include <iostream>
 
 template <class T>
 void swapBytes(T* val) {
@@ -34,14 +64,14 @@ void swapBytes(T* val) {
 }
 
 // Bitmap data returned is (R,G,B) tuples in row-major order.
-unsigned char* readBMP(const char* fname, int& width, int& height) {
+std::vector<uint8_t> readBMP(const char* fname, int& width, int& height) {
   FILE* file;
   BMP_DWORD pos;
 
-  if ((file = fopen(fname, "rb")) == NULL) return NULL;
+  if ((file = fopen(fname, "rb")) == NULL) return {};
 
   //	I am doing fread( &bmfh, sizeof(BMP_BITMAPFILEHEADER), 1, file ) in a
-  //safe way. :}
+  // safe way. :}
   fread(&(bmfh.bfType), 2, 1, file);
   fread(&(bmfh.bfSize), 4, 1, file);
   fread(&(bmfh.bfReserved1), 2, 1, file);
@@ -54,9 +84,9 @@ unsigned char* readBMP(const char* fname, int& width, int& height) {
 
   // error checking
   if (bmfh.bfType != 0x4d42) {  // "BM" actually
-    return NULL;
+    return {};
   }
-  if (bmih.biBitCount != 24) return NULL;
+  if (bmih.biBitCount != 24) return {};
   /*
           if ( bmih.biCompression != BMP_BI_RGB ) {
                   return NULL;
@@ -77,13 +107,12 @@ unsigned char* readBMP(const char* fname, int& width, int& height) {
   }
   int bytes = height * padWidth;
 
-  unsigned char* data = new unsigned char[bytes];
+  std::vector<uint8_t> data(bytes);
 
-  int result = fread(data, bytes, 1, file);
+  int result = fread(data.data(), bytes, 1, file);
 
   if (!result) {
-    delete[] data;
-    return NULL;
+    return {};
   }
 
   fclose(file);
@@ -91,12 +120,12 @@ unsigned char* readBMP(const char* fname, int& width, int& height) {
   // shuffle bitmap data such that it is (R,G,B) tuples in row-major order
   int i, j;
   j = 0;
-  unsigned char temp;
-  unsigned char* in;
-  unsigned char* out;
+  uint8_t temp;
+  uint8_t* in;
+  uint8_t* out;
 
-  in = data;
-  out = data;
+  in = data.data();
+  out = data.data();
 
   for (j = 0; j < height; ++j) {
     for (i = 0; i < width; ++i) {
@@ -114,45 +143,48 @@ unsigned char* readBMP(const char* fname, int& width, int& height) {
   return data;
 }
 
-void readBMP(const char* fname, float*& fImg, int& width, int& height) {
-  unsigned char* Img = readBMP(fname, width, height);
-  fImg = new float[3 * width * height];
+void readBMP(const char* fname, std::vector<float>& fImg, int& width,
+             int& height) {
+  auto Img = readBMP(fname, width, height);
+  fImg.resize(3 * width * height);
+  auto pfImg = fImg.data();
   int x, y, index;
   for (y = 0, index = 0; y < height; y++) {
     for (x = 0; x < width; x++, index++) {
-      fImg[3 * index] = Img[3 * index] / 255.0f;
-      fImg[3 * index + 1] = Img[3 * index + 1] / 255.0f;
-      fImg[3 * index + 2] = Img[3 * index + 2] / 255.0f;
+      pfImg[3 * index] = Img[3 * index] / 255.0f;
+      pfImg[3 * index + 1] = Img[3 * index + 1] / 255.0f;
+      pfImg[3 * index + 2] = Img[3 * index + 2] / 255.0f;
     }
   }
 
   std::cout << "readBMP " << width << " " << height << '\n';
-
-  delete[] Img;
 }
 
-void readBMP(const char* fname, float*& fImgR, float*& fImgG, float*& fImgB,
-             int& width, int& height) {
+void readBMP(const char* fname, std::vector<float>& fImgR,
+             std::vector<float>& fImgG, std::vector<float>& fImgB, int& width,
+             int& height) {
   std::cout << "readBMP fname " << fname << '\n';
-  unsigned char* Img = readBMP(fname, width, height);
-  fImgR = new float[width * height];
-  fImgG = new float[width * height];
-  fImgB = new float[width * height];
+  auto Img = readBMP(fname, width, height);
+  fImgR.resize(width * height);
+  fImgG.resize(width * height);
+  fImgB.resize(width * height);
+  auto* pfImgR = fImgR.data();
+  auto* pfImgG = fImgG.data();
+  auto* pfImgB = fImgB.data();
   int x, y, index;
   for (y = 0, index = 0; y < height; y++) {
     for (x = 0; x < width; x++, index++) {
-      fImgR[index] = Img[3 * index] / 255.0f;
-      fImgG[index] = Img[3 * index + 1] / 255.0f;
-      fImgB[index] = Img[3 * index + 2] / 255.0f;
+      pfImgR[index] = Img[3 * index] / 255.0f;
+      pfImgG[index] = Img[3 * index + 1] / 255.0f;
+      pfImgB[index] = Img[3 * index + 2] / 255.0f;
     }
   }
 
   std::cout << "readBMP " << width << " " << height << '\n';
-
-  delete[] Img;
 }
 
-void writeBMP(const char* iname, int width, int height, unsigned char* data) {
+void writeBMP(const char* iname, int width, int height,
+              const std::vector<uint8_t>& data) {
   int bytes, pad;
   bytes = width * 3;
   pad = (bytes % 4) ? 4 - (bytes % 4) : 0;
@@ -192,25 +224,24 @@ void writeBMP(const char* iname, int width, int height, unsigned char* data) {
   fwrite(&bmih, sizeof(BMP_BITMAPINFOHEADER), 1, outFile);
 
   bytes /= height;
-  unsigned char* scanline = new unsigned char[bytes];
+  std::vector<uint8_t> scanline(bytes);
   for (int j = 0; j < height; ++j) {
-    memcpy(scanline, data + j * 3 * width, bytes);
+    memcpy(scanline.data(), &data[j * 3 * width], bytes);
     for (int i = 0; i < width; ++i) {
-      unsigned char temp = scanline[i * 3];
+      uint8_t temp = scanline[i * 3];
       scanline[i * 3] = scanline[i * 3 + 2];
       scanline[i * 3 + 2] = temp;
     }
-    fwrite(scanline, bytes, 1, outFile);
+    fwrite(scanline.data(), bytes, 1, outFile);
   }
-
-  delete[] scanline;
 
   fclose(outFile);
 }
 
-void writeBMP(const char* iname, int width, int height, float* data) {
+void writeBMP(const char* iname, int width, int height,
+              const std::vector<float>& data) {
   int x, y, index;
-  unsigned char* Img = new unsigned char[3 * width * height];
+  std::vector<uint8_t> Img(3 * width * height);
   for (y = 0, index = 0; y < height; y++) {
     for (x = 0; x < width; x++, index++) {
       if (data[3 * index] < 0)
@@ -218,28 +249,28 @@ void writeBMP(const char* iname, int width, int height, float* data) {
       else if (data[3 * index] > 1)
         Img[3 * index] = 255;
       else
-        Img[3 * index] = (unsigned char)(data[3 * index] * 255.0f);
+        Img[3 * index] = (uint8_t)(data[3 * index] * 255.0f);
       if (data[3 * index + 1] < 0)
         Img[3 * index + 1] = 0;
       else if (data[3 * index + 1] > 1)
         Img[3 * index + 1] = 255;
       else
-        Img[3 * index + 1] = (unsigned char)(data[3 * index + 1] * 255.0f);
+        Img[3 * index + 1] = (uint8_t)(data[3 * index + 1] * 255.0f);
       if (data[3 * index + 2] < 0)
         Img[3 * index + 2] = 0;
       else if (data[3 * index + 2] > 1)
         Img[3 * index + 2] = 255;
       else
-        Img[3 * index + 2] = (unsigned char)(data[3 * index + 2] * 255.0f);
+        Img[3 * index + 2] = (uint8_t)(data[3 * index + 2] * 255.0f);
     }
   }
   writeBMP(iname, width, height, Img);
-  delete[] Img;
 }
-void writeBMP(const char* iname, int width, int height, float* dataR,
-              float* dataG, float* dataB) {
+void writeBMP(const char* iname, int width, int height,
+              const std::vector<float>& dataR, const std::vector<float>& dataG,
+              const std::vector<float>& dataB) {
   int x, y, index;
-  unsigned char* Img = new unsigned char[3 * width * height];
+  std::vector<uint8_t> Img(3 * width * height);
   for (y = 0, index = 0; y < height; y++) {
     for (x = 0; x < width; x++, index++) {
       if (dataR[index] < 0)
@@ -247,21 +278,20 @@ void writeBMP(const char* iname, int width, int height, float* dataR,
       else if (dataR[index] > 1)
         Img[3 * index] = 255;
       else
-        Img[3 * index] = (unsigned char)(dataR[index] * 255.0f);
+        Img[3 * index] = (uint8_t)(dataR[index] * 255.0f);
       if (dataG[index] < 0)
         Img[3 * index + 1] = 0;
       else if (dataG[index] > 1)
         Img[3 * index + 1] = 255;
       else
-        Img[3 * index + 1] = (unsigned char)(dataG[index] * 255.0f);
+        Img[3 * index + 1] = (uint8_t)(dataG[index] * 255.0f);
       if (dataB[index] < 0)
         Img[3 * index + 2] = 0;
       else if (dataB[index] > 1)
         Img[3 * index + 2] = 255;
       else
-        Img[3 * index + 2] = (unsigned char)(dataB[index] * 255.0f);
+        Img[3 * index + 2] = (uint8_t)(dataB[index] * 255.0f);
     }
   }
   writeBMP(iname, width, height, Img);
-  delete[] Img;
 }
