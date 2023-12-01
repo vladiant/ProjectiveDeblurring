@@ -6,17 +6,18 @@ find_package(Threads REQUIRED)
 
 add_executable(
     ${PROJECT_NAME}
-    BicubicInterpolation.h
-    BicubicInterpolation.cpp
-    bitmap.h
-    bitmap.cpp
-    homography.h
-    homography.cpp
-    ImResize.h
-    ImResize.cpp
-    svdcmp.h
-    svdcmp.cpp
-    ProjectiveMotionRL.cpp
+    include/BicubicInterpolation.h
+    src/BicubicInterpolation.cpp
+    include/bitmap.h
+    src/bitmap.cpp
+    include/homography.h
+    src/homography.cpp
+    include/ImResize.h
+    src/ImResize.cpp
+    include/svdcmp.h
+    src/svdcmp.cpp
+    include/ProjectiveMotionRL.h
+    src/ProjectiveMotionRL.cpp
     ProjectiveMotionRL_main.cpp
 )
 
@@ -28,14 +29,14 @@ set_target_properties(
         CXX_EXTENSIONS NO
 )
 
+target_include_directories(
+    ${PROJECT_NAME}
+    PUBLIC
+        include
+)
+
 # target_link_libraries(
 #     ${PROJECT_NAME}
 #     PRIVATE
 #         Threads::Threads
 # )
-
-target_include_directories(
-    ${PROJECT_NAME}
-    PUBLIC
-        .
-)
