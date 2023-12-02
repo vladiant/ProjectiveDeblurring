@@ -13,6 +13,7 @@
 #include "bitmap.h"
 
 #include <cstring>
+#include <fstream>
 #include <iostream>
 
 namespace {
@@ -67,22 +68,23 @@ void swapBytes(T* val) {
 // Bitmap data returned is (R,G,B) tuples in row-major order.
 std::vector<uint8_t> readBMP(const std::string& fname, int& width,
                              int& height) {
-  FILE* file;
+  std::fstream file(fname, std::fstream::in | std::fstream::binary);
   BMP_DWORD pos;
 
-  if ((file = fopen(fname.c_str(), "rb")) == NULL) return {};
+  if (!file) return {};
 
-  //	I am doing fread( &bmfh, sizeof(BMP_BITMAPFILEHEADER), 1, file ) in a
+  //	I am doing file.read(reinterpret_cast<char*>(&bmfh),
+  //sizeof(BMP_BITMAPFILEHEADER)) in a
   // safe way. :}
-  fread(&(bmfh.bfType), 2, 1, file);
-  fread(&(bmfh.bfSize), 4, 1, file);
-  fread(&(bmfh.bfReserved1), 2, 1, file);
-  fread(&(bmfh.bfReserved2), 2, 1, file);
-  fread(&(bmfh.bfOffBits), 4, 1, file);
+  file.read(reinterpret_cast<char*>(&(bmfh.bfType)), 2);
+  file.read(reinterpret_cast<char*>(&(bmfh.bfSize)), 4);
+  file.read(reinterpret_cast<char*>(&(bmfh.bfReserved1)), 2);
+  file.read(reinterpret_cast<char*>(&(bmfh.bfReserved2)), 2);
+  file.read(reinterpret_cast<char*>(&(bmfh.bfOffBits)), 4);
 
   pos = bmfh.bfOffBits;
 
-  fread(&bmih, sizeof(BMP_BITMAPINFOHEADER), 1, file);
+  file.read(reinterpret_cast<char*>(&bmih), sizeof(BMP_BITMAPINFOHEADER));
 
   // error checking
   if (bmfh.bfType != 0x4d42) {  // "BM" actually
@@ -91,10 +93,10 @@ std::vector<uint8_t> readBMP(const std::string& fname, int& width,
   if (bmih.biBitCount != 24) return {};
   /*
           if ( bmih.biCompression != BMP_BI_RGB ) {
-                  return NULL;
+                  return {};
           }
   */
-  fseek(file, pos, SEEK_SET);
+  file.seekg(pos, std::fstream::beg);
 
   width = bmih.biWidth;
   height = bmih.biHeight;
@@ -111,13 +113,11 @@ std::vector<uint8_t> readBMP(const std::string& fname, int& width,
 
   std::vector<uint8_t> data(bytes);
 
-  int result = fread(data.data(), bytes, 1, file);
+  file.read(reinterpret_cast<char*>(data.data()), bytes);
 
-  if (!result) {
+  if (!file) {
     return {};
   }
-
-  fclose(file);
 
   // shuffle bitmap data such that it is (R,G,B) tuples in row-major order
   int i, j;
@@ -214,16 +214,18 @@ void writeBMP(const std::string& iname, int width, int height,
   bmih.biClrUsed = 0;
   bmih.biClrImportant = 0;
 
-  FILE* outFile = fopen(iname.c_str(), "wb");
+  std::fstream outFile(iname, std::fstream::out | std::fstream::binary);
 
-  //	fwrite(&bmfh, sizeof(BMP_BITMAPFILEHEADER), 1, outFile);
-  fwrite(&(bmfh.bfType), 2, 1, outFile);
-  fwrite(&(bmfh.bfSize), 4, 1, outFile);
-  fwrite(&(bmfh.bfReserved1), 2, 1, outFile);
-  fwrite(&(bmfh.bfReserved2), 2, 1, outFile);
-  fwrite(&(bmfh.bfOffBits), 4, 1, outFile);
+  //	outFile.write(reinterpret_cast<const char*>(&bmfh),
+  //sizeof(BMP_BITMAPFILEHEADER));
+  outFile.write(reinterpret_cast<const char*>(&(bmfh.bfType)), 2);
+  outFile.write(reinterpret_cast<const char*>(&(bmfh.bfSize)), 4);
+  outFile.write(reinterpret_cast<const char*>(&(bmfh.bfReserved1)), 2);
+  outFile.write(reinterpret_cast<const char*>(&(bmfh.bfReserved2)), 2);
+  outFile.write(reinterpret_cast<const char*>(&(bmfh.bfOffBits)), 4);
 
-  fwrite(&bmih, sizeof(BMP_BITMAPINFOHEADER), 1, outFile);
+  outFile.write(reinterpret_cast<const char*>(&bmih),
+                sizeof(BMP_BITMAPINFOHEADER));
 
   bytes /= height;
   std::vector<uint8_t> scanline(bytes);
@@ -234,10 +236,8 @@ void writeBMP(const std::string& iname, int width, int height,
       scanline[i * 3] = scanline[i * 3 + 2];
       scanline[i * 3 + 2] = temp;
     }
-    fwrite(scanline.data(), bytes, 1, outFile);
+    outFile.write(reinterpret_cast<const char*>(scanline.data()), bytes);
   }
-
-  fclose(outFile);
 }
 
 void writeBMP(const std::string& iname, int width, int height,
