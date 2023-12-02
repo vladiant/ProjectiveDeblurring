@@ -77,27 +77,30 @@ int main(int argc, char* argv[]) {
   // m_ProjectiveMotionRL.SetGlobalPerspective(0.001f,0.001f);
 
   // Adjust the parameters for generating test case 1-15
-  /*float deltadx = 0.8f;
-  float deltascaling = 0.2f / NumSamples;
-  float deltapx = 0.001f / NumSamples;
-  float deltapy = 0.001f / NumSamples;
-  float deltadegree = (10.0f * PI / 180.0f) / NumSamples;
-  for(int i = 0; i < NumSamples; i++){
-          float dy = 5.0f * sin( (float)(i)/NumSamples * 2 * PI);
-          m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][0] =
-  (1+i*deltascaling)*cos(deltadegree*i);
-  m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][1] = sin(deltadegree*i);
-  m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][2] =i*deltadx;
-          m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][0] = -sin(deltadegree*i);
-  m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][1] =
-  (1+i*deltascaling)*cos(deltadegree*i);
-  m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][2] =dy;
-          m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][0] = i*deltapx;
-  m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][1] = i*deltapx;
-  m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][2] =1;
-          m_ProjectiveMotionRL.Hmatrix[i].MatrixInverse(m_ProjectiveMotionRL.Hmatrix[i].Hmatrix,
-  m_ProjectiveMotionRL.IHmatrix[i].Hmatrix);
-  }*/
+  if (false) {
+    float deltadx = 0.8f;
+    float deltascaling = 0.2f / NumSamples;
+    float deltapx = 0.001f / NumSamples;
+    float deltapy = 0.001f / NumSamples;
+    float deltadegree = (10.0f * PI / 180.0f) / NumSamples;
+    for (int i = 0; i < NumSamples; i++) {
+      float dy = 5.0f * sin((float)(i) / NumSamples * 2 * PI);
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][0] =
+          (1 + i * deltascaling) * cos(deltadegree * i);
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][1] = sin(deltadegree * i);
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][2] = i * deltadx;
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][0] = -sin(deltadegree * i);
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][1] =
+          (1 + i * deltascaling) * cos(deltadegree * i);
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][2] = dy;
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][0] = i * deltapx;
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][1] = i * deltapx;
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][2] = 1;
+      m_ProjectiveMotionRL.Hmatrix[i].MatrixInverse(
+          m_ProjectiveMotionRL.Hmatrix[i].Hmatrix,
+          m_ProjectiveMotionRL.IHmatrix[i].Hmatrix);
+    }
+  }
 
   ///////////////////////////////////
   m_ProjectiveMotionRL.SetGroundTruthImg(
