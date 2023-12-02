@@ -12,6 +12,7 @@
 
 #include "bitmap.h"
 
+#include <cstring>
 #include <iostream>
 
 namespace {
@@ -64,11 +65,12 @@ void swapBytes(T* val) {
 }
 
 // Bitmap data returned is (R,G,B) tuples in row-major order.
-std::vector<uint8_t> readBMP(const char* fname, int& width, int& height) {
+std::vector<uint8_t> readBMP(const std::string& fname, int& width,
+                             int& height) {
   FILE* file;
   BMP_DWORD pos;
 
-  if ((file = fopen(fname, "rb")) == NULL) return {};
+  if ((file = fopen(fname.c_str(), "rb")) == NULL) return {};
 
   //	I am doing fread( &bmfh, sizeof(BMP_BITMAPFILEHEADER), 1, file ) in a
   // safe way. :}
@@ -143,7 +145,7 @@ std::vector<uint8_t> readBMP(const char* fname, int& width, int& height) {
   return data;
 }
 
-void readBMP(const char* fname, std::vector<float>& fImg, int& width,
+void readBMP(const std::string& fname, std::vector<float>& fImg, int& width,
              int& height) {
   auto Img = readBMP(fname, width, height);
   fImg.resize(3 * width * height);
@@ -160,7 +162,7 @@ void readBMP(const char* fname, std::vector<float>& fImg, int& width,
   std::cout << "readBMP " << width << " " << height << '\n';
 }
 
-void readBMP(const char* fname, std::vector<float>& fImgR,
+void readBMP(const std::string& fname, std::vector<float>& fImgR,
              std::vector<float>& fImgG, std::vector<float>& fImgB, int& width,
              int& height) {
   std::cout << "readBMP fname " << fname << '\n';
@@ -183,7 +185,7 @@ void readBMP(const char* fname, std::vector<float>& fImgR,
   std::cout << "readBMP " << width << " " << height << '\n';
 }
 
-void writeBMP(const char* iname, int width, int height,
+void writeBMP(const std::string& iname, int width, int height,
               const std::vector<uint8_t>& data) {
   int bytes, pad;
   bytes = width * 3;
@@ -212,7 +214,7 @@ void writeBMP(const char* iname, int width, int height,
   bmih.biClrUsed = 0;
   bmih.biClrImportant = 0;
 
-  FILE* outFile = fopen(iname, "wb");
+  FILE* outFile = fopen(iname.c_str(), "wb");
 
   //	fwrite(&bmfh, sizeof(BMP_BITMAPFILEHEADER), 1, outFile);
   fwrite(&(bmfh.bfType), 2, 1, outFile);
@@ -238,7 +240,7 @@ void writeBMP(const char* iname, int width, int height,
   fclose(outFile);
 }
 
-void writeBMP(const char* iname, int width, int height,
+void writeBMP(const std::string& iname, int width, int height,
               const std::vector<float>& data) {
   int x, y, index;
   std::vector<uint8_t> Img(3 * width * height);
@@ -266,7 +268,7 @@ void writeBMP(const char* iname, int width, int height,
   }
   writeBMP(iname, width, height, Img);
 }
-void writeBMP(const char* iname, int width, int height,
+void writeBMP(const std::string& iname, int width, int height,
               const std::vector<float>& dataR, const std::vector<float>& dataG,
               const std::vector<float>& dataB) {
   int x, y, index;
