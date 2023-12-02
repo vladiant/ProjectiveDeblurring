@@ -1,5 +1,7 @@
 #include <cmath>
 #include <ctime>
+#include <fstream>
+#include <iomanip>
 #include <string>
 #include <vector>
 
@@ -397,30 +399,31 @@ int main(int argc, char* argv[]) {
 
     //   sprintf(fname, "ConvergencePoisson%s.txt", prefix);
     fname = "ConvergencePoisson" + prefix + ".txt";
-    FILE* fp = fopen(fname.c_str(), "w");
-    for (int iteration = 0; iteration < 5000; iteration++) {
-      m_ProjectiveMotionRL.ProjectiveMotionRLDeblur(
-          bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-          deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-          height, 1, true);
-      RMSError = (m_ProjectiveMotionRL.ComputeRMSError(
-                      fImg[0].data(), deblurImg[0].data(), width, height) +
-                  m_ProjectiveMotionRL.ComputeRMSError(
-                      fImg[1].data(), deblurImg[1].data(), width, height) +
-                  m_ProjectiveMotionRL.ComputeRMSError(
-                      fImg[2].data(), deblurImg[2].data(), width, height)) /
-                 3.0f;
-      fprintf(fp, "%.12f\n", RMSError * 255.0f);
-      if (iteration % 100 == 0 || iteration == 20 || iteration == 50) {
-        //   sprintf(fname.c_str(), "%s_deblurBasic_pitr%d_%f.bmp", prefix,
-        //   iteration, RMSError * 255.0f);
-        fname = prefix + "_deblurBasic_pitr" + std::to_string(iteration) + "_" +
-                std::to_string(RMSError * 255.0f) + ".bmp";
-        writeBMP(fname, width, height, deblurImg[0], deblurImg[1],
-                 deblurImg[2]);
+    {
+      std::fstream fp(fname, std::fstream::out);
+      for (int iteration = 0; iteration < 5000; iteration++) {
+        m_ProjectiveMotionRL.ProjectiveMotionRLDeblur(
+            bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
+            blurheight, deblurImg[0].data(), deblurImg[1].data(),
+            deblurImg[2].data(), width, height, 1, true);
+        RMSError = (m_ProjectiveMotionRL.ComputeRMSError(
+                        fImg[0].data(), deblurImg[0].data(), width, height) +
+                    m_ProjectiveMotionRL.ComputeRMSError(
+                        fImg[1].data(), deblurImg[1].data(), width, height) +
+                    m_ProjectiveMotionRL.ComputeRMSError(
+                        fImg[2].data(), deblurImg[2].data(), width, height)) /
+                   3.0f;
+        fp << std::setprecision(12) << RMSError * 255.0f << '\n';
+        if (iteration % 100 == 0 || iteration == 20 || iteration == 50) {
+          //   sprintf(fname.c_str(), "%s_deblurBasic_pitr%d_%f.bmp", prefix,
+          //   iteration, RMSError * 255.0f);
+          fname = prefix + "_deblurBasic_pitr" + std::to_string(iteration) +
+                  "_" + std::to_string(RMSError * 255.0f) + ".bmp";
+          writeBMP(fname, width, height, deblurImg[0], deblurImg[1],
+                   deblurImg[2]);
+        }
       }
     }
-    fclose(fp);
 
     memcpy(deblurImg[0].data(), intermediatedeblurImg[0].data(),
            width * height * sizeof(float));
@@ -430,30 +433,31 @@ int main(int argc, char* argv[]) {
            width * height * sizeof(float));
     //   sprintf(fname, "ConvergenceGaussian%s.txt", prefix);
     fname = "ConvergenceGaussian" + prefix + ".txt";
-    fp = fopen(fname.c_str(), "w");
-    for (int iteration = 0; iteration < 5000; iteration++) {
-      m_ProjectiveMotionRL.ProjectiveMotionRLDeblur(
-          bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-          deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-          height, 1, false);
-      RMSError = (m_ProjectiveMotionRL.ComputeRMSError(
-                      fImg[0].data(), deblurImg[0].data(), width, height) +
-                  m_ProjectiveMotionRL.ComputeRMSError(
-                      fImg[1].data(), deblurImg[1].data(), width, height) +
-                  m_ProjectiveMotionRL.ComputeRMSError(
-                      fImg[2].data(), deblurImg[2].data(), width, height)) /
-                 3.0f;
-      fprintf(fp, "%.12f\n", RMSError * 255.0f);
-      if (iteration % 100 == 0 || iteration == 20 || iteration == 50) {
-        //   sprintf(fname, "%s_deblurBasic_gitr%d_%f.bmp", prefix, iteration,
-        //   RMSError * 255.0f);
-        fname = prefix + "_deblurBasic_gitr" + std::to_string(iteration) + "_" +
-                std::to_string(RMSError * 255.0f) + ".bmp";
-        writeBMP(fname, width, height, deblurImg[0], deblurImg[1],
-                 deblurImg[2]);
+    {
+      std::fstream fp(fname, std::fstream::out);
+      for (int iteration = 0; iteration < 5000; iteration++) {
+        m_ProjectiveMotionRL.ProjectiveMotionRLDeblur(
+            bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
+            blurheight, deblurImg[0].data(), deblurImg[1].data(),
+            deblurImg[2].data(), width, height, 1, false);
+        RMSError = (m_ProjectiveMotionRL.ComputeRMSError(
+                        fImg[0].data(), deblurImg[0].data(), width, height) +
+                    m_ProjectiveMotionRL.ComputeRMSError(
+                        fImg[1].data(), deblurImg[1].data(), width, height) +
+                    m_ProjectiveMotionRL.ComputeRMSError(
+                        fImg[2].data(), deblurImg[2].data(), width, height)) /
+                   3.0f;
+        fp << std::setprecision(12) << RMSError * 255.0f << '\n';
+        if (iteration % 100 == 0 || iteration == 20 || iteration == 50) {
+          //   sprintf(fname, "%s_deblurBasic_gitr%d_%f.bmp", prefix, iteration,
+          //   RMSError * 255.0f);
+          fname = prefix + "_deblurBasic_gitr" + std::to_string(iteration) +
+                  "_" + std::to_string(RMSError * 255.0f) + ".bmp";
+          writeBMP(fname, width, height, deblurImg[0], deblurImg[1],
+                   deblurImg[2]);
+        }
       }
     }
-    fclose(fp);
   }
   return EXIT_SUCCESS;
 }
