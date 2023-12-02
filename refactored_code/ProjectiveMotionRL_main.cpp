@@ -169,8 +169,7 @@ int main(int argc, char* argv[]) {
   // would be much faster if this step was implemented in GPU...
 
   // Load Initial Guess, if you have...
-  // readBMP("", deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(),
-  // width, height);
+  //   readBMP("", deblurImg[0], deblurImg[1], deblurImg[2], width, height);
   memcpy(intermediatedeblurImg[0].data(), deblurImg[0].data(),
          width * height * sizeof(float));
   memcpy(intermediatedeblurImg[1].data(), deblurImg[1].data(),
@@ -214,9 +213,10 @@ int main(int argc, char* argv[]) {
   // Gradually decrease the regularization weight, otherwise, the result will be
   // over smooth. Actually, the following regularization produce similar
   // results....
-  //	m_ProjectiveMotionRL.ProjectiveMotionRLDeblurTVReg(bImg[0].data(),
-  // bImg[1].data(), bImg[2].data(), blurwidth, blurheight, deblurImg[0].data(),
-  // deblurImg[1].data(), deblurImg[2].data(), width, height, 500, true, 0.5f);
+  //   m_ProjectiveMotionRL.ProjectiveMotionRLDeblurTVReg(
+  //       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
+  //       blurheight, deblurImg[0].data(), deblurImg[1].data(),
+  //       deblurImg[2].data(), width, height, 500, true, 0.5f);
   m_ProjectiveMotionRL.ProjectiveMotionRLDeblurTVReg(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
@@ -258,9 +258,10 @@ int main(int argc, char* argv[]) {
   memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
          width * height * sizeof(float));
 
-  //	m_ProjectiveMotionRL.ProjectiveMotionRLDeblurSpsReg(bImg[0].data(),
-  // bImg[1].data(), bImg[2].data(), blurwidth, blurheight, deblurImg[0].data(),
-  // deblurImg[1].data(), deblurImg[2].data(), width, height, 500, true, 0.5f);
+  //   m_ProjectiveMotionRL.ProjectiveMotionRLDeblurSpsReg(
+  //       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
+  //       blurheight, deblurImg[0].data(), deblurImg[1].data(),
+  //       deblurImg[2].data(), width, height, 500, true, 0.5f);
   m_ProjectiveMotionRL.ProjectiveMotionRLDeblurSpsReg(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
@@ -303,9 +304,10 @@ int main(int argc, char* argv[]) {
   memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
          width * height * sizeof(float));
 
-  //	m_ProjectiveMotionRL.ProjectiveMotionRLDeblurBilateralReg(bImg[0].data(),
-  // bImg[1].data(), bImg[2].data(), blurwidth, blurheight, deblurImg[0].data(),
-  // deblurImg[1].data(), deblurImg[2].data(), width, height, 500, true, 0.5f);
+  //   m_ProjectiveMotionRL.ProjectiveMotionRLDeblurBilateralReg(
+  //       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
+  //       blurheight, deblurImg[0].data(), deblurImg[1].data(),
+  //       deblurImg[2].data(), width, height, 500, true, 0.5f);
   m_ProjectiveMotionRL.ProjectiveMotionRLDeblurBilateralReg(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
@@ -349,9 +351,10 @@ int main(int argc, char* argv[]) {
   memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
          width * height * sizeof(float));
 
-  //	m_ProjectiveMotionRL.ProjectiveMotionRLDeblurBilateralLapReg(bImg[0].data(),
-  // bImg[1].data(), bImg[2].data(), blurwidth, blurheight, deblurImg[0].data(),
-  // deblurImg[1].data(), deblurImg[2].data(), width, height, 500, true, 0.5f);
+//   m_ProjectiveMotionRL.ProjectiveMotionRLDeblurBilateralLapReg(
+//       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
+//       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
+//       height, 500, true, 0.5f);
   m_ProjectiveMotionRL.ProjectiveMotionRLDeblurBilateralLapReg(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
