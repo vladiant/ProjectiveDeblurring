@@ -43,29 +43,36 @@ int main(int argc, char* argv[]) {
   m_ProjectiveMotionRL.SetGlobalParameters(
       10, 1.2f, 0.0003f, 0.0006f, 10,
       20);  // This is parameter setting for doll example
+
   // m_ProjectiveMotionRL.SetGlobalParameters(-10, 1.1f, 0.0004f,0.0002f, 20,
   // -15); //This is parameter setting for Cameraman convergence example
 
   // Testing case for rotational motion
   // m_ProjectiveMotionRL.SetGlobalRotation(10);
+
   // Testing case for zooming motion
   // m_ProjectiveMotionRL.SetGlobalScaling(1.2f);
+
   // Testing case for translational motion
-  /*float deltadx = 0.8f;
-  for(int i = 0; i < NumSamples; i++){
-          float dy = 5.0f * sin( (float)(i)/NumSamples * 2 * PI);
-          m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][0] = 1;
-  m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][1] = 0;
-  m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][2] =i*deltadx;
-          m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][0] = 0;
-  m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][1] = 1;
-  m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][2] =dy;
-          m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][0] = 0;
-  m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][1] = 0;
-  m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][2] =1;
-          m_ProjectiveMotionRL.Hmatrix[i].MatrixInverse(m_ProjectiveMotionRL.Hmatrix[i].Hmatrix,
-  m_ProjectiveMotionRL.IHmatrix[i].Hmatrix);
-  }*/
+  if (false) {
+    float deltadx = 0.8f;
+    for (int i = 0; i < NumSamples; i++) {
+      float dy = 5.0f * sin((float)(i) / NumSamples * 2 * PI);
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][0] = 1;
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][1] = 0;
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][2] = i * deltadx;
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][0] = 0;
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][1] = 1;
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][2] = dy;
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][0] = 0;
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][1] = 0;
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][2] = 1;
+      m_ProjectiveMotionRL.Hmatrix[i].MatrixInverse(
+          m_ProjectiveMotionRL.Hmatrix[i].Hmatrix,
+          m_ProjectiveMotionRL.IHmatrix[i].Hmatrix);
+    }
+  }
+
   // Testing case for projective motion
   // m_ProjectiveMotionRL.SetGlobalPerspective(0.001f,0.001f);
 
@@ -377,7 +384,7 @@ int main(int argc, char* argv[]) {
   writeBMP(fname.c_str(), width, height, deblurImg[0], deblurImg[1],
            deblurImg[2]);
 
-  /////////////////////////////////// 
+  ///////////////////////////////////
   if (false) {
     printf("Testing for Convergence\n");
     memcpy(deblurImg[0].data(), intermediatedeblurImg[0].data(),
