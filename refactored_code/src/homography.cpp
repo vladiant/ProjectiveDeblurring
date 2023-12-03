@@ -2,7 +2,7 @@
 
 #include "svdcmp.h"
 
-void Homography::ComputeHomography(double correspondants[4][4]) {
+void Homography::ComputeHomography(const double (&correspondants)[4][4]) {
   int k;
   double sx1, sy1, sx2, sy2;
 
@@ -77,8 +77,8 @@ void Homography::ComputeHomography(double correspondants[4][4]) {
   delete[] w;
 }
 
-void Homography::ComputeHomography(double correspondantsA[4][2],
-                                   double correspondantsB[4][2]) {
+void Homography::ComputeHomography(double const (&correspondantsA)[4][2],
+                                   double const (&correspondantsB)[4][2]) {
   int k;
   double sx1, sy1, sx2, sy2;
 
@@ -153,8 +153,8 @@ void Homography::ComputeHomography(double correspondantsA[4][2],
   delete[] w;
 }
 
-void Homography::ComputeHomography(double correspondantsA[4][2],
-                                   double correspondantsB[4][2],
+void Homography::ComputeHomography(double const (&correspondantsA)[4][2],
+                                   double const (&correspondantsB)[4][2],
                                    double** featurevector, double* w,
                                    double** v, double* rv1) {
   int k;
@@ -368,7 +368,7 @@ void Homography::ComputeHomography(double** correspondantsA,
   delete[] w;
 }
 
-void Homography::ComputeAffineHomography(double correspondants[4][4]) {
+void Homography::ComputeAffineHomography(const double (&correspondants)[4][4]) {
   int k;
   double sx1, sy1, sx2, sy2;
 
@@ -439,8 +439,9 @@ void Homography::ComputeAffineHomography(double correspondants[4][4]) {
   delete[] w;
 }
 
-void Homography::ComputeAffineHomography(double correspondantsA[4][2],
-                                         double correspondantsB[4][2]) {
+void Homography::ComputeAffineHomography(
+    double const (&correspondantsA)[4][2],
+    double const (&correspondantsB)[4][2]) {
   int k;
   double sx1, sy1, sx2, sy2;
 
@@ -654,7 +655,7 @@ void Homography::ComputeAffineHomography(double** correspondantsA,
   delete[] w;
 }
 
-void Homography::ComputeRTHomography(double correspondants[4][4]) {
+void Homography::ComputeRTHomography(const double (&correspondants)[4][4]) {
   int k;
   double sx1, sy1, sx2, sy2;
 
@@ -721,8 +722,8 @@ void Homography::ComputeRTHomography(double correspondants[4][4]) {
   delete[] w;
 }
 
-void Homography::ComputeRTHomography(double correspondantsA[4][2],
-                                     double correspondantsB[4][2]) {
+void Homography::ComputeRTHomography(double const (&correspondantsA)[4][2],
+                                     double const (&correspondantsB)[4][2]) {
   int k;
   double sx1, sy1, sx2, sy2;
 
