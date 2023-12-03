@@ -74,7 +74,7 @@ std::vector<uint8_t> readBMP(const std::string& fname, int& width,
   if (!file) return {};
 
   //	I am doing file.read(reinterpret_cast<char*>(&bmfh),
-  //sizeof(BMP_BITMAPFILEHEADER)) in a
+  // sizeof(BMP_BITMAPFILEHEADER)) in a
   // safe way. :}
   file.read(reinterpret_cast<char*>(&(bmfh.bfType)), 2);
   file.read(reinterpret_cast<char*>(&(bmfh.bfSize)), 4);
@@ -217,7 +217,7 @@ void writeBMP(const std::string& iname, int width, int height,
   std::fstream outFile(iname, std::fstream::out | std::fstream::binary);
 
   //	outFile.write(reinterpret_cast<const char*>(&bmfh),
-  //sizeof(BMP_BITMAPFILEHEADER));
+  // sizeof(BMP_BITMAPFILEHEADER));
   outFile.write(reinterpret_cast<const char*>(&(bmfh.bfType)), 2);
   outFile.write(reinterpret_cast<const char*>(&(bmfh.bfSize)), 4);
   outFile.write(reinterpret_cast<const char*>(&(bmfh.bfReserved1)), 2);
