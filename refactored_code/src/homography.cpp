@@ -9,11 +9,8 @@ void Homography::ComputeHomography(const double (&correspondants)[4][4]) {
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  double** featurevector;
-  featurevector = new double*[8];
+  std::vector<std::array<double, 9>> featurevector(8);
   for (k = 0; k < 4; k++) {
-    featurevector[2 * k] = new double[9];
-    featurevector[2 * k + 1] = new double[9];
     sx1 = correspondants[k][0];
     sy1 = correspondants[k][1];
     sx2 = correspondants[k][2];
@@ -42,14 +39,13 @@ void Homography::ComputeHomography(const double (&correspondants)[4][4]) {
   /////////////////////////////////////////////////////////////
   // Least square distance method
   ////////////////////////////////////////////////////////////
-  double* w = new double[9];
-  double** v = new double*[9];
-  for (k = 0; k < 9; k++) v[k] = new double[9];
+  double w[9];
+  double v[9][9];
 
   int minwindex;
   double minw;
 
-  svdcmp(featurevector, 8, 9, w, v);
+  svdcmp(featurevector, w, v);
 
   minwindex = 0;
   minw = w[0];
@@ -69,12 +65,6 @@ void Homography::ComputeHomography(const double (&correspondants)[4][4]) {
   Hmatrix[2][0] = (float)(v[6][minwindex]);
   Hmatrix[2][1] = (float)(v[7][minwindex]);
   Hmatrix[2][2] = (float)(v[8][minwindex]);
-
-  for (k = 0; k < 8; k++) delete[] featurevector[k];
-  delete[] featurevector;
-  for (k = 0; k < 9; k++) delete[] v[k];
-  delete[] v;
-  delete[] w;
 }
 
 void Homography::ComputeHomography(double const (&correspondantsA)[4][2],
@@ -85,11 +75,8 @@ void Homography::ComputeHomography(double const (&correspondantsA)[4][2],
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  double** featurevector;
-  featurevector = new double*[8];
+  std::vector<std::array<double, 9>> featurevector(8);
   for (k = 0; k < 4; k++) {
-    featurevector[2 * k] = new double[9];
-    featurevector[2 * k + 1] = new double[9];
     sx1 = correspondantsA[k][0];
     sy1 = correspondantsA[k][1];
     sx2 = correspondantsB[k][0];
@@ -118,14 +105,13 @@ void Homography::ComputeHomography(double const (&correspondantsA)[4][2],
   /////////////////////////////////////////////////////////////
   // Least square distance method
   ////////////////////////////////////////////////////////////
-  double* w = new double[9];
-  double** v = new double*[9];
-  for (k = 0; k < 9; k++) v[k] = new double[9];
+  double w[9];
+  double v[9][9];
 
   int minwindex;
   double minw;
 
-  svdcmp(featurevector, 8, 9, w, v);
+  svdcmp(featurevector, w, v);
 
   minwindex = 0;
   minw = w[0];
@@ -145,12 +131,6 @@ void Homography::ComputeHomography(double const (&correspondantsA)[4][2],
   Hmatrix[2][0] = (float)(v[6][minwindex]);
   Hmatrix[2][1] = (float)(v[7][minwindex]);
   Hmatrix[2][2] = (float)(v[8][minwindex]);
-
-  for (k = 0; k < 8; k++) delete[] featurevector[k];
-  delete[] featurevector;
-  for (k = 0; k < 9; k++) delete[] v[k];
-  delete[] v;
-  delete[] w;
 }
 
 void Homography::ComputeHomography(double const (&correspondantsA)[4][2],
@@ -224,11 +204,8 @@ void Homography::ComputeHomography(double** correspondants, int ncor) {
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  double** featurevector;
-  featurevector = new double*[2 * ncor];
+  std::vector<std::array<double, 9>>  featurevector(2*ncor);
   for (k = 0; k < ncor; k++) {
-    featurevector[2 * k] = new double[9];
-    featurevector[2 * k + 1] = new double[9];
     sx1 = correspondants[k][0];
     sy1 = correspondants[k][1];
     sx2 = correspondants[k][2];
@@ -257,14 +234,13 @@ void Homography::ComputeHomography(double** correspondants, int ncor) {
   /////////////////////////////////////////////////////////////
   // Least square distance method
   ////////////////////////////////////////////////////////////
-  double* w = new double[9];
-  double** v = new double*[9];
-  for (k = 0; k < 9; k++) v[k] = new double[9];
+  double w[9];
+  double v[9][9];
 
   int minwindex;
   double minw;
 
-  svdcmp(featurevector, 2 * ncor, 9, w, v);
+  svdcmp(featurevector, w, v);
 
   minwindex = 0;
   minw = w[0];
@@ -284,12 +260,6 @@ void Homography::ComputeHomography(double** correspondants, int ncor) {
   Hmatrix[2][0] = (float)(v[6][minwindex]);
   Hmatrix[2][1] = (float)(v[7][minwindex]);
   Hmatrix[2][2] = (float)(v[8][minwindex]);
-
-  for (k = 0; k < 2 * ncor; k++) delete[] featurevector[k];
-  delete[] featurevector;
-  for (k = 0; k < 9; k++) delete[] v[k];
-  delete[] v;
-  delete[] w;
 }
 
 void Homography::ComputeHomography(double** correspondantsA,
@@ -300,11 +270,8 @@ void Homography::ComputeHomography(double** correspondantsA,
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  double** featurevector;
-  featurevector = new double*[2 * ncor];
+  std::vector<std::array<double, 9>>  featurevector(2 * ncor);
   for (k = 0; k < ncor; k++) {
-    featurevector[2 * k] = new double[9];
-    featurevector[2 * k + 1] = new double[9];
     sx1 = correspondantsA[k][0];
     sy1 = correspondantsA[k][1];
     sx2 = correspondantsB[k][0];
@@ -333,14 +300,13 @@ void Homography::ComputeHomography(double** correspondantsA,
   /////////////////////////////////////////////////////////////
   // Least square distance method
   ////////////////////////////////////////////////////////////
-  double* w = new double[9];
-  double** v = new double*[9];
-  for (k = 0; k < 9; k++) v[k] = new double[9];
+  double w[9];
+  double v[9][9];
 
   int minwindex;
   double minw;
 
-  svdcmp(featurevector, 2 * ncor, 9, w, v);
+  svdcmp(featurevector, w, v);
 
   minwindex = 0;
   minw = w[0];
@@ -360,12 +326,6 @@ void Homography::ComputeHomography(double** correspondantsA,
   Hmatrix[2][0] = (float)(v[6][minwindex]);
   Hmatrix[2][1] = (float)(v[7][minwindex]);
   Hmatrix[2][2] = (float)(v[8][minwindex]);
-
-  for (k = 0; k < 2 * ncor; k++) delete[] featurevector[k];
-  delete[] featurevector;
-  for (k = 0; k < 9; k++) delete[] v[k];
-  delete[] v;
-  delete[] w;
 }
 
 void Homography::ComputeAffineHomography(const double (&correspondants)[4][4]) {
@@ -375,11 +335,8 @@ void Homography::ComputeAffineHomography(const double (&correspondants)[4][4]) {
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  double** featurevector;
-  featurevector = new double*[8];
+  std::vector<std::array<double, 7>>  featurevector(8);
   for (k = 0; k < 4; k++) {
-    featurevector[2 * k] = new double[7];
-    featurevector[2 * k + 1] = new double[7];
     sx1 = correspondants[k][0];
     sy1 = correspondants[k][1];
     sx2 = correspondants[k][2];
@@ -404,14 +361,13 @@ void Homography::ComputeAffineHomography(const double (&correspondants)[4][4]) {
   /////////////////////////////////////////////////////////////
   // Least square distance method
   ////////////////////////////////////////////////////////////
-  double* w = new double[7];
-  double** v = new double*[7];
-  for (k = 0; k < 7; k++) v[k] = new double[7];
+  double w[7];
+  double v[7][7];
 
   int minwindex;
   double minw;
 
-  svdcmp(featurevector, 8, 7, w, v);
+  svdcmp(featurevector, w, v);
 
   minwindex = 0;
   minw = w[0];
@@ -431,12 +387,6 @@ void Homography::ComputeAffineHomography(const double (&correspondants)[4][4]) {
   Hmatrix[2][0] = 0.0f;
   Hmatrix[2][1] = 0.0f;
   Hmatrix[2][2] = 1.0f;
-
-  for (k = 0; k < 8; k++) delete[] featurevector[k];
-  delete[] featurevector;
-  for (k = 0; k < 7; k++) delete[] v[k];
-  delete[] v;
-  delete[] w;
 }
 
 void Homography::ComputeAffineHomography(
@@ -448,11 +398,8 @@ void Homography::ComputeAffineHomography(
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  double** featurevector;
-  featurevector = new double*[8];
+  std::vector<std::array<double, 7>>  featurevector(8);
   for (k = 0; k < 4; k++) {
-    featurevector[2 * k] = new double[7];
-    featurevector[2 * k + 1] = new double[7];
     sx1 = correspondantsA[k][0];
     sy1 = correspondantsA[k][1];
     sx2 = correspondantsB[k][0];
@@ -477,14 +424,13 @@ void Homography::ComputeAffineHomography(
   /////////////////////////////////////////////////////////////
   // Least square distance method
   ////////////////////////////////////////////////////////////
-  double* w = new double[7];
-  double** v = new double*[7];
-  for (k = 0; k < 7; k++) v[k] = new double[7];
+  double w[7];
+  double v[7][7];
 
   int minwindex;
   double minw;
 
-  svdcmp(featurevector, 8, 7, w, v);
+  svdcmp(featurevector, w, v);
 
   minwindex = 0;
   minw = w[0];
@@ -504,12 +450,6 @@ void Homography::ComputeAffineHomography(
   Hmatrix[2][0] = 0.0f;
   Hmatrix[2][1] = 0.0f;
   Hmatrix[2][2] = 1.0f;
-
-  for (k = 0; k < 8; k++) delete[] featurevector[k];
-  delete[] featurevector;
-  for (k = 0; k < 7; k++) delete[] v[k];
-  delete[] v;
-  delete[] w;
 }
 
 void Homography::ComputeAffineHomography(double** correspondants, int ncor) {
@@ -519,11 +459,8 @@ void Homography::ComputeAffineHomography(double** correspondants, int ncor) {
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  double** featurevector;
-  featurevector = new double*[2 * ncor];
+  std::vector<std::array<double, 7>>  featurevector(2*ncor);
   for (k = 0; k < ncor; k++) {
-    featurevector[2 * k] = new double[7];
-    featurevector[2 * k + 1] = new double[7];
     sx1 = correspondants[k][0];
     sy1 = correspondants[k][1];
     sx2 = correspondants[k][2];
@@ -548,14 +485,13 @@ void Homography::ComputeAffineHomography(double** correspondants, int ncor) {
   /////////////////////////////////////////////////////////////
   // Least square distance method
   ////////////////////////////////////////////////////////////
-  double* w = new double[7];
-  double** v = new double*[7];
-  for (k = 0; k < 7; k++) v[k] = new double[7];
+  double w[7];
+  double v[7][7];
 
   int minwindex;
   double minw;
 
-  svdcmp(featurevector, 2 * ncor, 7, w, v);
+  svdcmp(featurevector, w, v);
 
   minwindex = 0;
   minw = w[0];
@@ -575,12 +511,6 @@ void Homography::ComputeAffineHomography(double** correspondants, int ncor) {
   Hmatrix[2][0] = 0.0f;
   Hmatrix[2][1] = 0.0f;
   Hmatrix[2][2] = 1.0f;
-
-  for (k = 0; k < 2 * ncor; k++) delete[] featurevector[k];
-  delete[] featurevector;
-  for (k = 0; k < 7; k++) delete[] v[k];
-  delete[] v;
-  delete[] w;
 }
 
 void Homography::ComputeAffineHomography(double** correspondantsA,
@@ -591,11 +521,8 @@ void Homography::ComputeAffineHomography(double** correspondantsA,
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  double** featurevector;
-  featurevector = new double*[2 * ncor];
+  std::vector<std::array<double, 7>>  featurevector(2*ncor);
   for (k = 0; k < ncor; k++) {
-    featurevector[2 * k] = new double[7];
-    featurevector[2 * k + 1] = new double[7];
     sx1 = correspondantsA[k][0];
     sy1 = correspondantsA[k][1];
     sx2 = correspondantsB[k][0];
@@ -620,14 +547,13 @@ void Homography::ComputeAffineHomography(double** correspondantsA,
   /////////////////////////////////////////////////////////////
   // Least square distance method
   ////////////////////////////////////////////////////////////
-  double* w = new double[7];
-  double** v = new double*[7];
-  for (k = 0; k < 7; k++) v[k] = new double[7];
+  double w[7];
+  double v[7][7];
 
   int minwindex;
   double minw;
 
-  svdcmp(featurevector, 2 * ncor, 7, w, v);
+  svdcmp(featurevector, w, v);
 
   minwindex = 0;
   minw = w[0];
@@ -647,12 +573,6 @@ void Homography::ComputeAffineHomography(double** correspondantsA,
   Hmatrix[2][0] = 0.0f;
   Hmatrix[2][1] = 0.0f;
   Hmatrix[2][2] = 1.0f;
-
-  for (k = 0; k < 2 * ncor; k++) delete[] featurevector[k];
-  delete[] featurevector;
-  for (k = 0; k < 7; k++) delete[] v[k];
-  delete[] v;
-  delete[] w;
 }
 
 void Homography::ComputeRTHomography(const double (&correspondants)[4][4]) {
@@ -662,11 +582,8 @@ void Homography::ComputeRTHomography(const double (&correspondants)[4][4]) {
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  double** featurevector;
-  featurevector = new double*[8];
+  std::vector<std::array<double, 5>>  featurevector(8);
   for (k = 0; k < 4; k++) {
-    featurevector[2 * k] = new double[5];
-    featurevector[2 * k + 1] = new double[5];
     sx1 = correspondants[k][0];
     sy1 = correspondants[k][1];
     sx2 = correspondants[k][2];
@@ -687,14 +604,13 @@ void Homography::ComputeRTHomography(const double (&correspondants)[4][4]) {
   /////////////////////////////////////////////////////////////
   // Least square distance method
   ////////////////////////////////////////////////////////////
-  double* w = new double[5];
-  double** v = new double*[5];
-  for (k = 0; k < 5; k++) v[k] = new double[5];
+  double w[5];
+  double v[5][5];
 
   int minwindex;
   double minw;
 
-  svdcmp(featurevector, 8, 5, w, v);
+  svdcmp(featurevector, w, v);
 
   minwindex = 0;
   minw = w[0];
@@ -714,12 +630,6 @@ void Homography::ComputeRTHomography(const double (&correspondants)[4][4]) {
   Hmatrix[2][0] = 0.0f;
   Hmatrix[2][1] = 0.0f;
   Hmatrix[2][2] = 1.0f;
-
-  for (k = 0; k < 8; k++) delete[] featurevector[k];
-  delete[] featurevector;
-  for (k = 0; k < 5; k++) delete[] v[k];
-  delete[] v;
-  delete[] w;
 }
 
 void Homography::ComputeRTHomography(double const (&correspondantsA)[4][2],
@@ -730,11 +640,8 @@ void Homography::ComputeRTHomography(double const (&correspondantsA)[4][2],
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  double** featurevector;
-  featurevector = new double*[8];
+  std::vector<std::array<double, 5>>  featurevector(8);
   for (k = 0; k < 4; k++) {
-    featurevector[2 * k] = new double[5];
-    featurevector[2 * k + 1] = new double[5];
     sx1 = correspondantsA[k][0];
     sy1 = correspondantsA[k][1];
     sx2 = correspondantsB[k][0];
@@ -755,14 +662,13 @@ void Homography::ComputeRTHomography(double const (&correspondantsA)[4][2],
   /////////////////////////////////////////////////////////////
   // Least square distance method
   ////////////////////////////////////////////////////////////
-  double* w = new double[5];
-  double** v = new double*[5];
-  for (k = 0; k < 5; k++) v[k] = new double[5];
+  double w[5];
+  double v[5][5];
 
   int minwindex;
   double minw;
 
-  svdcmp(featurevector, 8, 5, w, v);
+  svdcmp(featurevector, w, v);
 
   minwindex = 0;
   minw = w[0];
@@ -782,12 +688,6 @@ void Homography::ComputeRTHomography(double const (&correspondantsA)[4][2],
   Hmatrix[2][0] = 0.0f;
   Hmatrix[2][1] = 0.0f;
   Hmatrix[2][2] = 1.0f;
-
-  for (k = 0; k < 8; k++) delete[] featurevector[k];
-  delete[] featurevector;
-  for (k = 0; k < 5; k++) delete[] v[k];
-  delete[] v;
-  delete[] w;
 }
 
 void Homography::ComputeRTHomography(double** correspondants, int ncor) {
@@ -797,11 +697,8 @@ void Homography::ComputeRTHomography(double** correspondants, int ncor) {
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  double** featurevector;
-  featurevector = new double*[2 * ncor];
+  std::vector<std::array<double, 5>>  featurevector(2*ncor);
   for (k = 0; k < ncor; k++) {
-    featurevector[2 * k] = new double[5];
-    featurevector[2 * k + 1] = new double[5];
     sx1 = correspondants[k][0];
     sy1 = correspondants[k][1];
     sx2 = correspondants[k][2];
@@ -822,14 +719,13 @@ void Homography::ComputeRTHomography(double** correspondants, int ncor) {
   /////////////////////////////////////////////////////////////
   // Least square distance method
   ////////////////////////////////////////////////////////////
-  double* w = new double[5];
-  double** v = new double*[5];
-  for (k = 0; k < 5; k++) v[k] = new double[5];
+  double w[5];
+  double v[5][5];
 
   int minwindex;
   double minw;
 
-  svdcmp(featurevector, 2 * ncor, 5, w, v);
+  svdcmp(featurevector, w, v);
 
   minwindex = 0;
   minw = w[0];
@@ -849,12 +745,6 @@ void Homography::ComputeRTHomography(double** correspondants, int ncor) {
   Hmatrix[2][0] = 0.0f;
   Hmatrix[2][1] = 0.0f;
   Hmatrix[2][2] = 1.0f;
-
-  for (k = 0; k < 2 * ncor; k++) delete[] featurevector[k];
-  delete[] featurevector;
-  for (k = 0; k < 5; k++) delete[] v[k];
-  delete[] v;
-  delete[] w;
 }
 
 void Homography::ComputeRTHomography(double** correspondantsA,
@@ -865,11 +755,8 @@ void Homography::ComputeRTHomography(double** correspondantsA,
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  double** featurevector;
-  featurevector = new double*[2 * ncor];
+  std::vector<std::array<double, 5>>  featurevector(2*ncor);
   for (k = 0; k < ncor; k++) {
-    featurevector[2 * k] = new double[5];
-    featurevector[2 * k + 1] = new double[5];
     sx1 = correspondantsA[k][0];
     sy1 = correspondantsA[k][1];
     sx2 = correspondantsB[k][0];
@@ -890,14 +777,13 @@ void Homography::ComputeRTHomography(double** correspondantsA,
   /////////////////////////////////////////////////////////////
   // Least square distance method
   ////////////////////////////////////////////////////////////
-  double* w = new double[5];
-  double** v = new double*[5];
-  for (k = 0; k < 5; k++) v[k] = new double[5];
+  double w[5];
+  double v[5][5];
 
   int minwindex;
   double minw;
 
-  svdcmp(featurevector, 2 * ncor, 5, w, v);
+  svdcmp(featurevector, w, v);
 
   minwindex = 0;
   minw = w[0];
@@ -917,10 +803,4 @@ void Homography::ComputeRTHomography(double** correspondantsA,
   Hmatrix[2][0] = 0.0f;
   Hmatrix[2][1] = 0.0f;
   Hmatrix[2][2] = 1.0f;
-
-  for (k = 0; k < 2 * ncor; k++) delete[] featurevector[k];
-  delete[] featurevector;
-  for (k = 0; k < 5; k++) delete[] v[k];
-  delete[] v;
-  delete[] w;
 }
