@@ -7,27 +7,15 @@
 #include <math.h>
 #include <stdio.h>
 
-static double maxarg1, maxarg2;
-#define FMAX(a, b) \
-  (maxarg1 = (a), maxarg2 = (b), (maxarg1) > (maxarg2) ? (maxarg1) : (maxarg2))
-
-static int iminarg1, iminarg2;
-#define IMIN(a, b)                 \
-  (iminarg1 = (a), iminarg2 = (b), \
-   (iminarg1 < (iminarg2) ? (iminarg1) : iminarg2))
-
-static double sqrarg;
-#define SQR(a) ((sqrarg = (a)) == 0.0 ? 0.0 : sqrarg * sqrarg)
+double SQR(double a) { return a == 0.0 ? 0.0 : a * a; }
 
 // ------------------------------------------------------------------------
 // calculates sqrt( a^2 + b^2 ) with decent precision
 // ------------------------------------------------------------------------
 
 double pythag(double a, double b) {
-  double absa, absb;
-
-  absa = fabs(a);
-  absb = fabs(b);
+  const double absa = std::abs(a);
+  const double absb = std::abs(b);
 
   if (absa > absb)
     return (absa * sqrt(1.0 + SQR(absb / absa)));
