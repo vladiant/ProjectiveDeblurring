@@ -247,7 +247,7 @@ class ProjectiveMotionRL {
       memcpy(Hmatrix[i].Hmatrix[1], H.Hmatrix[1], 3 * sizeof(float));
       memcpy(Hmatrix[i].Hmatrix[2], H.Hmatrix[2], 3 * sizeof(float));
 
-      Hmatrix[i].MatrixInverse(Hmatrix[i].Hmatrix, IHmatrix[i].Hmatrix);
+      Homography::MatrixInverse(Hmatrix[i].Hmatrix, IHmatrix[i].Hmatrix);
     }
   }
 
@@ -370,7 +370,7 @@ class ProjectiveMotionRL {
       Hmatrix[i].Hmatrix[2][1] = i * deltapy;
       Hmatrix[i].Hmatrix[2][2] = 1;
 
-      Hmatrix[i].MatrixInverse(Hmatrix[i].Hmatrix, IHmatrix[i].Hmatrix);
+      Homography::MatrixInverse(Hmatrix[i].Hmatrix, IHmatrix[i].Hmatrix);
     }
   }
 

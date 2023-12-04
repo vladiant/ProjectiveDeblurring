@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][0] = 0;
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][1] = 0;
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][2] = 1;
-      m_ProjectiveMotionRL.Hmatrix[i].MatrixInverse(
+     Homography::MatrixInverse(
           m_ProjectiveMotionRL.Hmatrix[i].Hmatrix,
           m_ProjectiveMotionRL.IHmatrix[i].Hmatrix);
     }
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][0] = i * deltapx;
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][1] = i * deltapx;
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][2] = 1;
-      m_ProjectiveMotionRL.Hmatrix[i].MatrixInverse(
+      Homography::MatrixInverse(
           m_ProjectiveMotionRL.Hmatrix[i].Hmatrix,
           m_ProjectiveMotionRL.IHmatrix[i].Hmatrix);
     }
