@@ -197,14 +197,16 @@ void Homography::ComputeHomography(double const (&correspondantsA)[4][2],
   Hmatrix[2][2] = (float)(v[8][minwindex]);
 }
 
-void Homography::ComputeHomography(double** correspondants, int ncor) {
+void Homography::ComputeHomography(
+    const std::vector<std::array<double, 4>>& correspondants) {
+  const int ncor = correspondants.size();
   int k;
   double sx1, sy1, sx2, sy2;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  std::vector<std::array<double, 9>>  featurevector(2*ncor);
+  std::vector<std::array<double, 9>> featurevector(2 * ncor);
   for (k = 0; k < ncor; k++) {
     sx1 = correspondants[k][0];
     sy1 = correspondants[k][1];
@@ -262,15 +264,21 @@ void Homography::ComputeHomography(double** correspondants, int ncor) {
   Hmatrix[2][2] = (float)(v[8][minwindex]);
 }
 
-void Homography::ComputeHomography(double** correspondantsA,
-                                   double** correspondantsB, int ncor) {
+void Homography::ComputeHomography(
+    const std::vector<std::array<double, 2>>& correspondantsA,
+    const std::vector<std::array<double, 2>>& correspondantsB) {
+  if (correspondantsA.size() != correspondantsB.size()) {
+    return;
+  }
+
+  const int ncor = correspondantsA.size();
   int k;
   double sx1, sy1, sx2, sy2;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  std::vector<std::array<double, 9>>  featurevector(2 * ncor);
+  std::vector<std::array<double, 9>> featurevector(2 * ncor);
   for (k = 0; k < ncor; k++) {
     sx1 = correspondantsA[k][0];
     sy1 = correspondantsA[k][1];
@@ -335,7 +343,7 @@ void Homography::ComputeAffineHomography(const double (&correspondants)[4][4]) {
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  std::vector<std::array<double, 7>>  featurevector(8);
+  std::vector<std::array<double, 7>> featurevector(8);
   for (k = 0; k < 4; k++) {
     sx1 = correspondants[k][0];
     sy1 = correspondants[k][1];
@@ -398,7 +406,7 @@ void Homography::ComputeAffineHomography(
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  std::vector<std::array<double, 7>>  featurevector(8);
+  std::vector<std::array<double, 7>> featurevector(8);
   for (k = 0; k < 4; k++) {
     sx1 = correspondantsA[k][0];
     sy1 = correspondantsA[k][1];
@@ -452,14 +460,16 @@ void Homography::ComputeAffineHomography(
   Hmatrix[2][2] = 1.0f;
 }
 
-void Homography::ComputeAffineHomography(double** correspondants, int ncor) {
+void Homography::ComputeAffineHomography(
+    const std::vector<std::array<double, 4>>& correspondants) {
+  const int ncor = correspondants.size();
   int k;
   double sx1, sy1, sx2, sy2;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  std::vector<std::array<double, 7>>  featurevector(2*ncor);
+  std::vector<std::array<double, 7>> featurevector(2 * ncor);
   for (k = 0; k < ncor; k++) {
     sx1 = correspondants[k][0];
     sy1 = correspondants[k][1];
@@ -513,15 +523,21 @@ void Homography::ComputeAffineHomography(double** correspondants, int ncor) {
   Hmatrix[2][2] = 1.0f;
 }
 
-void Homography::ComputeAffineHomography(double** correspondantsA,
-                                         double** correspondantsB, int ncor) {
+void Homography::ComputeAffineHomography(
+    const std::vector<std::array<double, 2>>& correspondantsA,
+    const std::vector<std::array<double, 2>>& correspondantsB) {
+  if (correspondantsA.size() != correspondantsB.size()) {
+    return;
+  }
+
+  const int ncor = correspondantsA.size();
   int k;
   double sx1, sy1, sx2, sy2;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  std::vector<std::array<double, 7>>  featurevector(2*ncor);
+  std::vector<std::array<double, 7>> featurevector(2 * ncor);
   for (k = 0; k < ncor; k++) {
     sx1 = correspondantsA[k][0];
     sy1 = correspondantsA[k][1];
@@ -582,7 +598,7 @@ void Homography::ComputeRTHomography(const double (&correspondants)[4][4]) {
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  std::vector<std::array<double, 5>>  featurevector(8);
+  std::vector<std::array<double, 5>> featurevector(8);
   for (k = 0; k < 4; k++) {
     sx1 = correspondants[k][0];
     sy1 = correspondants[k][1];
@@ -640,7 +656,7 @@ void Homography::ComputeRTHomography(double const (&correspondantsA)[4][2],
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  std::vector<std::array<double, 5>>  featurevector(8);
+  std::vector<std::array<double, 5>> featurevector(8);
   for (k = 0; k < 4; k++) {
     sx1 = correspondantsA[k][0];
     sy1 = correspondantsA[k][1];
@@ -690,14 +706,16 @@ void Homography::ComputeRTHomography(double const (&correspondantsA)[4][2],
   Hmatrix[2][2] = 1.0f;
 }
 
-void Homography::ComputeRTHomography(double** correspondants, int ncor) {
+void Homography::ComputeRTHomography(
+    const std::vector<std::array<double, 4>>& correspondants) {
+  const int ncor = correspondants.size();
   int k;
   double sx1, sy1, sx2, sy2;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  std::vector<std::array<double, 5>>  featurevector(2*ncor);
+  std::vector<std::array<double, 5>> featurevector(2 * ncor);
   for (k = 0; k < ncor; k++) {
     sx1 = correspondants[k][0];
     sy1 = correspondants[k][1];
@@ -747,15 +765,21 @@ void Homography::ComputeRTHomography(double** correspondants, int ncor) {
   Hmatrix[2][2] = 1.0f;
 }
 
-void Homography::ComputeRTHomography(double** correspondantsA,
-                                     double** correspondantsB, int ncor) {
+void Homography::ComputeRTHomography(
+    const std::vector<std::array<double, 2>>& correspondantsA,
+    const std::vector<std::array<double, 2>>& correspondantsB) {
+  if (correspondantsA.size() != correspondantsB.size()) {
+    return;
+  }
+
+  const int ncor = correspondantsA.size();
   int k;
   double sx1, sy1, sx2, sy2;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
   ////////////////////////////////////////////////////////////
-  std::vector<std::array<double, 5>>  featurevector(2*ncor);
+  std::vector<std::array<double, 5>> featurevector(2 * ncor);
   for (k = 0; k < ncor; k++) {
     sx1 = correspondantsA[k][0];
     sy1 = correspondantsA[k][1];

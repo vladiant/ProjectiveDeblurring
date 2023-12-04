@@ -1,5 +1,8 @@
 #pragma once
 
+#include <array>
+#include <vector>
+
 class Homography {
  public:
   // From B to A
@@ -10,23 +13,29 @@ class Homography {
                          const double (&correspondantsB)[4][2],
                          double** featurevector, double* w, double** v,
                          double* rv1);
-  void ComputeHomography(double** correspondants, int ncor);
-  void ComputeHomography(double** correspondantsA, double** correspondantsB,
-                         int ncor);
+  void ComputeHomography(
+      const std::vector<std::array<double, 4>>& correspondants);
+  void ComputeHomography(
+      const std::vector<std::array<double, 2>>& correspondantsA,
+      const std::vector<std::array<double, 2>>& correspondantsB);
 
   void ComputeAffineHomography(const double (&correspondants)[4][4]);
   void ComputeAffineHomography(const double (&correspondantsA)[4][2],
                                const double (&correspondantsB)[4][2]);
-  void ComputeAffineHomography(double** correspondants, int ncor);
-  void ComputeAffineHomography(double** correspondantsA,
-                               double** correspondantsB, int ncor);
+  void ComputeAffineHomography(
+      const std::vector<std::array<double, 4>>& correspondants);
+  void ComputeAffineHomography(
+      const std::vector<std::array<double, 2>>& correspondantsA,
+      const std::vector<std::array<double, 2>>& correspondantsB);
 
   void ComputeRTHomography(const double (&correspondants)[4][4]);
   void ComputeRTHomography(const double (&correspondantsA)[4][2],
                            const double (&correspondantsB)[4][2]);
-  void ComputeRTHomography(double** correspondants, int ncor);
-  void ComputeRTHomography(double** correspondantsA, double** correspondantsB,
-                           int ncor);
+  void ComputeRTHomography(
+      const std::vector<std::array<double, 4>>& correspondants);
+  void ComputeRTHomography(
+      const std::vector<std::array<double, 2>>& correspondantsA,
+      const std::vector<std::array<double, 2>>& correspondantsB);
 
   static void MatrixInverse(const float (&A)[3][3], float (&I)[3][3]) {
     const double detA =
