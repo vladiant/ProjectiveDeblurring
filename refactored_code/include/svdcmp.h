@@ -6,10 +6,10 @@
 
 #include <stdio.h>
 
-#include <cmath>
-#include <vector>
 #include <array>
+#include <cmath>
 #include <cstdint>
+#include <vector>
 
 template <typename T>
 auto SIGN(T a, T b) -> T {
@@ -37,7 +37,7 @@ double pythag(double a, double b);
 // V (not V transpose) is output as the matrix V[nCols][nCols].
 // ------------------------------------------------------------------------
 template <size_t nCols>
-inline int svdcmp(std::vector<std::array<double, nCols>>& a, double (&w)[nCols],
+inline int svdcmp(std::vector<std::array<double, nCols>> &a, double (&w)[nCols],
                   double (&v)[nCols][nCols]) {
   const size_t nRows = a.size();
   int flag, its;
@@ -53,7 +53,8 @@ inline int svdcmp(std::vector<std::array<double, nCols>>& a, double (&w)[nCols],
     rv1[i] = scale * g;
     g = s = scale = 0.0;
     if (i < static_cast<intmax_t>(nRows)) {
-      for (k = i; k < static_cast<intmax_t>(nRows); k++) scale += std::abs(a[k][i]);
+      for (k = i; k < static_cast<intmax_t>(nRows); k++)
+        scale += std::abs(a[k][i]);
       if (scale) {
         for (k = i; k < static_cast<intmax_t>(nRows); k++) {
           a[k][i] /= scale;
@@ -64,9 +65,11 @@ inline int svdcmp(std::vector<std::array<double, nCols>>& a, double (&w)[nCols],
         h = f * g - s;
         a[i][i] = f - g;
         for (j = l; j < nCols; j++) {
-          for (s = 0.0, k = i; k < static_cast<intmax_t>(nRows); k++) s += a[k][i] * a[k][j];
+          for (s = 0.0, k = i; k < static_cast<intmax_t>(nRows); k++)
+            s += a[k][i] * a[k][j];
           f = s / h;
-          for (k = i; k < static_cast<intmax_t>(nRows); k++) a[k][j] += f * a[k][i];
+          for (k = i; k < static_cast<intmax_t>(nRows); k++)
+            a[k][j] += f * a[k][i];
         }
         for (k = i; k < static_cast<intmax_t>(nRows); k++) a[k][i] *= scale;
       }
@@ -74,7 +77,8 @@ inline int svdcmp(std::vector<std::array<double, nCols>>& a, double (&w)[nCols],
     w[i] = scale * g;
     g = s = scale = 0.0;
     if (i < static_cast<intmax_t>(nRows) && i != nCols - 1) {
-      for (k = l; k < static_cast<intmax_t>(nCols); k++) scale += std::abs(a[i][k]);
+      for (k = l; k < static_cast<intmax_t>(nCols); k++)
+        scale += std::abs(a[i][k]);
       if (scale) {
         for (k = l; k < static_cast<intmax_t>(nCols); k++) {
           a[i][k] /= scale;
@@ -86,8 +90,10 @@ inline int svdcmp(std::vector<std::array<double, nCols>>& a, double (&w)[nCols],
         a[i][l] = f - g;
         for (k = l; k < static_cast<intmax_t>(nCols); k++) rv1[k] = a[i][k] / h;
         for (j = l; j < nRows; j++) {
-          for (s = 0.0, k = l; k < static_cast<intmax_t>(nCols); k++) s += a[j][k] * a[i][k];
-          for (k = l; k < static_cast<intmax_t>(nCols); k++) a[j][k] += s * rv1[k];
+          for (s = 0.0, k = l; k < static_cast<intmax_t>(nCols); k++)
+            s += a[j][k] * a[i][k];
+          for (k = l; k < static_cast<intmax_t>(nCols); k++)
+            a[j][k] += s * rv1[k];
         }
         for (k = l; k < static_cast<intmax_t>(nCols); k++) a[i][k] *= scale;
       }
@@ -102,8 +108,10 @@ inline int svdcmp(std::vector<std::array<double, nCols>>& a, double (&w)[nCols],
       if (g) {
         for (j = l; j < nCols; j++) v[j][i] = (a[i][j] / a[i][l]) / g;
         for (j = l; j < static_cast<intmax_t>(nCols); j++) {
-          for (s = 0.0, k = l; k < static_cast<intmax_t>(nCols); k++) s += a[i][k] * v[k][j];
-          for (k = l; k < static_cast<intmax_t>(nCols); k++) v[k][j] += s * v[k][i];
+          for (s = 0.0, k = l; k < static_cast<intmax_t>(nCols); k++)
+            s += a[i][k] * v[k][j];
+          for (k = l; k < static_cast<intmax_t>(nCols); k++)
+            v[k][j] += s * v[k][i];
         }
       }
       for (j = l; j < nCols; j++) v[i][j] = v[j][i] = 0.0;
@@ -121,9 +129,11 @@ inline int svdcmp(std::vector<std::array<double, nCols>>& a, double (&w)[nCols],
     if (g) {
       g = 1.0 / g;
       for (j = l; j < nCols; j++) {
-        for (s = 0.0, k = l; k < static_cast<intmax_t>(nRows); k++) s += a[k][i] * a[k][j];
+        for (s = 0.0, k = l; k < static_cast<intmax_t>(nRows); k++)
+          s += a[k][i] * a[k][j];
         f = (s / a[i][i]) * g;
-        for (k = i; k < static_cast<intmax_t>(nRows); k++) a[k][j] += f * a[k][i];
+        for (k = i; k < static_cast<intmax_t>(nRows); k++)
+          a[k][j] += f * a[k][i];
       }
       for (j = i; j < nRows; j++) a[j][i] *= g;
     } else
