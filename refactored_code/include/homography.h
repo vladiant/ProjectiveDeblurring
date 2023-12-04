@@ -9,10 +9,10 @@ class Homography {
   void ComputeHomography(const double (&correspondants)[4][4]);
   void ComputeHomography(const double (&correspondantsA)[4][2],
                          const double (&correspondantsB)[4][2]);
-  void ComputeHomography(const double (&correspondantsA)[4][2],
-                         const double (&correspondantsB)[4][2],
-                         double** featurevector, double* w, double** v,
-                         double* rv1);
+  void ComputeHomography(double const (&correspondantsA)[4][2],
+                         double const (&correspondantsB)[4][2],
+                         std::vector<std::array<double, 9>>& featurevector,
+                         double (&w)[9], double (&v)[9][9], double (&rv1)[9]);
   void ComputeHomography(
       const std::vector<std::array<double, 4>>& correspondants);
   void ComputeHomography(

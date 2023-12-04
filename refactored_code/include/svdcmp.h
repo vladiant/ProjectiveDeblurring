@@ -36,16 +36,15 @@ double pythag(double a, double b);
 // returns.  The diagonal matrix W is output as a vector w[nCols].
 // V (not V transpose) is output as the matrix V[nCols][nCols].
 // ------------------------------------------------------------------------
+
 template <size_t nCols>
 inline int svdcmp(std::vector<std::array<double, nCols>> &a, double (&w)[nCols],
-                  double (&v)[nCols][nCols]) {
+                  double (&v)[nCols][nCols], double (&rv1)[nCols]) {
   const size_t nRows = a.size();
   int flag, its;
   size_t jj, j, nm;
   intmax_t i, k, l;
   double anorm, c, f, g, h, s, scale, x, y, z;
-
-  double rv1[nCols];
 
   g = scale = anorm = 0.0;
   for (i = 0; i < static_cast<intmax_t>(nCols); i++) {
@@ -238,13 +237,9 @@ inline int svdcmp(std::vector<std::array<double, nCols>> &a, double (&w)[nCols],
   return (0);
 }
 
-// ------------------------------------------------------------------------
-// Modified from Numerical Recipes in C
-// Given a matrix a[nRows][nCols], svdcmp() computes its singular value
-// decomposition, A = U * W * Vt.  A is replaced by U when svdcmp
-// returns.  The diagonal matrix W is output as a vector w[nCols].
-// V (not V transpose) is output as the matrix V[nCols][nCols].
-// CAUTION : Output is unsorted!!!!!
-// ------------------------------------------------------------------------
-int svdcmp(double **a, int nRows, int nCols, double *w, double **v,
-           double *rv1);
+template <size_t nCols>
+inline int svdcmp(std::vector<std::array<double, nCols>> &a, double (&w)[nCols],
+                  double (&v)[nCols][nCols]) {
+  double rv1[nCols];
+  return svdcmp<nCols>(a, w, v, rv1);
+}

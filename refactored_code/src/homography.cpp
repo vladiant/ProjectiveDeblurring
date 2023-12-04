@@ -133,10 +133,15 @@ void Homography::ComputeHomography(double const (&correspondantsA)[4][2],
   Hmatrix[2][2] = (float)(v[8][minwindex]);
 }
 
-void Homography::ComputeHomography(double const (&correspondantsA)[4][2],
-                                   double const (&correspondantsB)[4][2],
-                                   double** featurevector, double* w,
-                                   double** v, double* rv1) {
+void Homography::ComputeHomography(
+    double const (&correspondantsA)[4][2],
+    double const (&correspondantsB)[4][2],
+    std::vector<std::array<double, 9>>& featurevector, double (&w)[9],
+    double (&v)[9][9], double (&rv1)[9]) {
+  if (featurevector.size() != 8) {
+    return;
+  }
+
   int k;
   double sx1, sy1, sx2, sy2;
 
@@ -175,7 +180,7 @@ void Homography::ComputeHomography(double const (&correspondantsA)[4][2],
   int minwindex;
   double minw;
 
-  svdcmp(featurevector, 8, 9, w, v, rv1);
+  svdcmp(featurevector, w, v, rv1);
 
   minwindex = 0;
   minw = w[0];
