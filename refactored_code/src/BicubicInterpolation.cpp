@@ -1,9 +1,9 @@
 #include "BicubicInterpolation.h"
 
-void bicubicweight(float x, float y, float* w) {
+void bicubicweight(float x, float y, float (&w)[4]) {
   float ww;
 
-  float ix = x - (int)(x), iy = y - (int)(y);
+  const float ix = x - (int)(x), iy = y - (int)(y);
   if (x >= 0 && y >= 0) {
     w[0] = (1 - ix) * (1 - iy);
     w[1] = (1 - ix) * (iy);
@@ -36,7 +36,7 @@ void bicubicweight(float x, float y, float* w) {
   w[3] /= ww;
 }
 
-void bicubicweightFast(float x, float y, float* w) {
+void bicubicweightFast(float x, float y, float (&w)[4]) {
   float ix = x - (int)(x), iy = y - (int)(y);
   w[1] = (1.0f - ix) * iy;
   w[2] = ix * (1.0f - iy);
