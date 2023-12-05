@@ -1,5 +1,4 @@
-#ifndef __PROJECTIVE_MOTION_RL_H__
-#define __PROJECTIVE_MOTION_RL_H__
+#pragma once
 
 #include <cmath>
 #include <cstring>
@@ -7,16 +6,12 @@
 
 #include "homography.h"
 
-#ifndef PI
-#define PI 3.141592653589793238462643383279502884197169399375105820974944592f
-#endif
-
 //#define __SHOWERROR__
-
-#define NumSamples 30
 
 class ProjectiveMotionRL {
  public:
+  constexpr static int NumSamples = 30;
+
   ProjectiveMotionRL() {
     int i;
     for (i = 0; i < NumSamples; i++) {
@@ -39,131 +34,69 @@ class ProjectiveMotionRL {
       IHmatrix[i].Hmatrix[2][1] = 0;
       IHmatrix[i].Hmatrix[2][2] = 1;
     }
-    WarpImgBuffer = NULL;
-    WarpImgBufferR = NULL;
-    WarpImgBufferG = NULL;
-    WarpImgBufferB = NULL;
-    WarpWeightBuffer = NULL;
-    BlurImgBuffer = NULL;
-    BlurImgBufferR = NULL;
-    BlurImgBufferG = NULL;
-    BlurImgBufferB = NULL;
-    BlurWeightBuffer = NULL;
-    ErrorImgBuffer = NULL;
-    ErrorImgBufferR = NULL;
-    ErrorImgBufferG = NULL;
-    ErrorImgBufferB = NULL;
-    ErrorWeightBuffer = NULL;
 
     SetSpsTable();
     SetBilateralTable();
-
-    GroundTruthImg = NULL;
-    GroundTruthImgR = NULL;
-    GroundTruthImgG = NULL;
-    GroundTruthImgB = NULL;
   }
+
   ~ProjectiveMotionRL() {
     ClearBuffer();
-    if (GroundTruthImg) {
-      delete[] GroundTruthImg;
-      GroundTruthImg = NULL;
-    }
-    if (GroundTruthImgR) {
-      delete[] GroundTruthImgR;
-      GroundTruthImgR = NULL;
-    }
-    if (GroundTruthImgG) {
-      delete[] GroundTruthImgG;
-      GroundTruthImgG = NULL;
-    }
-    if (GroundTruthImgB) {
-      delete[] GroundTruthImgB;
-      GroundTruthImgB = NULL;
-    }
+    GroundTruthImg.clear();
+    GroundTruthImgR.clear();
+    GroundTruthImgG.clear();
+    GroundTruthImgB.clear();
   }
 
   ////////////////////////////////////
   // These functions are used to set Buffer for caching
   ////////////////////////////////////
   void SetBuffer(int width, int height) {
-    WarpImgBuffer = new float[width * height];
-    WarpImgBufferR = new float[width * height];
-    WarpImgBufferG = new float[width * height];
-    WarpImgBufferB = new float[width * height];
-    WarpWeightBuffer = new float[width * height];
-    BlurImgBuffer = new float[width * height];
-    BlurImgBufferR = new float[width * height];
-    BlurImgBufferG = new float[width * height];
-    BlurImgBufferB = new float[width * height];
-    BlurWeightBuffer = new float[width * height];
-    ErrorImgBuffer = new float[width * height];
-    ErrorImgBufferR = new float[width * height];
-    ErrorImgBufferG = new float[width * height];
-    ErrorImgBufferB = new float[width * height];
-    ErrorWeightBuffer = new float[width * height];
+    WarpImgBuffer.resize(width * height);
+    WarpImgBufferR.resize(width * height);
+    WarpImgBufferG.resize(width * height);
+    WarpImgBufferB.resize(width * height);
+    WarpWeightBuffer.resize(width * height);
+    BlurImgBuffer.resize(width * height);
+    BlurImgBufferR.resize(width * height);
+    BlurImgBufferG.resize(width * height);
+    BlurImgBufferB.resize(width * height);
+    BlurWeightBuffer.resize(width * height);
+    ErrorImgBuffer.resize(width * height);
+    ErrorImgBufferR.resize(width * height);
+    ErrorImgBufferG.resize(width * height);
+    ErrorImgBufferB.resize(width * height);
+    ErrorWeightBuffer.resize(width * height);
   }
   void ClearBuffer() {
-    if (WarpImgBuffer) {
-      delete[] WarpImgBuffer;
-      WarpImgBuffer = NULL;
-    }
-    if (WarpImgBufferR) {
-      delete[] WarpImgBufferR;
-      WarpImgBufferR = NULL;
-    }
-    if (WarpImgBufferG) {
-      delete[] WarpImgBufferG;
-      WarpImgBufferG = NULL;
-    }
-    if (WarpImgBufferB) {
-      delete[] WarpImgBufferB;
-      WarpImgBufferB = NULL;
-    }
-    if (WarpWeightBuffer) {
-      delete[] WarpWeightBuffer;
-      WarpWeightBuffer = NULL;
-    }
-    if (BlurImgBuffer) {
-      delete[] BlurImgBuffer;
-      BlurImgBuffer = NULL;
-    }
-    if (BlurImgBufferR) {
-      delete[] BlurImgBufferR;
-      BlurImgBufferR = NULL;
-    }
-    if (BlurImgBufferG) {
-      delete[] BlurImgBufferG;
-      BlurImgBufferG = NULL;
-    }
-    if (BlurImgBufferB) {
-      delete[] BlurImgBufferB;
-      BlurImgBufferB = NULL;
-    }
-    if (BlurWeightBuffer) {
-      delete[] BlurWeightBuffer;
-      BlurWeightBuffer = NULL;
-    }
-    if (ErrorImgBuffer) {
-      delete[] ErrorImgBuffer;
-      ErrorImgBuffer = NULL;
-    }
-    if (ErrorImgBufferR) {
-      delete[] ErrorImgBufferR;
-      ErrorImgBufferR = NULL;
-    }
-    if (ErrorImgBufferG) {
-      delete[] ErrorImgBufferG;
-      ErrorImgBufferG = NULL;
-    }
-    if (ErrorImgBufferB) {
-      delete[] ErrorImgBufferB;
-      ErrorImgBufferB = NULL;
-    }
-    if (ErrorWeightBuffer) {
-      delete[] ErrorWeightBuffer;
-      ErrorWeightBuffer = NULL;
-    }
+    WarpImgBuffer.clear();
+
+    WarpImgBufferR.clear();
+
+    WarpImgBufferG.clear();
+
+    WarpImgBufferB.clear();
+
+    WarpWeightBuffer.clear();
+
+    BlurImgBuffer.clear();
+
+    BlurImgBufferR.clear();
+
+    BlurImgBufferG.clear();
+
+    BlurImgBufferB.clear();
+
+    BlurWeightBuffer.clear();
+
+    ErrorImgBuffer.clear();
+
+    ErrorImgBufferR.clear();
+
+    ErrorImgBufferG.clear();
+
+    ErrorImgBufferB.clear();
+
+    ErrorWeightBuffer.clear();
   }
 
   void SetSpsTable() {
@@ -213,29 +146,20 @@ class ProjectiveMotionRL {
     //	}
   }
   void SetGroundTruthImg(float* GroundTruth, int width, int height) {
-    if (GroundTruthImg) {
-      delete[] GroundTruthImg;
-      GroundTruthImg = new float[width * height];
-    }
-    memcpy(GroundTruthImg, GroundTruth, width * height * sizeof(float));
+    GroundTruthImg.resize(width * height);
+    memcpy(GroundTruthImg.data(), GroundTruth, width * height * sizeof(float));
   }
   void SetGroundTruthImg(float* GroundTruthR, float* GroundTruthG,
                          float* GroundTruthB, int width, int height) {
-    if (GroundTruthImgR) {
-      delete[] GroundTruthImgR;
-    }
-    GroundTruthImgR = new float[width * height];
-    if (GroundTruthImgG) {
-      delete[] GroundTruthImgG;
-    }
-    GroundTruthImgG = new float[width * height];
-    if (GroundTruthImgB) {
-      delete[] GroundTruthImgB;
-    }
-    GroundTruthImgB = new float[width * height];
-    memcpy(GroundTruthImgR, GroundTruthR, width * height * sizeof(float));
-    memcpy(GroundTruthImgG, GroundTruthG, width * height * sizeof(float));
-    memcpy(GroundTruthImgB, GroundTruthB, width * height * sizeof(float));
+    GroundTruthImgR.resize(width * height);
+    GroundTruthImgG.resize(width * height);
+    GroundTruthImgB.resize(width * height);
+    memcpy(GroundTruthImgR.data(), GroundTruthR,
+           width * height * sizeof(float));
+    memcpy(GroundTruthImgG.data(), GroundTruthG,
+           width * height * sizeof(float));
+    memcpy(GroundTruthImgB.data(), GroundTruthB,
+           width * height * sizeof(float));
   }
 
   ////////////////////////////////////
@@ -253,7 +177,7 @@ class ProjectiveMotionRL {
 
   void SetGlobalRotation(float degree) {
     int i;
-    float deltadegree = (degree * PI / 180.0f) / NumSamples;
+    float deltadegree = (degree * M_PI / 180.0f) / NumSamples;
     for (i = 0; i < NumSamples; i++) {
       Hmatrix[i].Hmatrix[0][0] = cos(deltadegree * i);
       Hmatrix[i].Hmatrix[0][1] = sin(deltadegree * i);
@@ -353,7 +277,7 @@ class ProjectiveMotionRL {
   void SetGlobalParameters(float degree, float scalefactor, float px, float py,
                            float dx, float dy) {
     int i;
-    float deltadegree = (degree * PI / 180.0f) / NumSamples;
+    float deltadegree = (degree * M_PI / 180.0f) / NumSamples;
     float deltascale = (scalefactor - 1.0f) / NumSamples;
     float deltapx = px / NumSamples;
     float deltapy = py / NumSamples;
@@ -528,27 +452,25 @@ class ProjectiveMotionRL {
   // These are buffer and lookup table variables
   float BilateralTable[256];
   float SpsTable[256];
-  float* WarpImgBuffer;
-  float* WarpImgBufferR;
-  float* WarpImgBufferG;
-  float* WarpImgBufferB;
-  float* WarpWeightBuffer;
-  float* BlurImgBuffer;
-  float* BlurImgBufferR;
-  float* BlurImgBufferG;
-  float* BlurImgBufferB;
-  float* BlurWeightBuffer;
-  float* ErrorImgBuffer;
-  float* ErrorImgBufferR;
-  float* ErrorImgBufferG;
-  float* ErrorImgBufferB;
-  float* ErrorWeightBuffer;
+  std::vector<float> WarpImgBuffer;
+  std::vector<float> WarpImgBufferR;
+  std::vector<float> WarpImgBufferG;
+  std::vector<float> WarpImgBufferB;
+  std::vector<float> WarpWeightBuffer;
+  std::vector<float> BlurImgBuffer;
+  std::vector<float> BlurImgBufferR;
+  std::vector<float> BlurImgBufferG;
+  std::vector<float> BlurImgBufferB;
+  std::vector<float> BlurWeightBuffer;
+  std::vector<float> ErrorImgBuffer;
+  std::vector<float> ErrorImgBufferR;
+  std::vector<float> ErrorImgBufferG;
+  std::vector<float> ErrorImgBufferB;
+  std::vector<float> ErrorWeightBuffer;
 
   // This variables are used for RMS computation
-  float* GroundTruthImg;
-  float* GroundTruthImgR;
-  float* GroundTruthImgG;
-  float* GroundTruthImgB;
+  std::vector<float> GroundTruthImg;
+  std::vector<float> GroundTruthImgR;
+  std::vector<float> GroundTruthImgG;
+  std::vector<float> GroundTruthImgB;
 };
-
-#endif

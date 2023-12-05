@@ -167,7 +167,7 @@ void ProjectiveMotionRL::GenerateMotionBlurImg(float* InputImg,
                                                int height, bool bforward) {
   int i, index, totalpixel = width * height;
 
-  if (!WarpImgBuffer) {
+  if (WarpImgBuffer.empty()) {
     SetBuffer(width, height);
   }
 
@@ -175,11 +175,11 @@ void ProjectiveMotionRL::GenerateMotionBlurImg(float* InputImg,
   memset(outputWeight, 0, totalpixel * sizeof(float));
   for (i = 0; i < NumSamples; i++) {
     if (bforward) {
-      WarpImage(InputImg, inputWeight, iwidth, iheight, WarpImgBuffer,
-                WarpWeightBuffer, width, height, i);
+      WarpImage(InputImg, inputWeight, iwidth, iheight, WarpImgBuffer.data(),
+                WarpWeightBuffer.data(), width, height, i);
     } else {
-      WarpImage(InputImg, inputWeight, iwidth, iheight, WarpImgBuffer,
-                WarpWeightBuffer, width, height, -i);
+      WarpImage(InputImg, inputWeight, iwidth, iheight, WarpImgBuffer.data(),
+                WarpWeightBuffer.data(), width, height, -i);
     }
     for (index = 0; index < totalpixel; index++) {
       BlurImg[index] += WarpImgBuffer[index] * WarpWeightBuffer[index];
@@ -198,7 +198,7 @@ void ProjectiveMotionRL::GenerateMotionBlurImg(
     float* outputWeight, int width, int height, bool bforward) {
   int i, index, totalpixel = width * height;
 
-  if (!WarpImgBuffer) {
+  if (WarpImgBuffer.empty()) {
     SetBuffer(width, height);
   }
 
@@ -209,12 +209,14 @@ void ProjectiveMotionRL::GenerateMotionBlurImg(
   for (i = 0; i < NumSamples; i++) {
     if (bforward) {
       WarpImage(InputImgR, InputImgG, InputImgB, inputWeight, iwidth, iheight,
-                WarpImgBufferR, WarpImgBufferG, WarpImgBufferB,
-                WarpWeightBuffer, width, height, i);
+                WarpImgBufferR.data(), WarpImgBufferG.data(),
+                WarpImgBufferB.data(), WarpWeightBuffer.data(), width, height,
+                i);
     } else {
       WarpImage(InputImgR, InputImgG, InputImgB, inputWeight, iwidth, iheight,
-                WarpImgBufferR, WarpImgBufferG, WarpImgBufferB,
-                WarpWeightBuffer, width, height, -i);
+                WarpImgBufferR.data(), WarpImgBufferG.data(),
+                WarpImgBufferB.data(), WarpWeightBuffer.data(), width, height,
+                -i);
     }
     for (index = 0; index < totalpixel; index++) {
       BlurImgR[index] += WarpImgBufferR[index] * WarpWeightBuffer[index];
@@ -238,7 +240,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblur(float* BlurImg, int iwidth,
   int x, y, index, itr;
   float* InputWeight = NULL;
 
-  float* DeltaImg = new float[iwidth * iheight];
+  std::vector<float> DeltaImg(iwidth * iheight);
 
   ClearBuffer();
   if (width * height >= iwidth * iheight)
@@ -247,8 +249,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblur(float* BlurImg, int iwidth,
     SetBuffer(iwidth, iheight);
 
   for (itr = 0; itr < Niter; itr++) {
-    GenerateMotionBlurImg(DeblurImg, InputWeight, width, height, BlurImgBuffer,
-                          BlurWeightBuffer, iwidth, iheight, true);
+    GenerateMotionBlurImg(DeblurImg, InputWeight, width, height,
+                          BlurImgBuffer.data(), BlurWeightBuffer.data(), iwidth,
+                          iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -262,9 +265,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblur(float* BlurImg, int iwidth,
         }
       }
     }
-    GenerateMotionBlurImg(DeltaImg, BlurWeightBuffer, iwidth, iheight,
-                          ErrorImgBuffer, ErrorWeightBuffer, width, height,
-                          false);
+    GenerateMotionBlurImg(DeltaImg.data(), BlurWeightBuffer.data(), iwidth,
+                          iheight, ErrorImgBuffer.data(),
+                          ErrorWeightBuffer.data(), width, height, false);
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
         if (bPoisson) {
@@ -284,8 +287,6 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblur(float* BlurImg, int iwidth,
     printf(".");
 #endif
   }
-
-  delete[] DeltaImg;
 }
 
 void ProjectiveMotionRL::ProjectiveMotionRLDeblur(
@@ -295,9 +296,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblur(
   int x, y, index, itr;
   float* InputWeight = NULL;
 
-  float* DeltaImgR = new float[iwidth * iheight];
-  float* DeltaImgG = new float[iwidth * iheight];
-  float* DeltaImgB = new float[iwidth * iheight];
+  std::vector<float> DeltaImgR(iwidth * iheight);
+  std::vector<float> DeltaImgG(iwidth * iheight);
+  std::vector<float> DeltaImgB(iwidth * iheight);
 
   ClearBuffer();
   if (width * height >= iwidth * iheight)
@@ -307,9 +308,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblur(
 
   for (itr = 0; itr < Niter; itr++) {
     GenerateMotionBlurImg(DeblurImgR, DeblurImgG, DeblurImgB, InputWeight,
-                          width, height, BlurImgBufferR, BlurImgBufferG,
-                          BlurImgBufferB, BlurWeightBuffer, iwidth, iheight,
-                          true);
+                          width, height, BlurImgBufferR.data(),
+                          BlurImgBufferG.data(), BlurImgBufferB.data(),
+                          BlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -335,10 +336,11 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblur(
         }
       }
     }
-    GenerateMotionBlurImg(DeltaImgR, DeltaImgG, DeltaImgB, BlurWeightBuffer,
-                          iwidth, iheight, ErrorImgBufferR, ErrorImgBufferG,
-                          ErrorImgBufferB, ErrorWeightBuffer, width, height,
-                          false);
+    GenerateMotionBlurImg(DeltaImgR.data(), DeltaImgG.data(), DeltaImgB.data(),
+                          BlurWeightBuffer.data(), iwidth, iheight,
+                          ErrorImgBufferR.data(), ErrorImgBufferG.data(),
+                          ErrorImgBufferB.data(), ErrorWeightBuffer.data(),
+                          width, height, false);
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
         if (bPoisson) {
@@ -369,10 +371,6 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblur(
     printf(".");
 #endif
   }
-
-  delete[] DeltaImgR;
-  delete[] DeltaImgG;
-  delete[] DeltaImgB;
 }
 
 void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVReg(
@@ -381,11 +379,11 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVReg(
   int x, y, index, itr;
   float* InputWeight = NULL;
 
-  float* DeltaImg = new float[iwidth * iheight];
-  float* DxImg = new float[width * height];
-  float* DyImg = new float[width * height];
-  float* DxxImg = new float[width * height];
-  float* DyyImg = new float[width * height];
+  std::vector<float> DeltaImg(iwidth * iheight);
+  std::vector<float> DxImg(width * height);
+  std::vector<float> DyImg(width * height);
+  std::vector<float> DxxImg(width * height);
+  std::vector<float> DyyImg(width * height);
 
   ClearBuffer();
   if (width * height >= iwidth * iheight)
@@ -394,8 +392,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVReg(
     SetBuffer(iwidth, iheight);
 
   for (itr = 0; itr < Niter; itr++) {
-    GenerateMotionBlurImg(DeblurImg, InputWeight, width, height, BlurImgBuffer,
-                          BlurWeightBuffer, iwidth, iheight, true);
+    GenerateMotionBlurImg(DeblurImg, InputWeight, width, height,
+                          BlurImgBuffer.data(), BlurWeightBuffer.data(), iwidth,
+                          iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -409,11 +408,12 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVReg(
         }
       }
     }
-    GenerateMotionBlurImg(DeltaImg, BlurWeightBuffer, iwidth, iheight,
-                          ErrorImgBuffer, ErrorWeightBuffer, width, height,
-                          false);
+    GenerateMotionBlurImg(DeltaImg.data(), BlurWeightBuffer.data(), iwidth,
+                          iheight, ErrorImgBuffer.data(),
+                          ErrorWeightBuffer.data(), width, height, false);
 
-    ComputeGradientImage(DeblurImg, width, height, DxImg, DyImg, true);
+    ComputeGradientImage(DeblurImg, width, height, DxImg.data(), DyImg.data(),
+                         true);
     for (y = 0, index = 0; y < height; y++) {  // Normalize the gradient
       for (x = 0; x < width; x++, index++) {
         if (DxImg[index] > 0) DxImg[index] = 1.0f / 255.0f;
@@ -422,8 +422,8 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVReg(
         if (DyImg[index] < 0) DyImg[index] = -1.0f / 255.0f;
       }
     }
-    ComputeGradientXImage(DxImg, width, height, DxxImg, false);
-    ComputeGradientYImage(DyImg, width, height, DyyImg, false);
+    ComputeGradientXImage(DxImg.data(), width, height, DxxImg.data(), false);
+    ComputeGradientYImage(DyImg.data(), width, height, DyyImg.data(), false);
 
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
@@ -446,13 +446,6 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVReg(
     printf(".");
 #endif
   }
-
-  delete[] DeltaImg;
-
-  delete[] DxImg;
-  delete[] DyImg;
-  delete[] DxxImg;
-  delete[] DyyImg;
 }
 
 void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVReg(
@@ -462,22 +455,22 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVReg(
   int x, y, index, itr;
   float* InputWeight = NULL;
 
-  float* DeltaImgR = new float[iwidth * iheight];
-  float* DeltaImgG = new float[iwidth * iheight];
-  float* DeltaImgB = new float[iwidth * iheight];
+  std::vector<float> DeltaImgR(iwidth * iheight);
+  std::vector<float> DeltaImgG(iwidth * iheight);
+  std::vector<float> DeltaImgB(iwidth * iheight);
 
-  float* DxImgR = new float[width * height];
-  float* DyImgR = new float[width * height];
-  float* DxxImgR = new float[width * height];
-  float* DyyImgR = new float[width * height];
-  float* DxImgG = new float[width * height];
-  float* DyImgG = new float[width * height];
-  float* DxxImgG = new float[width * height];
-  float* DyyImgG = new float[width * height];
-  float* DxImgB = new float[width * height];
-  float* DyImgB = new float[width * height];
-  float* DxxImgB = new float[width * height];
-  float* DyyImgB = new float[width * height];
+  std::vector<float> DxImgR(width * height);
+  std::vector<float> DyImgR(width * height);
+  std::vector<float> DxxImgR(width * height);
+  std::vector<float> DyyImgR(width * height);
+  std::vector<float> DxImgG(width * height);
+  std::vector<float> DyImgG(width * height);
+  std::vector<float> DxxImgG(width * height);
+  std::vector<float> DyyImgG(width * height);
+  std::vector<float> DxImgB(width * height);
+  std::vector<float> DyImgB(width * height);
+  std::vector<float> DxxImgB(width * height);
+  std::vector<float> DyyImgB(width * height);
 
   ClearBuffer();
   if (width * height >= iwidth * iheight)
@@ -487,9 +480,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVReg(
 
   for (itr = 0; itr < Niter; itr++) {
     GenerateMotionBlurImg(DeblurImgR, DeblurImgG, DeblurImgB, InputWeight,
-                          width, height, BlurImgBufferR, BlurImgBufferG,
-                          BlurImgBufferB, BlurWeightBuffer, iwidth, iheight,
-                          true);
+                          width, height, BlurImgBufferR.data(),
+                          BlurImgBufferG.data(), BlurImgBufferB.data(),
+                          BlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -515,14 +508,18 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVReg(
         }
       }
     }
-    GenerateMotionBlurImg(DeltaImgR, DeltaImgG, DeltaImgB, BlurWeightBuffer,
-                          iwidth, iheight, ErrorImgBufferR, ErrorImgBufferG,
-                          ErrorImgBufferB, ErrorWeightBuffer, width, height,
-                          false);
+    GenerateMotionBlurImg(DeltaImgR.data(), DeltaImgG.data(), DeltaImgB.data(),
+                          BlurWeightBuffer.data(), iwidth, iheight,
+                          ErrorImgBufferR.data(), ErrorImgBufferG.data(),
+                          ErrorImgBufferB.data(), ErrorWeightBuffer.data(),
+                          width, height, false);
 
-    ComputeGradientImage(DeblurImgR, width, height, DxImgR, DyImgR, true);
-    ComputeGradientImage(DeblurImgG, width, height, DxImgG, DyImgG, true);
-    ComputeGradientImage(DeblurImgB, width, height, DxImgB, DyImgB, true);
+    ComputeGradientImage(DeblurImgR, width, height, DxImgR.data(),
+                         DyImgR.data(), true);
+    ComputeGradientImage(DeblurImgG, width, height, DxImgG.data(),
+                         DyImgG.data(), true);
+    ComputeGradientImage(DeblurImgB, width, height, DxImgB.data(),
+                         DyImgB.data(), true);
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
         if (DxImgR[index] > 0) DxImgR[index] = 1.0f / 255.0f;
@@ -539,12 +536,12 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVReg(
         if (DyImgB[index] < 0) DyImgB[index] = -1.0f / 255.0f;
       }
     }
-    ComputeGradientXImage(DxImgR, width, height, DxxImgR, false);
-    ComputeGradientYImage(DyImgR, width, height, DyyImgR, false);
-    ComputeGradientXImage(DxImgG, width, height, DxxImgG, false);
-    ComputeGradientYImage(DyImgG, width, height, DyyImgG, false);
-    ComputeGradientXImage(DxImgB, width, height, DxxImgB, false);
-    ComputeGradientYImage(DyImgB, width, height, DyyImgB, false);
+    ComputeGradientXImage(DxImgR.data(), width, height, DxxImgR.data(), false);
+    ComputeGradientYImage(DyImgR.data(), width, height, DyyImgR.data(), false);
+    ComputeGradientXImage(DxImgG.data(), width, height, DxxImgG.data(), false);
+    ComputeGradientYImage(DyImgG.data(), width, height, DyyImgG.data(), false);
+    ComputeGradientXImage(DxImgB.data(), width, height, DxxImgB.data(), false);
+    ComputeGradientYImage(DyImgB.data(), width, height, DyyImgB.data(), false);
 
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
@@ -583,23 +580,6 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVReg(
     printf(".");
 #endif
   }
-
-  delete[] DeltaImgR;
-  delete[] DeltaImgG;
-  delete[] DeltaImgB;
-
-  delete[] DxImgR;
-  delete[] DyImgR;
-  delete[] DxxImgR;
-  delete[] DyyImgR;
-  delete[] DxImgG;
-  delete[] DyImgG;
-  delete[] DxxImgG;
-  delete[] DyyImgG;
-  delete[] DxImgB;
-  delete[] DyImgB;
-  delete[] DxxImgB;
-  delete[] DyyImgB;
 }
 
 void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
@@ -609,12 +589,12 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
   float* InputWeight = NULL;
   float Wx, Wy;
 
-  float* DeltaImg = new float[iwidth * iheight];
+  std::vector<float> DeltaImg(iwidth * iheight);
 
-  float* DxImg = new float[width * height];
-  float* DyImg = new float[width * height];
-  float* DxxImg = new float[width * height];
-  float* DyyImg = new float[width * height];
+  std::vector<float> DxImg(width * height);
+  std::vector<float> DyImg(width * height);
+  std::vector<float> DxxImg(width * height);
+  std::vector<float> DyyImg(width * height);
 
   ClearBuffer();
   if (width * height >= iwidth * iheight)
@@ -623,8 +603,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
     SetBuffer(iwidth, iheight);
 
   for (itr = 0; itr < Niter; itr++) {
-    GenerateMotionBlurImg(DeblurImg, InputWeight, width, height, BlurImgBuffer,
-                          BlurWeightBuffer, iwidth, iheight, true);
+    GenerateMotionBlurImg(DeblurImg, InputWeight, width, height,
+                          BlurImgBuffer.data(), BlurWeightBuffer.data(), iwidth,
+                          iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -638,14 +619,15 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
         }
       }
     }
-    GenerateMotionBlurImg(DeltaImg, BlurWeightBuffer, iwidth, iheight,
-                          ErrorImgBuffer, ErrorWeightBuffer, width, height,
-                          false);
+    GenerateMotionBlurImg(DeltaImg.data(), BlurWeightBuffer.data(), iwidth,
+                          iheight, ErrorImgBuffer.data(),
+                          ErrorWeightBuffer.data(), width, height, false);
 
-    ComputeGradientImage(DeblurImg, width, height, DxImg, DyImg, true);
+    ComputeGradientImage(DeblurImg, width, height, DxImg.data(), DyImg.data(),
+                         true);
 
-    ComputeGradientXImage(DxImg, width, height, DxxImg, false);
-    ComputeGradientYImage(DyImg, width, height, DyyImg, false);
+    ComputeGradientXImage(DxImg.data(), width, height, DxxImg.data(), false);
+    ComputeGradientYImage(DyImg.data(), width, height, DyyImg.data(), false);
 
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
@@ -673,12 +655,6 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
     printf(".");
 #endif
   }
-
-  delete[] DeltaImg;
-  delete[] DxImg;
-  delete[] DyImg;
-  delete[] DxxImg;
-  delete[] DyyImg;
 }
 
 void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
@@ -689,22 +665,22 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
   float* InputWeight = NULL;
   float WxR, WyR, WxG, WyG, WxB, WyB;
 
-  float* DeltaImgR = new float[iwidth * iheight];
-  float* DeltaImgG = new float[iwidth * iheight];
-  float* DeltaImgB = new float[iwidth * iheight];
+  std::vector<float> DeltaImgR(iwidth * iheight);
+  std::vector<float> DeltaImgG(iwidth * iheight);
+  std::vector<float> DeltaImgB(iwidth * iheight);
 
-  float* DxImgR = new float[width * height];
-  float* DyImgR = new float[width * height];
-  float* DxxImgR = new float[width * height];
-  float* DyyImgR = new float[width * height];
-  float* DxImgG = new float[width * height];
-  float* DyImgG = new float[width * height];
-  float* DxxImgG = new float[width * height];
-  float* DyyImgG = new float[width * height];
-  float* DxImgB = new float[width * height];
-  float* DyImgB = new float[width * height];
-  float* DxxImgB = new float[width * height];
-  float* DyyImgB = new float[width * height];
+  std::vector<float> DxImgR(width * height);
+  std::vector<float> DyImgR(width * height);
+  std::vector<float> DxxImgR(width * height);
+  std::vector<float> DyyImgR(width * height);
+  std::vector<float> DxImgG(width * height);
+  std::vector<float> DyImgG(width * height);
+  std::vector<float> DxxImgG(width * height);
+  std::vector<float> DyyImgG(width * height);
+  std::vector<float> DxImgB(width * height);
+  std::vector<float> DyImgB(width * height);
+  std::vector<float> DxxImgB(width * height);
+  std::vector<float> DyyImgB(width * height);
 
   ClearBuffer();
   if (width * height >= iwidth * iheight)
@@ -714,9 +690,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
 
   for (itr = 0; itr < Niter; itr++) {
     GenerateMotionBlurImg(DeblurImgR, DeblurImgG, DeblurImgB, InputWeight,
-                          width, height, BlurImgBufferR, BlurImgBufferG,
-                          BlurImgBufferB, BlurWeightBuffer, iwidth, iheight,
-                          true);
+                          width, height, BlurImgBufferR.data(),
+                          BlurImgBufferG.data(), BlurImgBufferB.data(),
+                          BlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -742,21 +718,25 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
         }
       }
     }
-    GenerateMotionBlurImg(DeltaImgR, DeltaImgG, DeltaImgB, BlurWeightBuffer,
-                          iwidth, iheight, ErrorImgBufferR, ErrorImgBufferG,
-                          ErrorImgBufferB, ErrorWeightBuffer, width, height,
-                          false);
+    GenerateMotionBlurImg(DeltaImgR.data(), DeltaImgG.data(), DeltaImgB.data(),
+                          BlurWeightBuffer.data(), iwidth, iheight,
+                          ErrorImgBufferR.data(), ErrorImgBufferG.data(),
+                          ErrorImgBufferB.data(), ErrorWeightBuffer.data(),
+                          width, height, false);
 
-    ComputeGradientImage(DeblurImgR, width, height, DxImgR, DyImgR, true);
-    ComputeGradientImage(DeblurImgG, width, height, DxImgG, DyImgG, true);
-    ComputeGradientImage(DeblurImgB, width, height, DxImgB, DyImgB, true);
+    ComputeGradientImage(DeblurImgR, width, height, DxImgR.data(),
+                         DyImgR.data(), true);
+    ComputeGradientImage(DeblurImgG, width, height, DxImgG.data(),
+                         DyImgG.data(), true);
+    ComputeGradientImage(DeblurImgB, width, height, DxImgB.data(),
+                         DyImgB.data(), true);
 
-    ComputeGradientXImage(DxImgR, width, height, DxxImgR, false);
-    ComputeGradientYImage(DyImgR, width, height, DyyImgR, false);
-    ComputeGradientXImage(DxImgG, width, height, DxxImgG, false);
-    ComputeGradientYImage(DyImgG, width, height, DyyImgG, false);
-    ComputeGradientXImage(DxImgB, width, height, DxxImgB, false);
-    ComputeGradientYImage(DyImgB, width, height, DyyImgB, false);
+    ComputeGradientXImage(DxImgR.data(), width, height, DxxImgR.data(), false);
+    ComputeGradientYImage(DyImgR.data(), width, height, DyyImgR.data(), false);
+    ComputeGradientXImage(DxImgG.data(), width, height, DxxImgG.data(), false);
+    ComputeGradientYImage(DyImgG.data(), width, height, DyyImgG.data(), false);
+    ComputeGradientXImage(DxImgB.data(), width, height, DxxImgB.data(), false);
+    ComputeGradientYImage(DyImgB.data(), width, height, DyyImgB.data(), false);
 
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
@@ -808,22 +788,6 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
     printf(".");
 #endif
   }
-
-  delete[] DeltaImgR;
-  delete[] DxImgR;
-  delete[] DyImgR;
-  delete[] DxxImgR;
-  delete[] DyyImgR;
-  delete[] DeltaImgG;
-  delete[] DxImgG;
-  delete[] DyImgG;
-  delete[] DxxImgG;
-  delete[] DyyImgG;
-  delete[] DeltaImgB;
-  delete[] DxImgB;
-  delete[] DyImgB;
-  delete[] DxxImgB;
-  delete[] DyyImgB;
 }
 
 void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralReg(
@@ -832,8 +796,8 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralReg(
   int x, y, index, itr;
   float* InputWeight = NULL;
 
-  float* DeltaImg = new float[iwidth * iheight];
-  float* BilateralRegImg = new float[width * height];
+  std::vector<float> DeltaImg(iwidth * iheight);
+  std::vector<float> BilateralRegImg(width * height);
 
   ClearBuffer();
   if (width * height >= iwidth * iheight)
@@ -842,8 +806,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralReg(
     SetBuffer(iwidth, iheight);
 
   for (itr = 0; itr < Niter; itr++) {
-    GenerateMotionBlurImg(DeblurImg, InputWeight, width, height, BlurImgBuffer,
-                          BlurWeightBuffer, iwidth, iheight, true);
+    GenerateMotionBlurImg(DeblurImg, InputWeight, width, height,
+                          BlurImgBuffer.data(), BlurWeightBuffer.data(), iwidth,
+                          iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -857,10 +822,10 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralReg(
         }
       }
     }
-    GenerateMotionBlurImg(DeltaImg, BlurWeightBuffer, iwidth, iheight,
-                          ErrorImgBuffer, ErrorWeightBuffer, width, height,
-                          false);
-    ComputeBilaterRegImage(DeblurImg, width, height, BilateralRegImg);
+    GenerateMotionBlurImg(DeltaImg.data(), BlurWeightBuffer.data(), iwidth,
+                          iheight, ErrorImgBuffer.data(),
+                          ErrorWeightBuffer.data(), width, height, false);
+    ComputeBilaterRegImage(DeblurImg, width, height, BilateralRegImg.data());
 
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
@@ -883,9 +848,6 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralReg(
     printf(".");
 #endif
   }
-
-  delete[] DeltaImg;
-  delete[] BilateralRegImg;
 }
 
 void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralReg(
@@ -895,12 +857,12 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralReg(
   int x, y, index, itr;
   float* InputWeight = NULL;
 
-  float* DeltaImgR = new float[iwidth * iheight];
-  float* DeltaImgG = new float[iwidth * iheight];
-  float* DeltaImgB = new float[iwidth * iheight];
-  float* BilateralRegImgR = new float[width * height];
-  float* BilateralRegImgG = new float[width * height];
-  float* BilateralRegImgB = new float[width * height];
+  std::vector<float> DeltaImgR(iwidth * iheight);
+  std::vector<float> DeltaImgG(iwidth * iheight);
+  std::vector<float> DeltaImgB(iwidth * iheight);
+  std::vector<float> BilateralRegImgR(width * height);
+  std::vector<float> BilateralRegImgG(width * height);
+  std::vector<float> BilateralRegImgB(width * height);
 
   ClearBuffer();
   if (width * height >= iwidth * iheight)
@@ -910,9 +872,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralReg(
 
   for (itr = 0; itr < Niter; itr++) {
     GenerateMotionBlurImg(DeblurImgR, DeblurImgG, DeblurImgB, InputWeight,
-                          width, height, BlurImgBufferR, BlurImgBufferG,
-                          BlurImgBufferB, BlurWeightBuffer, iwidth, iheight,
-                          true);
+                          width, height, BlurImgBufferR.data(),
+                          BlurImgBufferG.data(), BlurImgBufferB.data(),
+                          BlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -938,13 +900,14 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralReg(
         }
       }
     }
-    GenerateMotionBlurImg(DeltaImgR, DeltaImgG, DeltaImgB, BlurWeightBuffer,
-                          iwidth, iheight, ErrorImgBufferR, ErrorImgBufferG,
-                          ErrorImgBufferB, ErrorWeightBuffer, width, height,
-                          false);
-    ComputeBilaterRegImage(DeblurImgR, width, height, BilateralRegImgR);
-    ComputeBilaterRegImage(DeblurImgG, width, height, BilateralRegImgG);
-    ComputeBilaterRegImage(DeblurImgB, width, height, BilateralRegImgB);
+    GenerateMotionBlurImg(DeltaImgR.data(), DeltaImgG.data(), DeltaImgB.data(),
+                          BlurWeightBuffer.data(), iwidth, iheight,
+                          ErrorImgBufferR.data(), ErrorImgBufferG.data(),
+                          ErrorImgBufferB.data(), ErrorWeightBuffer.data(),
+                          width, height, false);
+    ComputeBilaterRegImage(DeblurImgR, width, height, BilateralRegImgR.data());
+    ComputeBilaterRegImage(DeblurImgG, width, height, BilateralRegImgG.data());
+    ComputeBilaterRegImage(DeblurImgB, width, height, BilateralRegImgB.data());
 
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
@@ -983,13 +946,6 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralReg(
     printf(".");
 #endif
   }
-
-  delete[] DeltaImgR;
-  delete[] DeltaImgG;
-  delete[] DeltaImgB;
-  delete[] BilateralRegImgR;
-  delete[] BilateralRegImgG;
-  delete[] BilateralRegImgB;
 }
 
 void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralLapReg(

@@ -58,8 +58,8 @@ int main(int argc, char* argv[]) {
   // Testing case for translational motion
   if (false) {
     float deltadx = 0.8f;
-    for (int i = 0; i < NumSamples; i++) {
-      float dy = 5.0f * sin((float)(i) / NumSamples * 2 * PI);
+    for (int i = 0; i < ProjectiveMotionRL::NumSamples; i++) {
+      float dy = 5.0f * sin((float)(i) / ProjectiveMotionRL::NumSamples * 2 * M_PI);
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][0] = 1;
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][1] = 0;
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][2] = i * deltadx;
@@ -81,12 +81,12 @@ int main(int argc, char* argv[]) {
   // Adjust the parameters for generating test case 1-15
   if (false) {
     float deltadx = 0.8f;
-    float deltascaling = 0.2f / NumSamples;
-    float deltapx = 0.001f / NumSamples;
-    float deltapy = 0.001f / NumSamples;
-    float deltadegree = (10.0f * PI / 180.0f) / NumSamples;
-    for (int i = 0; i < NumSamples; i++) {
-      float dy = 5.0f * sin((float)(i) / NumSamples * 2 * PI);
+    float deltascaling = 0.2f / ProjectiveMotionRL::NumSamples;
+    float deltapx = 0.001f / ProjectiveMotionRL::NumSamples;
+    float deltapy = 0.001f / ProjectiveMotionRL::NumSamples;
+    float deltadegree = (10.0f * M_PI / 180.0f) / ProjectiveMotionRL::NumSamples;
+    for (int i = 0; i < ProjectiveMotionRL::NumSamples; i++) {
+      float dy = 5.0f * sin((float)(i) / ProjectiveMotionRL::NumSamples * 2 * M_PI);
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][0] =
           (1 + i * deltascaling) * cos(deltadegree * i);
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][1] = sin(deltadegree * i);
