@@ -17,7 +17,8 @@ void readBMP(const std::string& fname, std::vector<float>& fImg, int& width,
 void readBMP(const std::string& fname, std::vector<float>& fImgR,
              std::vector<float>& fImgG, std::vector<float>& fImgB, int& width,
              int& height);
-void writeBMP(const std::string& iname, int width, int height, uint8_t* data);
+void writeBMP(const std::string& iname, int width, int height,
+              const std::vector<uint8_t>& data);
 void writeBMP(const std::string& iname, int width, int height,
               const std::vector<float>& data);
 void writeBMP(const std::string& iname, int width, int height,
