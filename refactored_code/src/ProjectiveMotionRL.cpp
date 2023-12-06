@@ -1121,64 +1121,68 @@ void ProjectiveMotionRL::ComputeBilaterRegImage(float* Img, int width,
   }
 }
 
-/*
-void ProjectiveMotionRL::ProjectiveMotionRLDeblurMultiScale(float* BlurImg, int
-iwidth, int iheight, float* DeblurImg, int width, int height, int Niter, int
-Nscale, bool bPoisson){ int i,iscale,x,y,index, itr; float* InputWeight = NULL;
-        float HFactor[NumSamples];
-        float ScaleFactor = sqrt(2.0f);
-        for(i = 0; i < NumSamples; i++){
-                HFactor[i] = Hmatrix[i].Hmatrix[2][2];
+void ProjectiveMotionRL::ProjectiveMotionRLDeblurMultiScale(
+    float* BlurImg, int iwidth, int iheight, float* DeblurImg, int width,
+    int height, int Niter, int Nscale, bool bPoisson) {
+  int i, iscale, x, y, index, itr;
+  float* InputWeight = NULL;
+  float HFactor[NumSamples];
+  float ScaleFactor = sqrt(2.0f);
+  for (i = 0; i < NumSamples; i++) {
+    HFactor[i] = Hmatrix[i].Hmatrix[2][2];
+  }
+
+  std::vector<float> DeltaImg(width * height);
+
+  ClearBuffer();
+  SetBuffer(width, height);
+
+  for (iscale = Nscale - 1; iscale >= 0; iscale--) {
+    float powfactor = pow(ScaleFactor, iscale);
+    int bwidth = (int)(iwidth / powfactor),
+        bheight = (int)(iheight / powfactor);
+    printf("Level %d: %d %d\n", iscale, bwidth, bheight);
+    float bfactw = (float)(iwidth - 1) / (float)(bwidth - 1),
+          bfacth = (float)(iheight - 1) / (float)(bheight - 1);
+    for (i = 0; i < NumSamples; i++) {
+      Hmatrix[i].Hmatrix[2][2] = HFactor[i] * powfactor;
+      Hmatrix[i].MatrixInverse(Hmatrix[i].Hmatrix, IHmatrix[i].Hmatrix);
+    }
+
+    for (itr = 0; itr < Niter; itr++) {
+      printf("%d\n", itr);
+      GenerateMotionBlurImg(DeblurImg, InputWeight, width, height,
+                            BlurImgBuffer.data(), BlurWeightBuffer.data(),
+                            bwidth, bheight, true);
+      for (y = 0, index = 0; y < bheight; y++) {
+        for (x = 0; x < bwidth; x++, index++) {
+          float bvalue = ReturnInterpolatedValueFast(x * bfactw, y * bfacth,
+                                                     BlurImg, iwidth, iheight);
+          if (bPoisson) {
+            if (BlurImgBuffer[index] > 0.0001f) {
+              DeltaImg[index] = bvalue / BlurImgBuffer[index];
+            } else {
+              DeltaImg[index] = bvalue / 0.0001f;
+            }
+          } else {
+            DeltaImg[index] = bvalue - BlurImgBuffer[index];
+          }
         }
-
-        float* DeltaImg = new float[width*height];
-
-        ClearBuffer();
-        SetBuffer(width, height);
-
-        for(iscale = Nscale-1; iscale >= 0; iscale--){
-
-                float powfactor = pow(ScaleFactor, iscale);
-                int bwidth = (int)(iwidth/powfactor), bheight =
-(int)(iheight/powfactor); printf("Level %d: %d %d\n", iscale, bwidth, bheight);
-                float bfactw = (float)(iwidth-1)/(float)(bwidth-1), bfacth =
-(float)(iheight-1)/(float)(bheight-1); for(i = 0; i < NumSamples; i++){
-                        Hmatrix[i].Hmatrix[2][2] = HFactor[i] * powfactor;
-                        Hmatrix[i].MatrixInverse(Hmatrix[i].Hmatrix,
-IHmatrix[i].Hmatrix);
-                }
-
-                for(itr = 0; itr < Niter; itr++){
-                        printf("%d\n", itr);
-                        GenerateMotionBlurImg(DeblurImg, InputWeight, width,
-height, BlurImgBuffer, BlurWeightBuffer, bwidth, bheight, true); for(y = 0,
-index = 0; y < bheight; y++){ for(x = 0; x < bwidth; x++, index++){ float bvalue
-= ReturnInterpolatedValueFast(x*bfactw, y*bfacth, BlurImg, iwidth, iheight);
-                                        if(bPoisson){
-                                                if( BlurImgBuffer[index] >
-0.0001f){ DeltaImg[index] = bvalue / BlurImgBuffer[index]; }else{
-                                                        DeltaImg[index] = bvalue
-/ 0.0001f;
-                                                }
-                                        }else{
-                                                DeltaImg[index] = bvalue -
-BlurImgBuffer[index];
-                                        }
-                                }
-                        }
-                        GenerateMotionBlurImg(DeltaImg, BlurWeightBuffer,
-bwidth, bheight, ErrorImgBuffer, ErrorWeightBuffer, width, height, false); for(y
-= 0, index = 0; y < height; y++){ for(x = 0; x < width; x++, index++){
-                                        if(bPoisson){
-                                                DeblurImg[index] *=
-ErrorImgBuffer[index]; }else{ DeblurImg[index] += ErrorImgBuffer[index];
-                                        }
-                                        if(DeblurImg[index] < 0)
-DeblurImg[index] = 0; if(DeblurImg[index] > 1) DeblurImg[index] = 1;
-                                }
-                        }
-                }
+      }
+      GenerateMotionBlurImg(DeltaImg.data(), BlurWeightBuffer.data(), bwidth,
+                            bheight, ErrorImgBuffer.data(),
+                            ErrorWeightBuffer.data(), width, height, false);
+      for (y = 0, index = 0; y < height; y++) {
+        for (x = 0; x < width; x++, index++) {
+          if (bPoisson) {
+            DeblurImg[index] *= ErrorImgBuffer[index];
+          } else {
+            DeblurImg[index] += ErrorImgBuffer[index];
+          }
+          if (DeblurImg[index] < 0) DeblurImg[index] = 0;
+          if (DeblurImg[index] > 1) DeblurImg[index] = 1;
         }
-
-        delete [] DeltaImg;
-}*/
+      }
+    }
+  }
+}

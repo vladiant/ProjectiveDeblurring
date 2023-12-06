@@ -439,9 +439,10 @@ class ProjectiveMotionRL {
   }
 
   // Multiscale version: not very useful...
-  // void ProjectiveMotionRLDeblurMultiScale(float* BlurImg, int iwidth, int
-  // iheight, float* DeblurImg, int width, int height, int Niter = 10, int
-  // Nscale = 5, bool bPoisson = true);
+  void ProjectiveMotionRLDeblurMultiScale(float* BlurImg, int iwidth,
+                                          int iheight, float* DeblurImg,
+                                          int width, int height, int Niter = 10,
+                                          int Nscale = 5, bool bPoisson = true);
 
   // private:
 
