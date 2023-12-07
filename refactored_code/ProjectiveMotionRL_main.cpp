@@ -10,7 +10,9 @@
 #include "bitmap.h"
 
 int main(int argc, char* argv[]) {
-  srand(time(0));
+  const auto seed = time(0);
+  printf("seed: %ld\n", seed);  // 1701803442
+  srand(seed);
 
   int width, height;
   std::vector<float> fImg[3];
@@ -59,7 +61,8 @@ int main(int argc, char* argv[]) {
   if (false) {
     float deltadx = 0.8f;
     for (int i = 0; i < ProjectiveMotionRL::NumSamples; i++) {
-      float dy = 5.0f * sin((float)(i) / ProjectiveMotionRL::NumSamples * 2 * M_PI);
+      float dy =
+          5.0f * sin((float)(i) / ProjectiveMotionRL::NumSamples * 2 * M_PI);
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][0] = 1;
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][1] = 0;
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][2] = i * deltadx;
@@ -69,9 +72,8 @@ int main(int argc, char* argv[]) {
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][0] = 0;
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][1] = 0;
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][2] = 1;
-     Homography::MatrixInverse(
-          m_ProjectiveMotionRL.Hmatrix[i].Hmatrix,
-          m_ProjectiveMotionRL.IHmatrix[i].Hmatrix);
+      Homography::MatrixInverse(m_ProjectiveMotionRL.Hmatrix[i].Hmatrix,
+                                m_ProjectiveMotionRL.IHmatrix[i].Hmatrix);
     }
   }
 
@@ -84,9 +86,11 @@ int main(int argc, char* argv[]) {
     float deltascaling = 0.2f / ProjectiveMotionRL::NumSamples;
     float deltapx = 0.001f / ProjectiveMotionRL::NumSamples;
     float deltapy = 0.001f / ProjectiveMotionRL::NumSamples;
-    float deltadegree = (10.0f * M_PI / 180.0f) / ProjectiveMotionRL::NumSamples;
+    float deltadegree =
+        (10.0f * M_PI / 180.0f) / ProjectiveMotionRL::NumSamples;
     for (int i = 0; i < ProjectiveMotionRL::NumSamples; i++) {
-      float dy = 5.0f * sin((float)(i) / ProjectiveMotionRL::NumSamples * 2 * M_PI);
+      float dy =
+          5.0f * sin((float)(i) / ProjectiveMotionRL::NumSamples * 2 * M_PI);
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][0] =
           (1 + i * deltascaling) * cos(deltadegree * i);
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][1] = sin(deltadegree * i);
@@ -98,9 +102,8 @@ int main(int argc, char* argv[]) {
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][0] = i * deltapx;
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][1] = i * deltapx;
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][2] = 1;
-      Homography::MatrixInverse(
-          m_ProjectiveMotionRL.Hmatrix[i].Hmatrix,
-          m_ProjectiveMotionRL.IHmatrix[i].Hmatrix);
+      Homography::MatrixInverse(m_ProjectiveMotionRL.Hmatrix[i].Hmatrix,
+                                m_ProjectiveMotionRL.IHmatrix[i].Hmatrix);
     }
   }
 
