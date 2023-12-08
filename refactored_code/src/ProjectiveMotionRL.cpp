@@ -285,8 +285,8 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblur(float* BlurImg, int iwidth,
         } else {
           DeblurImg[index] += ErrorImgBuffer[index];
         }
-        if (DeblurImg[index] < 0) DeblurImg[index] = 0;
-        if (DeblurImg[index] > 1) DeblurImg[index] = 1;
+
+        DeblurImg[index] = std::clamp(DeblurImg[index], 0.0f, 1.0f);
       }
     }
 
@@ -362,12 +362,10 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblur(
           DeblurImgG[index] += ErrorImgBufferG[index];
           DeblurImgB[index] += ErrorImgBufferB[index];
         }
-        if (DeblurImgR[index] < 0) DeblurImgR[index] = 0;
-        if (DeblurImgR[index] > 1) DeblurImgR[index] = 1;
-        if (DeblurImgG[index] < 0) DeblurImgG[index] = 0;
-        if (DeblurImgG[index] > 1) DeblurImgG[index] = 1;
-        if (DeblurImgB[index] < 0) DeblurImgB[index] = 0;
-        if (DeblurImgB[index] > 1) DeblurImgB[index] = 1;
+
+        DeblurImgR[index] = std::clamp(DeblurImgR[index], 0.0f, 1.0f);
+        DeblurImgG[index] = std::clamp(DeblurImgG[index], 0.0f, 1.0f);
+        DeblurImgB[index] = std::clamp(DeblurImgB[index], 0.0f, 1.0f);
       }
     }
 #ifdef __SHOWERROR__
@@ -444,8 +442,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVReg(
           DeblurImg[index] +=
               ErrorImgBuffer[index] - lambda * (DxxImg[index] + DyyImg[index]);
         }
-        if (DeblurImg[index] < 0) DeblurImg[index] = 0;
-        if (DeblurImg[index] > 1) DeblurImg[index] = 1;
+        DeblurImg[index] = std::clamp(DeblurImg[index], 0.0f, 1.0f);
       }
     }
 
@@ -570,12 +567,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVReg(
           DeblurImgB[index] += ErrorImgBufferB[index] -
                                lambda * (DxxImgB[index] + DyyImgB[index]);
         }
-        if (DeblurImgR[index] < 0) DeblurImgR[index] = 0;
-        if (DeblurImgR[index] > 1) DeblurImgR[index] = 1;
-        if (DeblurImgG[index] < 0) DeblurImgG[index] = 0;
-        if (DeblurImgG[index] > 1) DeblurImgG[index] = 1;
-        if (DeblurImgB[index] < 0) DeblurImgB[index] = 0;
-        if (DeblurImgB[index] > 1) DeblurImgB[index] = 1;
+        DeblurImgR[index] = std::clamp(DeblurImgR[index], 0.0f, 1.0f);
+        DeblurImgG[index] = std::clamp(DeblurImgG[index], 0.0f, 1.0f);
+        DeblurImgB[index] = std::clamp(DeblurImgB[index], 0.0f, 1.0f);
       }
     }
 
@@ -653,8 +647,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
           DeblurImg[index] = DeblurImg[index] + ErrorImgBuffer[index] -
                              lambda * (Wx * DxxImg[index] + Wy * DyyImg[index]);
         }
-        if (DeblurImg[index] < 0) DeblurImg[index] = 0;
-        if (DeblurImg[index] > 1) DeblurImg[index] = 1;
+        DeblurImg[index] = std::clamp(DeblurImg[index], 0.0f, 1.0f);
         if (std::isnan(DeblurImg[index])) DeblurImg[index] = 0;
       }
     }
@@ -780,12 +773,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
               ErrorImgBufferB[index] -
               lambda * (WxB * DxxImgB[index] + WyB * DyyImgB[index]);
         }
-        if (DeblurImgR[index] < 0) DeblurImgR[index] = 0;
-        if (DeblurImgR[index] > 1) DeblurImgR[index] = 1;
-        if (DeblurImgG[index] < 0) DeblurImgG[index] = 0;
-        if (DeblurImgG[index] > 1) DeblurImgG[index] = 1;
-        if (DeblurImgB[index] < 0) DeblurImgB[index] = 0;
-        if (DeblurImgB[index] > 1) DeblurImgB[index] = 1;
+        DeblurImgR[index] = std::clamp(DeblurImgR[index], 0.0f, 1.0f);
+        DeblurImgG[index] = std::clamp(DeblurImgG[index], 0.0f, 1.0f);
+        DeblurImgB[index] = std::clamp(DeblurImgB[index], 0.0f, 1.0f);
 
         if (std::isnan(DeblurImgR[index])) DeblurImgR[index] = 0;
         if (std::isnan(DeblurImgG[index])) DeblurImgG[index] = 0;
@@ -852,8 +842,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralReg(
           DeblurImg[index] +=
               ErrorImgBuffer[index] - lambda * BilateralRegImg[index];
         }
-        if (DeblurImg[index] < 0) DeblurImg[index] = 0;
-        if (DeblurImg[index] > 1) DeblurImg[index] = 1;
+        DeblurImg[index] = std::clamp(DeblurImg[index], 0.0f, 1.0f);
       }
     }
 
@@ -942,12 +931,10 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralReg(
           DeblurImgB[index] +=
               ErrorImgBufferB[index] - lambda * BilateralRegImgB[index];
         }
-        if (DeblurImgR[index] < 0) DeblurImgR[index] = 0;
-        if (DeblurImgR[index] > 1) DeblurImgR[index] = 1;
-        if (DeblurImgG[index] < 0) DeblurImgG[index] = 0;
-        if (DeblurImgG[index] > 1) DeblurImgG[index] = 1;
-        if (DeblurImgB[index] < 0) DeblurImgB[index] = 0;
-        if (DeblurImgB[index] > 1) DeblurImgB[index] = 1;
+
+        DeblurImgR[index] = std::clamp(DeblurImgR[index], 0.0f, 1.0f);
+        DeblurImgG[index] = std::clamp(DeblurImgG[index], 0.0f, 1.0f);
+        DeblurImgB[index] = std::clamp(DeblurImgB[index], 0.0f, 1.0f);
       }
     }
 
@@ -1195,8 +1182,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurMultiScale(
           } else {
             DeblurImg[index] += ErrorImgBuffer[index];
           }
-          if (DeblurImg[index] < 0) DeblurImg[index] = 0;
-          if (DeblurImg[index] > 1) DeblurImg[index] = 1;
+          DeblurImg[index] = std::clamp(DeblurImg[index], 0.0f, 1.0f);
         }
       }
     }
