@@ -1,7 +1,9 @@
 #include "BicubicInterpolation.h"
 
+#include <cmath>
+
 void bicubicweight(float x, float y, float (&w)[4]) {
-  float ww;
+  float ww = NAN;
 
   const float ix = x - (int)(x), iy = y - (int)(y);
   if (x >= 0 && y >= 0) {
@@ -45,8 +47,8 @@ void bicubicweightFast(float x, float y, float (&w)[4]) {
 }
 
 float ReturnInterpolatedValue(float x, float y, float* img, int width,
-                              int height) {
-  float w[4], value;
+                              int /*height*/) {
+  float w[4], value = NAN;
   int ix = (int)(x), iy = (int)(y);
   int index = iy * width + ix;
   bicubicweight(x, y, w);
@@ -58,7 +60,7 @@ float ReturnInterpolatedValue(float x, float y, float* img, int width,
 }
 
 float ReturnInterpolatedValueFast(float x, float y, float* img, int width,
-                                  int height) {
+                                  int /*height*/) {
   float w[4];
   int ix = (int)(x), iy = (int)(y);
   int index = iy * width + ix;
@@ -73,8 +75,8 @@ float ReturnInterpolatedValueFast(float x, float y, float* img, int width,
 }
 
 void ReturnInterpolatedValueFast(float x, float y, float* Rimg, float* Gimg,
-                                 float* Bimg, int width, int height, float& R,
-                                 float& G, float& B) {
+                                 float* Bimg, int width, int /*height*/,
+                                 float& R, float& G, float& B) {
   float w[4];
   int ix = (int)(x), iy = (int)(y);
   int index = iy * width + ix;

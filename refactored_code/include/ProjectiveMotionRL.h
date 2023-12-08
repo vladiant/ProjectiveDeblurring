@@ -108,8 +108,7 @@ class ProjectiveMotionRL {
     // Siggraph'07
     float powD = 0.8f, noiseVar = 0.005f, epilson = t / 255.0f;
     float minWeight =
-              exp(-pow(epilson, powD) / noiseVar) * pow(epilson, powD - 1.0f),
-          minEpi = pow(epilson, powD - 2.0f);
+        exp(-pow(epilson, powD) / noiseVar) * pow(epilson, powD - 1.0f);
 
     for (i = 0; i <= t; i++) {
       SpsTable[i] = 1.0f;
@@ -121,18 +120,17 @@ class ProjectiveMotionRL {
 
       // Reweighting scheme from Levin et al Siggraph'07,
       // Similar Effect, smaller smoothing weight for large gradient
-      // SpsTable[i] = pow(i/255.0f,powD-2.0f) / minEpi ;
+      // float minEpi = pow(epilson, powD - 2.0f);
+      // SpsTable[i] = pow(i / 255.0f, powD - 2.0f) / minEpi;
     }
   }
 
   void SetBilateralTable() {
-    int i, t = 1;
+    int i;
     // Parameters are set according to Levin et al Siggraph'07
     // Better result can be obtained by using smaller noiseVar, but for
     // fairness, we use the same setting.
-    float powD = 0.8f, noiseVar = 0.005f, epilson = t / 255.0f;
-    float minWeight =
-        exp(-pow(epilson, powD) / noiseVar) * pow(epilson, powD - 1.0f);
+    float noiseVar = 0.005f;
 
     // Standard Bilateral Weight
     for (i = 0; i < 256; i++) {
@@ -140,13 +138,19 @@ class ProjectiveMotionRL {
     }
 
     // Bilateral Laplician Regularization
-    //	for(i = 0; i <= t; i++){
-    //		BilateralTable[i] = 1.0f;
-    //	}
-    //	for(i = t+1; i < 256; i++){
-    //		BilateralTable[i] = (exp(-pow(i/255.0f,powD) / noiseVar) *
-    // pow(i/255.0f,powD-1.0f) ) / minWeight;
-    //	}
+    // int t = 1;
+    // float powD = 0.8f;
+    // float epilson = t / 255.0f;
+    // float minWeight =
+    //     exp(-pow(epilson, powD) / noiseVar) * pow(epilson, powD - 1.0f);
+    // for (i = 0; i <= t; i++) {
+    //   BilateralTable[i] = 1.0f;
+    // }
+    // for (i = t + 1; i < 256; i++) {
+    //   BilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
+    //                        pow(i / 255.0f, powD - 1.0f)) /
+    //                       minWeight;
+    // }
   }
   void SetGroundTruthImg(float* GroundTruth, int width, int height) {
     GroundTruthImg.resize(width * height);

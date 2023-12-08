@@ -19,19 +19,19 @@
 namespace {
 constexpr auto BMP_BI_RGB = 0L;
 
-typedef uint16_t BMP_WORD;
-typedef uint32_t BMP_DWORD;
-typedef int32_t BMP_LONG;
+using BMP_WORD = uint16_t;
+using BMP_DWORD = uint32_t;
+using BMP_LONG = int32_t;
 
-typedef struct {
+using BMP_BITMAPFILEHEADER = struct {
   BMP_WORD bfType;
   BMP_DWORD bfSize;
   BMP_WORD bfReserved1;
   BMP_WORD bfReserved2;
   BMP_DWORD bfOffBits;
-} BMP_BITMAPFILEHEADER;
+};
 
-typedef struct {
+using BMP_BITMAPINFOHEADER = struct {
   BMP_DWORD biSize;
   BMP_LONG biWidth;
   BMP_LONG biHeight;
@@ -43,7 +43,7 @@ typedef struct {
   BMP_LONG biYPelsPerMeter;
   BMP_DWORD biClrUsed;
   BMP_DWORD biClrImportant;
-} BMP_BITMAPINFOHEADER;
+};
 }  // namespace
 
 BMP_BITMAPFILEHEADER bmfh;
@@ -69,7 +69,7 @@ void swapBytes(T* val) {
 std::vector<uint8_t> readBMP(const std::string& fname, int& width,
                              int& height) {
   std::fstream file(fname, std::fstream::in | std::fstream::binary);
-  BMP_DWORD pos;
+  BMP_DWORD pos = 0;
 
   if (!file) return {};
 
@@ -120,11 +120,11 @@ std::vector<uint8_t> readBMP(const std::string& fname, int& width,
   }
 
   // shuffle bitmap data such that it is (R,G,B) tuples in row-major order
-  int i, j;
+  int i = 0, j = 0;
   j = 0;
-  uint8_t temp;
-  uint8_t* in;
-  uint8_t* out;
+  uint8_t temp = 0;
+  uint8_t* in = nullptr;
+  uint8_t* out = nullptr;
 
   in = data.data();
   out = data.data();
@@ -150,7 +150,7 @@ void readBMP(const std::string& fname, std::vector<float>& fImg, int& width,
   auto Img = readBMP(fname, width, height);
   fImg.resize(3 * width * height);
   auto pfImg = fImg.data();
-  int x, y, index;
+  int x = 0, y = 0, index = 0;
   for (y = 0, index = 0; y < height; y++) {
     for (x = 0; x < width; x++, index++) {
       pfImg[3 * index] = Img[3 * index] / 255.0f;
@@ -173,7 +173,7 @@ void readBMP(const std::string& fname, std::vector<float>& fImgR,
   auto* pfImgR = fImgR.data();
   auto* pfImgG = fImgG.data();
   auto* pfImgB = fImgB.data();
-  int x, y, index;
+  int x = 0, y = 0, index = 0;
   for (y = 0, index = 0; y < height; y++) {
     for (x = 0; x < width; x++, index++) {
       pfImgR[index] = Img[3 * index] / 255.0f;
@@ -187,7 +187,7 @@ void readBMP(const std::string& fname, std::vector<float>& fImgR,
 
 void writeBMP(const std::string& iname, int width, int height,
               const std::vector<uint8_t>& data) {
-  int bytes, pad;
+  int bytes = 0, pad = 0;
   bytes = width * 3;
   pad = (bytes % 4) ? 4 - (bytes % 4) : 0;
   bytes += pad;
@@ -242,7 +242,7 @@ void writeBMP(const std::string& iname, int width, int height,
 
 void writeBMP(const std::string& iname, int width, int height,
               const std::vector<float>& data) {
-  int x, y, index;
+  int x = 0, y = 0, index = 0;
   std::vector<uint8_t> Img(3 * width * height);
   for (y = 0, index = 0; y < height; y++) {
     for (x = 0; x < width; x++, index++) {
@@ -271,7 +271,7 @@ void writeBMP(const std::string& iname, int width, int height,
 void writeBMP(const std::string& iname, int width, int height,
               const std::vector<float>& dataR, const std::vector<float>& dataG,
               const std::vector<float>& dataB) {
-  int x, y, index;
+  int x = 0, y = 0, index = 0;
   std::vector<uint8_t> Img(3 * width * height);
   for (y = 0, index = 0; y < height; y++) {
     for (x = 0; x < width; x++, index++) {

@@ -1,10 +1,12 @@
 #include "homography.h"
 
+#include <cmath>
+
 #include "svdcmp.h"
 
 void Homography::ComputeHomography(const double (&correspondants)[4][4]) {
-  int k;
-  double sx1, sy1, sx2, sy2;
+  int k = 0;
+  double sx1 = NAN, sy1 = NAN, sx2 = NAN, sy2 = NAN;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
@@ -42,8 +44,8 @@ void Homography::ComputeHomography(const double (&correspondants)[4][4]) {
   double w[9];
   double v[9][9];
 
-  int minwindex;
-  double minw;
+  int minwindex = 0;
+  double minw = NAN;
 
   svdcmp(featurevector, w, v);
 
@@ -69,8 +71,8 @@ void Homography::ComputeHomography(const double (&correspondants)[4][4]) {
 
 void Homography::ComputeHomography(double const (&correspondantsA)[4][2],
                                    double const (&correspondantsB)[4][2]) {
-  int k;
-  double sx1, sy1, sx2, sy2;
+  int k = 0;
+  double sx1 = NAN, sy1 = NAN, sx2 = NAN, sy2 = NAN;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
@@ -108,8 +110,8 @@ void Homography::ComputeHomography(double const (&correspondantsA)[4][2],
   double w[9];
   double v[9][9];
 
-  int minwindex;
-  double minw;
+  int minwindex = 0;
+  double minw = NAN;
 
   svdcmp(featurevector, w, v);
 
@@ -142,8 +144,8 @@ void Homography::ComputeHomography(
     return;
   }
 
-  int k;
-  double sx1, sy1, sx2, sy2;
+  int k = 0;
+  double sx1 = NAN, sy1 = NAN, sx2 = NAN, sy2 = NAN;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
@@ -177,8 +179,8 @@ void Homography::ComputeHomography(
   /////////////////////////////////////////////////////////////
   // Least square distance method
   ////////////////////////////////////////////////////////////
-  int minwindex;
-  double minw;
+  int minwindex = 0;
+  double minw = NAN;
 
   svdcmp(featurevector, w, v, rv1);
 
@@ -205,8 +207,8 @@ void Homography::ComputeHomography(
 void Homography::ComputeHomography(
     const std::vector<std::array<double, 4>>& correspondants) {
   const int ncor = correspondants.size();
-  int k;
-  double sx1, sy1, sx2, sy2;
+  int k = 0;
+  double sx1 = NAN, sy1 = NAN, sx2 = NAN, sy2 = NAN;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
@@ -244,8 +246,8 @@ void Homography::ComputeHomography(
   double w[9];
   double v[9][9];
 
-  int minwindex;
-  double minw;
+  int minwindex = 0;
+  double minw = NAN;
 
   svdcmp(featurevector, w, v);
 
@@ -277,8 +279,8 @@ void Homography::ComputeHomography(
   }
 
   const int ncor = correspondantsA.size();
-  int k;
-  double sx1, sy1, sx2, sy2;
+  int k = 0;
+  double sx1 = NAN, sy1 = NAN, sx2 = NAN, sy2 = NAN;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
@@ -316,8 +318,8 @@ void Homography::ComputeHomography(
   double w[9];
   double v[9][9];
 
-  int minwindex;
-  double minw;
+  int minwindex = 0;
+  double minw = NAN;
 
   svdcmp(featurevector, w, v);
 
@@ -342,8 +344,8 @@ void Homography::ComputeHomography(
 }
 
 void Homography::ComputeAffineHomography(const double (&correspondants)[4][4]) {
-  int k;
-  double sx1, sy1, sx2, sy2;
+  int k = 0;
+  double sx1 = NAN, sy1 = NAN, sx2 = NAN, sy2 = NAN;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
@@ -377,8 +379,8 @@ void Homography::ComputeAffineHomography(const double (&correspondants)[4][4]) {
   double w[7];
   double v[7][7];
 
-  int minwindex;
-  double minw;
+  int minwindex = 0;
+  double minw = NAN;
 
   svdcmp(featurevector, w, v);
 
@@ -405,8 +407,8 @@ void Homography::ComputeAffineHomography(const double (&correspondants)[4][4]) {
 void Homography::ComputeAffineHomography(
     double const (&correspondantsA)[4][2],
     double const (&correspondantsB)[4][2]) {
-  int k;
-  double sx1, sy1, sx2, sy2;
+  int k = 0;
+  double sx1 = NAN, sy1 = NAN, sx2 = NAN, sy2 = NAN;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
@@ -440,8 +442,8 @@ void Homography::ComputeAffineHomography(
   double w[7];
   double v[7][7];
 
-  int minwindex;
-  double minw;
+  int minwindex = 0;
+  double minw = NAN;
 
   svdcmp(featurevector, w, v);
 
@@ -468,8 +470,8 @@ void Homography::ComputeAffineHomography(
 void Homography::ComputeAffineHomography(
     const std::vector<std::array<double, 4>>& correspondants) {
   const int ncor = correspondants.size();
-  int k;
-  double sx1, sy1, sx2, sy2;
+  int k = 0;
+  double sx1 = NAN, sy1 = NAN, sx2 = NAN, sy2 = NAN;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
@@ -503,8 +505,8 @@ void Homography::ComputeAffineHomography(
   double w[7];
   double v[7][7];
 
-  int minwindex;
-  double minw;
+  int minwindex = 0;
+  double minw = NAN;
 
   svdcmp(featurevector, w, v);
 
@@ -536,8 +538,8 @@ void Homography::ComputeAffineHomography(
   }
 
   const int ncor = correspondantsA.size();
-  int k;
-  double sx1, sy1, sx2, sy2;
+  int k = 0;
+  double sx1 = NAN, sy1 = NAN, sx2 = NAN, sy2 = NAN;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
@@ -571,8 +573,8 @@ void Homography::ComputeAffineHomography(
   double w[7];
   double v[7][7];
 
-  int minwindex;
-  double minw;
+  int minwindex = 0;
+  double minw = NAN;
 
   svdcmp(featurevector, w, v);
 
@@ -597,8 +599,8 @@ void Homography::ComputeAffineHomography(
 }
 
 void Homography::ComputeRTHomography(const double (&correspondants)[4][4]) {
-  int k;
-  double sx1, sy1, sx2, sy2;
+  int k = 0;
+  double sx1 = NAN, sy1 = NAN, sx2 = NAN, sy2 = NAN;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
@@ -628,8 +630,8 @@ void Homography::ComputeRTHomography(const double (&correspondants)[4][4]) {
   double w[5];
   double v[5][5];
 
-  int minwindex;
-  double minw;
+  int minwindex = 0;
+  double minw = NAN;
 
   svdcmp(featurevector, w, v);
 
@@ -655,8 +657,8 @@ void Homography::ComputeRTHomography(const double (&correspondants)[4][4]) {
 
 void Homography::ComputeRTHomography(double const (&correspondantsA)[4][2],
                                      double const (&correspondantsB)[4][2]) {
-  int k;
-  double sx1, sy1, sx2, sy2;
+  int k = 0;
+  double sx1 = NAN, sy1 = NAN, sx2 = NAN, sy2 = NAN;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
@@ -686,8 +688,8 @@ void Homography::ComputeRTHomography(double const (&correspondantsA)[4][2],
   double w[5];
   double v[5][5];
 
-  int minwindex;
-  double minw;
+  int minwindex = 0;
+  double minw = NAN;
 
   svdcmp(featurevector, w, v);
 
@@ -714,8 +716,8 @@ void Homography::ComputeRTHomography(double const (&correspondantsA)[4][2],
 void Homography::ComputeRTHomography(
     const std::vector<std::array<double, 4>>& correspondants) {
   const int ncor = correspondants.size();
-  int k;
-  double sx1, sy1, sx2, sy2;
+  int k = 0;
+  double sx1 = NAN, sy1 = NAN, sx2 = NAN, sy2 = NAN;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
@@ -745,8 +747,8 @@ void Homography::ComputeRTHomography(
   double w[5];
   double v[5][5];
 
-  int minwindex;
-  double minw;
+  int minwindex = 0;
+  double minw = NAN;
 
   svdcmp(featurevector, w, v);
 
@@ -778,8 +780,8 @@ void Homography::ComputeRTHomography(
   }
 
   const int ncor = correspondantsA.size();
-  int k;
-  double sx1, sy1, sx2, sy2;
+  int k = 0;
+  double sx1 = NAN, sy1 = NAN, sx2 = NAN, sy2 = NAN;
 
   /////////////////////////////////////////////////////////////
   // Map correspondants to feature
@@ -809,8 +811,8 @@ void Homography::ComputeRTHomography(
   double w[5];
   double v[5][5];
 
-  int minwindex;
-  double minw;
+  int minwindex = 0;
+  double minw = NAN;
 
   svdcmp(featurevector, w, v);
 

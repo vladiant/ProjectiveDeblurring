@@ -8,8 +8,8 @@
 #include "ProjectiveMotionRL.h"
 #include "bitmap.h"
 
-int main(int argc, char* argv[]) {
-  int width, height;
+int main(int /*argc*/, char* /*argv*/[]) {
+  int width = 0, height = 0;
   std::vector<float> fImg[3];
   std::string prefix = "doll";
   // memcpy(prefix, argv[1], strlen(argv[1])+1);
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
   std::vector<float> intermediatedeblurImg[3];
   std::vector<float> inputWeight;
   std::vector<float> outputWeight(width * height);
-  float RMSError;
+  float RMSError = NAN;
   bImg[0].resize(width * height);
   bImg[1].resize(width * height);
   bImg[2].resize(width * height);
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
           (1 + i * deltascaling) * cos(deltadegree * i);
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][2] = dy;
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][0] = i * deltapx;
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][1] = i * deltapx;
+      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][1] = i * deltapy;
       m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][2] = 1;
       Homography::MatrixInverse(m_ProjectiveMotionRL.Hmatrix[i].Hmatrix,
                                 m_ProjectiveMotionRL.IHmatrix[i].Hmatrix);

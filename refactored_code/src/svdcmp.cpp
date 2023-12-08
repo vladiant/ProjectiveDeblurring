@@ -4,8 +4,8 @@
 
 #include "svdcmp.h"
 
-#include <math.h>
-#include <stdio.h>
+#include <cmath>
+#include <cstdio>
 
 double SQR(double a) { return a == 0.0 ? 0.0 : a * a; }
 

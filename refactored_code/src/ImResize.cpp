@@ -1,11 +1,13 @@
 #include "ImResize.h"
 
+#include <cmath>
+
 #include "BicubicInterpolation.h"
 
 void ImResize(float* Img, int width, int height, float* Rimg, int Rwidth,
               int Rheight) {
-  int x, y, index;
-  float fx, fy;
+  int x = 0, y = 0, index = 0;
+  float fx = NAN, fy = NAN;
   float widthscale = (width - 1.0f) / (Rwidth - 1.0f),
         heightscale = (height - 1.0f) / (Rheight - 1.0f);
   for (y = 0, index = 0; y < Rheight; y++) {
@@ -24,7 +26,7 @@ void ImResize(float* Img, int width, int height, float* Rimg, int Rwidth,
 
 void ImChopping(float* Img, int width, int height, float* Rimg, int Rwidth,
                 int Rheight) {
-  int x, y, index, lindex;
+  int x = 0, y = 0, index = 0, lindex = 0;
   int shiftx = (Rwidth - width) / 2, shifty = (Rheight - height) / 2;
 
   for (y = 0, index = 0; y < Rheight; y++) {
@@ -48,7 +50,7 @@ void ImChopping(float* Img, int width, int height, float* Rimg, int Rwidth,
 
 void ImChopping(float* Img, int width, int height, float* Rimg, int Rwidth,
                 int Rheight, int CenterX, int CenterY) {
-  int x, y, index, lindex;
+  int x = 0, y = 0, index = 0, lindex = 0;
   int shiftx = (Rwidth - width) / 2 + width / 2 - CenterX,
       shifty = (Rheight - height) / 2 + height / 2 - CenterY;
 
