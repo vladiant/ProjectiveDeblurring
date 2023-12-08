@@ -1,5 +1,4 @@
 #include <cmath>
-#include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <string>
@@ -10,9 +9,6 @@
 #include "bitmap.h"
 
 int main(int argc, char* argv[]) {
-  const auto seed = 1701803442l;  // time(0);
-  srand(seed);
-
   int width, height;
   std::vector<float> fImg[3];
   std::string prefix = "doll";

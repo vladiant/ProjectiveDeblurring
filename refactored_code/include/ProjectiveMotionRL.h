@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <cstring>
-#include <memory>
+#include <random>
 
 #include "homography.h"
 
@@ -11,8 +11,11 @@
 class ProjectiveMotionRL {
  public:
   constexpr static int NumSamples = 30;
+  // Random engine seed
+  constexpr static int kSeed = 1234;
 
   ProjectiveMotionRL() {
+    mRandomEngine.seed(kSeed);
     int i;
     for (i = 0; i < NumSamples; i++) {
       Hmatrix[i].Hmatrix[0][0] = 1;
@@ -419,10 +422,13 @@ class ProjectiveMotionRL {
   ////////////////////////////////////
   // Normal random number generator, variance = 1
   float normalrand() {
-    float val = 0;
-    for (int i = 0; i != 12; ++i) val += ((float)(rand()) / RAND_MAX);
-    return val - 6.0f;
+    std::normal_distribution<float> normalDist(0.0f, 1.0f);
+    // float val = 0;
+    // for (int i = 0; i != 12; ++i) val += ((float)(rand()) / RAND_MAX);
+    // return val - 6.0f;
+    return normalDist(mRandomEngine);
   }
+
   // Noise variance = amp
   void gaussianNoise(float* Img, int width, int height, float amp) {
     int x, y, index;
@@ -444,13 +450,12 @@ class ProjectiveMotionRL {
                                           int width, int height, int Niter = 10,
                                           int Nscale = 5, bool bPoisson = true);
 
-  float getSpsWeight(float aValue) const;
-
-  // private:
-
   // These are the homography sequence for Projective motion blur model
   Homography Hmatrix[NumSamples];
   Homography IHmatrix[NumSamples];
+
+ private:
+  float getSpsWeight(float aValue) const;
 
   // These are buffer and lookup table variables
   float BilateralTable[256];
@@ -476,4 +481,8 @@ class ProjectiveMotionRL {
   std::vector<float> GroundTruthImgR;
   std::vector<float> GroundTruthImgG;
   std::vector<float> GroundTruthImgB;
+
+  // Random values generation
+  std::random_device mRandomDevice;
+  std::mt19937 mRandomEngine{mRandomDevice()};
 };
