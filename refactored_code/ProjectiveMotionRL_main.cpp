@@ -10,8 +10,7 @@
 #include "bitmap.h"
 
 int main(int argc, char* argv[]) {
-  const auto seed = time(0);
-  printf("seed: %ld\n", seed);  // 1701803442
+  const auto seed = 1701803442l;  // time(0);
   srand(seed);
 
   int width, height;
