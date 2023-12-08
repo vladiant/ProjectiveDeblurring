@@ -444,6 +444,8 @@ class ProjectiveMotionRL {
                                           int width, int height, int Niter = 10,
                                           int Nscale = 5, bool bPoisson = true);
 
+  float getSpsWeight(float aValue) const;
+
   // private:
 
   // These are the homography sequence for Projective motion blur model

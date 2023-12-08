@@ -1,10 +1,19 @@
 #include "ProjectiveMotionRL.h"
 
+#include <cmath>
 #include <memory>
 
 #include "BicubicInterpolation.h"
 #include "ImResize.h"
 #include "bitmap.h"
+
+float ProjectiveMotionRL::getSpsWeight(float aValue) const {
+  if (!std::isfinite(aValue)) {
+    return 0.0f;
+  }
+
+  return SpsTable[static_cast<int>(std::abs(aValue) * 255.0f)];
+}
 
 void ProjectiveMotionRL::WarpImage(float* InputImg, float* inputWeight,
                                    int iwidth, int iheight, float* OutputImg,
@@ -218,6 +227,7 @@ void ProjectiveMotionRL::GenerateMotionBlurImg(
                 WarpImgBufferB.data(), WarpWeightBuffer.data(), width, height,
                 -i);
     }
+
     for (index = 0; index < totalpixel; index++) {
       BlurImgR[index] += WarpImgBufferR[index] * WarpWeightBuffer[index];
       BlurImgG[index] += WarpImgBufferG[index] * WarpWeightBuffer[index];
@@ -631,8 +641,8 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
 
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
-        Wx = SpsTable[(int)(fabs(DxImg[index]) * 255.0f)];
-        Wy = SpsTable[(int)(fabs(DyImg[index]) * 255.0f)];
+        Wx = getSpsWeight(DxImg[index]);
+        Wy = getSpsWeight(DyImg[index]);
 
         if (bPoisson) {
           DeblurImg[index] =
@@ -645,6 +655,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
         }
         if (DeblurImg[index] < 0) DeblurImg[index] = 0;
         if (DeblurImg[index] > 1) DeblurImg[index] = 1;
+        if (std::isnan(DeblurImg[index])) DeblurImg[index] = 0;
       }
     }
 
@@ -693,6 +704,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
                           width, height, BlurImgBufferR.data(),
                           BlurImgBufferG.data(), BlurImgBufferB.data(),
                           BlurWeightBuffer.data(), iwidth, iheight, true);
+
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -740,12 +752,12 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
 
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
-        WxR = SpsTable[(int)(fabs(DxImgR[index]) * 255.0f)];
-        WyR = SpsTable[(int)(fabs(DyImgR[index]) * 255.0f)];
-        WxG = SpsTable[(int)(fabs(DxImgG[index]) * 255.0f)];
-        WyG = SpsTable[(int)(fabs(DyImgG[index]) * 255.0f)];
-        WxB = SpsTable[(int)(fabs(DxImgB[index]) * 255.0f)];
-        WyB = SpsTable[(int)(fabs(DyImgB[index]) * 255.0f)];
+        WxR = getSpsWeight(DxImgR[index]);
+        WyR = getSpsWeight(DyImgR[index]);
+        WxG = getSpsWeight(DxImgG[index]);
+        WyG = getSpsWeight(DyImgG[index]);
+        WxB = getSpsWeight(DxImgB[index]);
+        WyB = getSpsWeight(DyImgB[index]);
 
         if (bPoisson) {
           DeblurImgR[index] *=
@@ -774,6 +786,10 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsReg(
         if (DeblurImgG[index] > 1) DeblurImgG[index] = 1;
         if (DeblurImgB[index] < 0) DeblurImgB[index] = 0;
         if (DeblurImgB[index] > 1) DeblurImgB[index] = 1;
+
+        if (std::isnan(DeblurImgR[index])) DeblurImgR[index] = 0;
+        if (std::isnan(DeblurImgG[index])) DeblurImgG[index] = 0;
+        if (std::isnan(DeblurImgB[index])) DeblurImgB[index] = 0;
       }
     }
 
