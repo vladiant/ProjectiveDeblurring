@@ -23,7 +23,7 @@ using BMP_WORD = uint16_t;
 using BMP_DWORD = uint32_t;
 using BMP_LONG = int32_t;
 
-using BMP_BITMAPFILEHEADER = struct {
+struct BMP_BITMAPFILEHEADER {
   BMP_WORD bfType;
   BMP_DWORD bfSize;
   BMP_WORD bfReserved1;
@@ -31,7 +31,7 @@ using BMP_BITMAPFILEHEADER = struct {
   BMP_DWORD bfOffBits;
 };
 
-using BMP_BITMAPINFOHEADER = struct {
+struct BMP_BITMAPINFOHEADER {
   BMP_DWORD biSize;
   BMP_LONG biWidth;
   BMP_LONG biHeight;
@@ -45,9 +45,6 @@ using BMP_BITMAPINFOHEADER = struct {
   BMP_DWORD biClrImportant;
 };
 }  // namespace
-
-BMP_BITMAPFILEHEADER bmfh;
-BMP_BITMAPINFOHEADER bmih;
 
 template <class T>
 void swapBytes(T* val) {
@@ -76,6 +73,7 @@ std::vector<uint8_t> readBMP(const std::string& fname, int& width,
   //	I am doing file.read(reinterpret_cast<char*>(&bmfh),
   // sizeof(BMP_BITMAPFILEHEADER)) in a
   // safe way. :}
+  BMP_BITMAPFILEHEADER bmfh;
   file.read(reinterpret_cast<char*>(&(bmfh.bfType)), 2);
   file.read(reinterpret_cast<char*>(&(bmfh.bfSize)), 4);
   file.read(reinterpret_cast<char*>(&(bmfh.bfReserved1)), 2);
@@ -84,6 +82,7 @@ std::vector<uint8_t> readBMP(const std::string& fname, int& width,
 
   pos = bmfh.bfOffBits;
 
+  BMP_BITMAPINFOHEADER bmih;
   file.read(reinterpret_cast<char*>(&bmih), sizeof(BMP_BITMAPINFOHEADER));
 
   // error checking
@@ -193,6 +192,7 @@ void writeBMP(const std::string& iname, int width, int height,
   bytes += pad;
   bytes *= height;
 
+  BMP_BITMAPFILEHEADER bmfh;
   bmfh.bfType = 0x4d42;  // "BM"
   bmfh.bfSize =
       sizeof(BMP_BITMAPFILEHEADER) + sizeof(BMP_BITMAPINFOHEADER) + bytes;
@@ -202,6 +202,7 @@ void writeBMP(const std::string& iname, int width, int height,
                       work?*/
       14 + sizeof(BMP_BITMAPINFOHEADER);
 
+  BMP_BITMAPINFOHEADER bmih;
   bmih.biSize = sizeof(BMP_BITMAPINFOHEADER);
   bmih.biWidth = width;
   bmih.biHeight = height;
@@ -230,7 +231,7 @@ void writeBMP(const std::string& iname, int width, int height,
   bytes /= height;
   std::vector<uint8_t> scanline(bytes);
   for (int j = 0; j < height; ++j) {
-    memcpy(scanline.data(), &data[j * 3 * width], bytes);
+    memcpy(scanline.data(), &data[j * 3 * width], 3 * width);
     for (int i = 0; i < width; ++i) {
       uint8_t temp = scanline[i * 3];
       scanline[i * 3] = scanline[i * 3 + 2];
