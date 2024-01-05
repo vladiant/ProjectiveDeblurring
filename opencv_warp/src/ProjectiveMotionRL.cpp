@@ -1,8 +1,8 @@
 #include "ProjectiveMotionRL.h"
 
+#include <algorithm>
 #include <cmath>
 #include <memory>
-#include <algorithm>
 
 #include "BicubicInterpolation.h"
 #include "ImResize.h"
@@ -75,6 +75,68 @@ void ProjectiveMotionRL::WarpImage(float* InputImg, float* inputWeight,
           } else {
             outputWeight[index] = 1.01f;
           }
+        } else {
+          outputWeight[index] = 0.01f;
+        }
+
+        if (fx < 0) fx = 0;
+        if (fy < 0) fy = 0;
+        if (fx >= iwidth - 1.001f) fx = iwidth - 1.001f;
+        if (fy >= iheight - 1.001f) fy = iheight - 1.001f;
+
+        OutputImg[index] =
+            ReturnInterpolatedValueFast(fx, fy, InputImg, iwidth, iheight);
+      }
+    }
+  }
+}
+
+void ProjectiveMotionRL::WarpImage(float* InputImg, int iwidth, int iheight,
+                                   float* OutputImg, float* outputWeight,
+                                   int width, int height, int i) {
+  int x = 0, y = 0, index = 0;
+  float fx = NAN, fy = NAN;
+  if (i >= 0 && i < NumSamples) {
+    float woffset = width * 0.5f, hoffset = height * 0.5f;
+    float iwoffset = iwidth * 0.5f, ihoffset = iheight * 0.5f;
+
+    for (y = 0, index = 0; y < height; y++) {
+      for (x = 0; x < width; x++, index++) {
+        fx = x - woffset;
+        fy = y - hoffset;
+        IHmatrix[i].Transform(fx, fy);  // Inverse mapping, use inverse instead
+        fx += iwoffset;
+        fy += ihoffset;
+
+        if (fx >= 0 && fx < iwidth - 1 && fy >= 0 && fy < iheight - 1) {
+          outputWeight[index] = 1.01f;
+        } else {
+          outputWeight[index] = 0.01f;
+        }
+
+        if (fx < 0) fx = 0;
+        if (fy < 0) fy = 0;
+        if (fx >= iwidth - 1.001f) fx = iwidth - 1.001f;
+        if (fy >= iheight - 1.001f) fy = iheight - 1.001f;
+
+        OutputImg[index] =
+            ReturnInterpolatedValueFast(fx, fy, InputImg, iwidth, iheight);
+      }
+    }
+  } else if (i < 0 && i > -NumSamples) {
+    float woffset = width * 0.5f, hoffset = height * 0.5f;
+    float iwoffset = iwidth * 0.5f, ihoffset = iheight * 0.5f;
+
+    for (y = 0, index = 0; y < height; y++) {
+      for (x = 0; x < width; x++, index++) {
+        fx = x - woffset;
+        fy = y - hoffset;
+        Hmatrix[-i].Transform(fx, fy);  // Inverse mapping, use inverse instead
+        fx += iwoffset;
+        fy += ihoffset;
+
+        if (fx >= 0 && fx < iwidth - 1 && fy >= 0 && fy < iheight - 1) {
+          outputWeight[index] = 1.01f;
         } else {
           outputWeight[index] = 0.01f;
         }
