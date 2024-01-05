@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 
 project(ProjectiveDeblur)
 
-find_package(Threads REQUIRED)
-
 add_executable(
     ${PROJECT_NAME}
     BicubicInterpolation.h
