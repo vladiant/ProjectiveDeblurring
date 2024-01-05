@@ -232,6 +232,37 @@ void ProjectiveMotionRL::WarpImage(float* InputImgR, float* InputImgG,
   }
 }
 
+void ProjectiveMotionRL::GenerateMotionBlurImg(float* InputImg, int iwidth,
+                                               int iheight, float* BlurImg,
+                                               float* outputWeight, int width,
+                                               int height, bool bforward) {
+  int i = 0, index = 0, totalpixel = width * height;
+
+  if (WarpImgBuffer.empty()) {
+    SetBuffer(width, height);
+  }
+
+  memset(BlurImg, 0, totalpixel * sizeof(float));
+  memset(outputWeight, 0, totalpixel * sizeof(float));
+  for (i = 0; i < NumSamples; i++) {
+    if (bforward) {
+      WarpImage(InputImg, iwidth, iheight, WarpImgBuffer.data(),
+                WarpWeightBuffer.data(), width, height, i);
+    } else {
+      WarpImage(InputImg, iwidth, iheight, WarpImgBuffer.data(),
+                WarpWeightBuffer.data(), width, height, -i);
+    }
+    for (index = 0; index < totalpixel; index++) {
+      BlurImg[index] += WarpImgBuffer[index] * WarpWeightBuffer[index];
+      outputWeight[index] += WarpWeightBuffer[index];
+    }
+  }
+
+  for (index = 0; index < totalpixel; index++) {
+    BlurImg[index] /= outputWeight[index];
+  }
+}
+
 void ProjectiveMotionRL::GenerateMotionBlurImg(float* InputImg,
                                                float* inputWeight, int iwidth,
                                                int iheight, float* BlurImg,
