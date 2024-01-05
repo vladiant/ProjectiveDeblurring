@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(ProjectiveDeblur)
 
-find_package(Threads REQUIRED)
+find_package(OpenCV REQUIRED)
 
 add_executable(
     ${PROJECT_NAME}
@@ -33,6 +33,7 @@ target_include_directories(
     ${PROJECT_NAME}
     PUBLIC
         include
+        ${OpenCV_INCLUDE_DIRS}
 )
 
 target_compile_options(
@@ -47,4 +48,5 @@ target_link_libraries(
    ${PROJECT_NAME}
    PRIVATE
       $<$<CXX_COMPILER_ID:Clang>:-fsanitize=address>
+      ${OpenCV_LIBS}
 )
