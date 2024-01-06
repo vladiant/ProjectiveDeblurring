@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <memory>
+#include <opencv2/imgproc.hpp>
 
 #include "BicubicInterpolation.h"
 #include "ImResize.h"
@@ -119,10 +120,25 @@ void ProjectiveMotionRL::WarpImage(float* InputImg, int iwidth, int iheight,
         if (fx >= iwidth - 1.001f) fx = iwidth - 1.001f;
         if (fy >= iheight - 1.001f) fy = iheight - 1.001f;
 
-        OutputImg[index] =
-            ReturnInterpolatedValueFast(fx, fy, InputImg, iwidth, iheight);
+        // OutputImg[index] =
+        //     ReturnInterpolatedValueFast(fx, fy, InputImg, iwidth, iheight);
       }
     }
+
+    const cv::Mat inImg(height, width, CV_32FC1, InputImg);
+    const cv::Mat outImg(height, width, CV_32FC1, OutputImg);
+    const cv::Mat hMat(3, 3, CV_32FC1, IHmatrix[i].Hmatrix);
+
+    float transf[9] = {1.0, 0.0, -woffset, 0.0, 1.0, -hoffset, 0.0, 0.0, 1.0};
+    const cv::Mat coordTransf(3, 3, CV_32FC1, transf);
+    float backTransf[9] = {1.0, 0.0, woffset, 0.0, 1.0, hoffset, 0.0, 0.0, 1.0};
+    const cv::Mat coordBackTransf(3, 3, CV_32FC1, backTransf);
+    const cv::Mat perspMat = coordBackTransf * hMat * coordTransf;
+
+    cv::warpPerspective(inImg, outImg, perspMat, cv::Size(iwidth, iheight),
+                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                        cv::BORDER_REPLICATE);
+
   } else if (i < 0 && i > -NumSamples) {
     float woffset = width * 0.5f, hoffset = height * 0.5f;
     float iwoffset = iwidth * 0.5f, ihoffset = iheight * 0.5f;
@@ -146,10 +162,24 @@ void ProjectiveMotionRL::WarpImage(float* InputImg, int iwidth, int iheight,
         if (fx >= iwidth - 1.001f) fx = iwidth - 1.001f;
         if (fy >= iheight - 1.001f) fy = iheight - 1.001f;
 
-        OutputImg[index] =
-            ReturnInterpolatedValueFast(fx, fy, InputImg, iwidth, iheight);
+        // OutputImg[index] =
+        //     ReturnInterpolatedValueFast(fx, fy, InputImg, iwidth, iheight);
       }
     }
+
+    const cv::Mat inImg(height, width, CV_32FC1, InputImg);
+    const cv::Mat outImg(height, width, CV_32FC1, OutputImg);
+    const cv::Mat hMat(3, 3, CV_32FC1, Hmatrix[i].Hmatrix);
+
+    float transf[9] = {1.0, 0.0, -woffset, 0.0, 1.0, -hoffset, 0.0, 0.0, 1.0};
+    const cv::Mat coordTransf(3, 3, CV_32FC1, transf);
+    float backTransf[9] = {1.0, 0.0, woffset, 0.0, 1.0, hoffset, 0.0, 0.0, 1.0};
+    const cv::Mat coordBackTransf(3, 3, CV_32FC1, backTransf);
+    const cv::Mat perspMat = coordBackTransf * hMat * coordTransf;
+
+    cv::warpPerspective(inImg, outImg, perspMat, cv::Size(iwidth, iheight),
+                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                        cv::BORDER_REPLICATE);
   }
 }
 
