@@ -8,6 +8,10 @@
 
 //#define __SHOWERROR__
 
+void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
+               float* OutputImg, float* outputWeight, int width, int height,
+               const Homography& homography);
+
 class ProjectiveMotionRL {
  public:
   constexpr static int NumSamples = 30;
