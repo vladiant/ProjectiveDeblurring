@@ -8,6 +8,8 @@ add_executable(
     ${PROJECT_NAME}
     include/BicubicInterpolation.h
     src/BicubicInterpolation.cpp
+    include/warping.h
+    src/warping.cpp
     include/bitmap.h
     src/bitmap.cpp
     include/homography.h
