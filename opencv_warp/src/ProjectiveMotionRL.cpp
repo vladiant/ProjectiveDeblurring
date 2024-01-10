@@ -108,7 +108,7 @@ void ProjectiveMotionRL::WarpImage(float* InputImg, int iwidth, int iheight,
 
     const cv::Mat inImg(height, width, CV_32FC1, InputImg);
     const cv::Mat outImg(height, width, CV_32FC1, OutputImg);
-    const cv::Mat hMat(3, 3, CV_32FC1, Hmatrix[i].Hmatrix);
+    const cv::Mat hMat(3, 3, CV_32FC1, Hmatrix[-i].Hmatrix);
 
     float transf[9] = {1.0, 0.0, -woffset, 0.0, 1.0, -hoffset, 0.0, 0.0, 1.0};
     const cv::Mat coordTransf(3, 3, CV_32FC1, transf);

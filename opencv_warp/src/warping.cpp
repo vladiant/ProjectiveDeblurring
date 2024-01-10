@@ -1,5 +1,7 @@
 #include "warping.h"
 
+#include <opencv2/imgproc.hpp>
+
 #include "BicubicInterpolation.h"
 
 void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
@@ -10,34 +12,33 @@ void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
   const float iwoffset = iwidth * 0.5f;
   const float ihoffset = iheight * 0.5f;
 
-  for (int y = 0, index = 0; y < height; y++) {
-    for (int x = 0; x < width; x++, index++) {
-      float fx = x - woffset;
-      float fy = y - hoffset;
-      homography.Transform(fx, fy);  // Inverse mapping, use inverse instead
-      fx += iwoffset;
-      fy += ihoffset;
+  const cv::Mat inImg(height, width, CV_32FC1, InputImg);
+  const cv::Mat outImg(height, width, CV_32FC1, OutputImg);
+  const cv::Mat hMat(3, 3, CV_32FC1, (void*)homography.Hmatrix);
 
-      if (fx >= 0 && fx < iwidth - 1 && fy >= 0 && fy < iheight - 1) {
-        if (inputWeight) {
-          outputWeight[index] =
-              0.01f +
-              ReturnInterpolatedValueFast(fx, fy, inputWeight, iwidth, iheight);
-        } else {
-          outputWeight[index] = 1.01f;
-        }
-      } else {
-        outputWeight[index] = 0.01f;
-      }
+  float transf[9] = {1.0, 0.0, -woffset, 0.0, 1.0, -hoffset, 0.0, 0.0, 1.0};
+  const cv::Mat coordTransf(3, 3, CV_32FC1, transf);
+  float backTransf[9] = {1.0, 0.0, woffset, 0.0, 1.0, hoffset, 0.0, 0.0, 1.0};
+  const cv::Mat coordBackTransf(3, 3, CV_32FC1, backTransf);
+  const cv::Mat perspMat = coordBackTransf * hMat * coordTransf;
 
-      if (fx < 0) fx = 0;
-      if (fy < 0) fy = 0;
-      if (fx >= iwidth - 1.001f) fx = iwidth - 1.001f;
-      if (fy >= iheight - 1.001f) fy = iheight - 1.001f;
+  cv::warpPerspective(inImg, outImg, perspMat, cv::Size(iwidth, iheight),
+                      cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                      cv::BORDER_REPLICATE);
 
-      OutputImg[index] =
-          ReturnInterpolatedValueFast(fx, fy, InputImg, iwidth, iheight);
-    }
+  const cv::Mat outWeight(height, width, CV_32FC1, outputWeight);
+  if (inputWeight) {
+    const cv::Mat inWeight(height, width, CV_32FC1, inputWeight);
+    cv::warpPerspective(inWeight + 0.01, outWeight, perspMat,
+                        cv::Size(iwidth, iheight),
+                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                        cv::BORDER_CONSTANT, cv::Scalar(0.01));
+  } else {
+    const cv::Mat inWeight(height, width, CV_32FC1, cv::Scalar(1.01));
+    cv::warpPerspective(inWeight, outWeight, perspMat,
+                        cv::Size(iwidth, iheight),
+                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                        cv::BORDER_CONSTANT, cv::Scalar(0.01));
   }
 }
 
@@ -50,34 +51,42 @@ void warpImage(float* InputImgR, float* InputImgG, float* InputImgB,
   const float iwoffset = iwidth * 0.5f;
   const float ihoffset = iheight * 0.5f;
 
-  for (int y = 0, index = 0; y < height; y++) {
-    for (int x = 0; x < width; x++, index++) {
-      float fx = x - woffset;
-      float fy = y - hoffset;
-      homography.Transform(fx, fy);  // Inverse mapping, use inverse instead
-      fx += iwoffset;
-      fy += ihoffset;
+  const cv::Mat inImgR(height, width, CV_32FC1, InputImgR);
+  const cv::Mat inImgG(height, width, CV_32FC1, InputImgG);
+  const cv::Mat inImgB(height, width, CV_32FC1, InputImgB);
+  const cv::Mat outImgR(height, width, CV_32FC1, OutputImgR);
+  const cv::Mat outImgG(height, width, CV_32FC1, OutputImgG);
+  const cv::Mat outImgB(height, width, CV_32FC1, OutputImgB);
+  const cv::Mat hMat(3, 3, CV_32FC1, (void*)homography.Hmatrix);
 
-      if (fx >= 0 && fx < iwidth - 1 && fy >= 0 && fy < iheight - 1) {
-        if (inputWeight) {
-          outputWeight[index] =
-              0.01f +
-              ReturnInterpolatedValueFast(fx, fy, inputWeight, iwidth, iheight);
-        } else {
-          outputWeight[index] = 1.01f;
-        }
-      } else {
-        outputWeight[index] = 0.01f;
-      }
+  float transf[9] = {1.0, 0.0, -woffset, 0.0, 1.0, -hoffset, 0.0, 0.0, 1.0};
+  const cv::Mat coordTransf(3, 3, CV_32FC1, transf);
+  float backTransf[9] = {1.0, 0.0, woffset, 0.0, 1.0, hoffset, 0.0, 0.0, 1.0};
+  const cv::Mat coordBackTransf(3, 3, CV_32FC1, backTransf);
+  const cv::Mat perspMat = coordBackTransf * hMat * coordTransf;
 
-      if (fx < 0) fx = 0;
-      if (fy < 0) fy = 0;
-      if (fx >= iwidth - 1.001f) fx = iwidth - 1.001f;
-      if (fy >= iheight - 1.001f) fy = iheight - 1.001f;
+  cv::warpPerspective(inImgR, outImgR, perspMat, cv::Size(iwidth, iheight),
+                      cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                      cv::BORDER_REPLICATE);
+  cv::warpPerspective(inImgG, outImgG, perspMat, cv::Size(iwidth, iheight),
+                      cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                      cv::BORDER_REPLICATE);
+  cv::warpPerspective(inImgB, outImgB, perspMat, cv::Size(iwidth, iheight),
+                      cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                      cv::BORDER_REPLICATE);
 
-      ReturnInterpolatedValueFast(fx, fy, InputImgR, InputImgG, InputImgB,
-                                  iwidth, iheight, OutputImgR[index],
-                                  OutputImgG[index], OutputImgB[index]);
-    }
+  const cv::Mat outWeight(height, width, CV_32FC1, outputWeight);
+  if (inputWeight) {
+    const cv::Mat inWeight(height, width, CV_32FC1, inputWeight);
+    cv::warpPerspective(inWeight + 0.01, outWeight, perspMat,
+                        cv::Size(iwidth, iheight),
+                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                        cv::BORDER_CONSTANT, cv::Scalar(0.01));
+  } else {
+    const cv::Mat inWeight(height, width, CV_32FC1, cv::Scalar(1.01));
+    cv::warpPerspective(inWeight, outWeight, perspMat,
+                        cv::Size(iwidth, iheight),
+                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                        cv::BORDER_CONSTANT, cv::Scalar(0.01));
   }
 }
