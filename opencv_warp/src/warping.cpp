@@ -6,7 +6,7 @@
 
 void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
                float* OutputImg, float* outputWeight, int width, int height,
-               const Homography& homography) {
+               float hmatrix[3][3]) {
   const float woffset = width * 0.5f;
   const float hoffset = height * 0.5f;
   const float iwoffset = iwidth * 0.5f;
@@ -14,7 +14,7 @@ void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
 
   const cv::Mat inImg(height, width, CV_32FC1, InputImg);
   const cv::Mat outImg(height, width, CV_32FC1, OutputImg);
-  const cv::Mat hMat(3, 3, CV_32FC1, (void*)homography.Hmatrix);
+  const cv::Mat hMat(3, 3, CV_32FC1, hmatrix);
 
   float transf[9] = {1.0, 0.0, -woffset, 0.0, 1.0, -hoffset, 0.0, 0.0, 1.0};
   const cv::Mat coordTransf(3, 3, CV_32FC1, transf);
@@ -45,7 +45,7 @@ void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
 void warpImage(float* InputImgR, float* InputImgG, float* InputImgB,
                float* inputWeight, int iwidth, int iheight, float* OutputImgR,
                float* OutputImgG, float* OutputImgB, float* outputWeight,
-               int width, int height, const Homography& homography) {
+               int width, int height, float hmatrix[3][3]) {
   const float woffset = width * 0.5f;
   const float hoffset = height * 0.5f;
   const float iwoffset = iwidth * 0.5f;
@@ -57,7 +57,7 @@ void warpImage(float* InputImgR, float* InputImgG, float* InputImgB,
   const cv::Mat outImgR(height, width, CV_32FC1, OutputImgR);
   const cv::Mat outImgG(height, width, CV_32FC1, OutputImgG);
   const cv::Mat outImgB(height, width, CV_32FC1, OutputImgB);
-  const cv::Mat hMat(3, 3, CV_32FC1, (void*)homography.Hmatrix);
+  const cv::Mat hMat(3, 3, CV_32FC1, hmatrix);
 
   float transf[9] = {1.0, 0.0, -woffset, 0.0, 1.0, -hoffset, 0.0, 0.0, 1.0};
   const cv::Mat coordTransf(3, 3, CV_32FC1, transf);

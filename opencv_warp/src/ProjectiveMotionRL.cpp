@@ -24,10 +24,10 @@ void ProjectiveMotionRL::WarpImage(float* InputImg, float* inputWeight,
                                    int i) {
   if (i >= 0 && i < NumSamples) {
     warpImage(InputImg, inputWeight, iwidth, iheight, OutputImg, outputWeight,
-              width, height, IHmatrix[i]);
+              width, height, IHmatrix[i].Hmatrix);
   } else if (i < 0 && i > -NumSamples) {
     warpImage(InputImg, inputWeight, iwidth, iheight, OutputImg, outputWeight,
-              width, height, Hmatrix[-i]);
+              width, height, Hmatrix[-i].Hmatrix);
   }
 }
 
@@ -131,11 +131,11 @@ void ProjectiveMotionRL::WarpImage(float* InputImgR, float* InputImgG,
   if (i >= 0 && i < NumSamples) {
     warpImage(InputImgR, InputImgG, InputImgB, inputWeight, iwidth, iheight,
               OutputImgR, OutputImgG, OutputImgB, outputWeight, width, height,
-              IHmatrix[i]);
+              IHmatrix[i].Hmatrix);
   } else if (i < 0 && i > -NumSamples) {
     warpImage(InputImgR, InputImgG, InputImgB, inputWeight, iwidth, iheight,
               OutputImgR, OutputImgG, OutputImgB, outputWeight, width, height,
-              Hmatrix[-i]);
+              Hmatrix[-i].Hmatrix);
   }
 }
 
