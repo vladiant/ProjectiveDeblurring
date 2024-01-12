@@ -18,7 +18,7 @@ void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
 
   float transf[9] = {1.0, 0.0, -woffset, 0.0, 1.0, -hoffset, 0.0, 0.0, 1.0};
   const cv::Mat coordTransf(3, 3, CV_32FC1, transf);
-  float backTransf[9] = {1.0, 0.0, woffset, 0.0, 1.0, hoffset, 0.0, 0.0, 1.0};
+  float backTransf[9] = {1.0, 0.0, iwoffset, 0.0, 1.0, ihoffset, 0.0, 0.0, 1.0};
   const cv::Mat coordBackTransf(3, 3, CV_32FC1, backTransf);
   const cv::Mat perspMat = coordBackTransf * hMat * coordTransf;
 
@@ -53,7 +53,7 @@ void warpImage(float* InputImgR, float* InputImgG, float* InputImgB,
 
   float transf[9] = {1.0, 0.0, -woffset, 0.0, 1.0, -hoffset, 0.0, 0.0, 1.0};
   const cv::Mat coordTransf(3, 3, CV_32FC1, transf);
-  float backTransf[9] = {1.0, 0.0, woffset, 0.0, 1.0, hoffset, 0.0, 0.0, 1.0};
+  float backTransf[9] = {1.0, 0.0, iwoffset, 0.0, 1.0, ihoffset, 0.0, 0.0, 1.0};
   const cv::Mat coordBackTransf(3, 3, CV_32FC1, backTransf);
   const cv::Mat perspMat = coordBackTransf * hMat * coordTransf;
 
