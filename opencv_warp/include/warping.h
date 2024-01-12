@@ -1,7 +1,5 @@
 #pragma once
 
-#include "homography.h"
-
 void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
                float* OutputImg, float* outputWeight, int width, int height,
                float hmatrix[3][3]);

@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cmath>
 #include <memory>
-#include <opencv2/imgproc.hpp>
 
 #include "BicubicInterpolation.h"
 #include "ImResize.h"
@@ -31,97 +30,6 @@ void ProjectiveMotionRL::WarpImage(float* InputImg, float* inputWeight,
   }
 }
 
-void ProjectiveMotionRL::WarpImage(float* InputImg, int iwidth, int iheight,
-                                   float* OutputImg, float* outputWeight,
-                                   int width, int height, int i) {
-  int x = 0, y = 0, index = 0;
-  float fx = NAN, fy = NAN;
-  if (i >= 0 && i < NumSamples) {
-    float woffset = width * 0.5f, hoffset = height * 0.5f;
-    float iwoffset = iwidth * 0.5f, ihoffset = iheight * 0.5f;
-
-    for (y = 0, index = 0; y < height; y++) {
-      for (x = 0; x < width; x++, index++) {
-        fx = x - woffset;
-        fy = y - hoffset;
-        IHmatrix[i].Transform(fx, fy);  // Inverse mapping, use inverse instead
-        fx += iwoffset;
-        fy += ihoffset;
-
-        if (fx >= 0 && fx < iwidth - 1 && fy >= 0 && fy < iheight - 1) {
-          outputWeight[index] = 1.01f;
-        } else {
-          outputWeight[index] = 0.01f;
-        }
-
-        if (fx < 0) fx = 0;
-        if (fy < 0) fy = 0;
-        if (fx >= iwidth - 1.001f) fx = iwidth - 1.001f;
-        if (fy >= iheight - 1.001f) fy = iheight - 1.001f;
-
-        // OutputImg[index] =
-        //     ReturnInterpolatedValueFast(fx, fy, InputImg, iwidth, iheight);
-      }
-    }
-
-    const cv::Mat inImg(height, width, CV_32FC1, InputImg);
-    const cv::Mat outImg(height, width, CV_32FC1, OutputImg);
-    const cv::Mat hMat(3, 3, CV_32FC1, IHmatrix[i].Hmatrix);
-
-    float transf[9] = {1.0, 0.0, -woffset, 0.0, 1.0, -hoffset, 0.0, 0.0, 1.0};
-    const cv::Mat coordTransf(3, 3, CV_32FC1, transf);
-    float backTransf[9] = {1.0, 0.0, woffset, 0.0, 1.0, hoffset, 0.0, 0.0, 1.0};
-    const cv::Mat coordBackTransf(3, 3, CV_32FC1, backTransf);
-    const cv::Mat perspMat = coordBackTransf * hMat * coordTransf;
-
-    cv::warpPerspective(inImg, outImg, perspMat, cv::Size(iwidth, iheight),
-                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
-                        cv::BORDER_REPLICATE);
-
-  } else if (i < 0 && i > -NumSamples) {
-    float woffset = width * 0.5f, hoffset = height * 0.5f;
-    float iwoffset = iwidth * 0.5f, ihoffset = iheight * 0.5f;
-
-    for (y = 0, index = 0; y < height; y++) {
-      for (x = 0; x < width; x++, index++) {
-        fx = x - woffset;
-        fy = y - hoffset;
-        Hmatrix[-i].Transform(fx, fy);  // Inverse mapping, use inverse instead
-        fx += iwoffset;
-        fy += ihoffset;
-
-        if (fx >= 0 && fx < iwidth - 1 && fy >= 0 && fy < iheight - 1) {
-          outputWeight[index] = 1.01f;
-        } else {
-          outputWeight[index] = 0.01f;
-        }
-
-        if (fx < 0) fx = 0;
-        if (fy < 0) fy = 0;
-        if (fx >= iwidth - 1.001f) fx = iwidth - 1.001f;
-        if (fy >= iheight - 1.001f) fy = iheight - 1.001f;
-
-        // OutputImg[index] =
-        //     ReturnInterpolatedValueFast(fx, fy, InputImg, iwidth, iheight);
-      }
-    }
-
-    const cv::Mat inImg(height, width, CV_32FC1, InputImg);
-    const cv::Mat outImg(height, width, CV_32FC1, OutputImg);
-    const cv::Mat hMat(3, 3, CV_32FC1, Hmatrix[-i].Hmatrix);
-
-    float transf[9] = {1.0, 0.0, -woffset, 0.0, 1.0, -hoffset, 0.0, 0.0, 1.0};
-    const cv::Mat coordTransf(3, 3, CV_32FC1, transf);
-    float backTransf[9] = {1.0, 0.0, woffset, 0.0, 1.0, hoffset, 0.0, 0.0, 1.0};
-    const cv::Mat coordBackTransf(3, 3, CV_32FC1, backTransf);
-    const cv::Mat perspMat = coordBackTransf * hMat * coordTransf;
-
-    cv::warpPerspective(inImg, outImg, perspMat, cv::Size(iwidth, iheight),
-                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
-                        cv::BORDER_REPLICATE);
-  }
-}
-
 void ProjectiveMotionRL::WarpImage(float* InputImgR, float* InputImgG,
                                    float* InputImgB, float* inputWeight,
                                    int iwidth, int iheight, float* OutputImgR,
@@ -136,37 +44,6 @@ void ProjectiveMotionRL::WarpImage(float* InputImgR, float* InputImgG,
     warpImage(InputImgR, InputImgG, InputImgB, inputWeight, iwidth, iheight,
               OutputImgR, OutputImgG, OutputImgB, outputWeight, width, height,
               Hmatrix[-i].Hmatrix);
-  }
-}
-
-void ProjectiveMotionRL::GenerateMotionBlurImg(float* InputImg, int iwidth,
-                                               int iheight, float* BlurImg,
-                                               float* outputWeight, int width,
-                                               int height, bool bforward) {
-  int i = 0, index = 0, totalpixel = width * height;
-
-  if (WarpImgBuffer.empty()) {
-    SetBuffer(width, height);
-  }
-
-  memset(BlurImg, 0, totalpixel * sizeof(float));
-  memset(outputWeight, 0, totalpixel * sizeof(float));
-  for (i = 0; i < NumSamples; i++) {
-    if (bforward) {
-      WarpImage(InputImg, iwidth, iheight, WarpImgBuffer.data(),
-                WarpWeightBuffer.data(), width, height, i);
-    } else {
-      WarpImage(InputImg, iwidth, iheight, WarpImgBuffer.data(),
-                WarpWeightBuffer.data(), width, height, -i);
-    }
-    for (index = 0; index < totalpixel; index++) {
-      BlurImg[index] += WarpImgBuffer[index] * WarpWeightBuffer[index];
-      outputWeight[index] += WarpWeightBuffer[index];
-    }
-  }
-
-  for (index = 0; index < totalpixel; index++) {
-    BlurImg[index] /= outputWeight[index];
   }
 }
 

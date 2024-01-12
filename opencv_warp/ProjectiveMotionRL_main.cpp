@@ -22,6 +22,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
   std::vector<float> bImg[3];
   std::vector<float> deblurImg[3];
   std::vector<float> intermediatedeblurImg[3];
+  std::vector<float> inputWeight(width * height, 1.01);
   std::vector<float> outputWeight(width * height);
   float RMSError = NAN;
   bImg[0].resize(width * height);
@@ -109,14 +110,14 @@ int main(int /*argc*/, char* /*argv*/[]) {
   ///////////////////////////////////
   printf("Generate Motion Blurred Image\n");
   m_ProjectiveMotionRL.GenerateMotionBlurImg(
-      fImg[0].data(), width, height, bImg[0].data(), outputWeight.data(),
-      blurwidth, blurheight, true);
+      fImg[0].data(), inputWeight.data(), width, height, bImg[0].data(),
+      outputWeight.data(), blurwidth, blurheight, true);
   m_ProjectiveMotionRL.GenerateMotionBlurImg(
-      fImg[1].data(), width, height, bImg[1].data(), outputWeight.data(),
-      blurwidth, blurheight, true);
+      fImg[1].data(), inputWeight.data(), width, height, bImg[1].data(),
+      outputWeight.data(), blurwidth, blurheight, true);
   m_ProjectiveMotionRL.GenerateMotionBlurImg(
-      fImg[2].data(), width, height, bImg[2].data(), outputWeight.data(),
-      blurwidth, blurheight, true);
+      fImg[2].data(), inputWeight.data(), width, height, bImg[2].data(),
+      outputWeight.data(), blurwidth, blurheight, true);
 
   RMSError = (m_ProjectiveMotionRL.ComputeRMSError(
                   fImg[0].data(), bImg[0].data(), width, height) +

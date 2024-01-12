@@ -318,14 +318,6 @@ class ProjectiveMotionRL {
                  float* inputWeight, int iwidth, int iheight, float* OutputImgR,
                  float* OutputImgG, float* OutputImgB, float* outputWeight,
                  int width, int height, int i);
-
-  // Methods without input weight
-  void WarpImage(float* InputImg, int iwidth, int iheight, float* OutputImg,
-                 float* outputWeight, int width, int height, int i);
-  void GenerateMotionBlurImg(float* InputImg, int iwidth, int iheight,
-                             float* BlurImg, float* outputWeight, int width,
-                             int height, bool bforward = true);
-
   // bforward: true forward, false backward
   void GenerateMotionBlurImg(float* InputImg, float* inputWeight, int iwidth,
                              int iheight, float* BlurImg, float* outputWeight,
