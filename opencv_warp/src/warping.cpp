@@ -1,8 +1,11 @@
 #include "warping.h"
 
+#include <future>
 #include <opencv2/imgproc.hpp>
 
 #include "BicubicInterpolation.h"
+
+constexpr static std::launch kExecutionPolicy = std::launch::async;
 
 void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
                float* OutputImg, float* outputWeight, int width, int height,
@@ -12,8 +15,6 @@ void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
   const float iwoffset = iwidth * 0.5f;
   const float ihoffset = iheight * 0.5f;
 
-  const cv::Mat inImg(height, width, CV_32FC1, InputImg);
-  const cv::Mat outImg(height, width, CV_32FC1, OutputImg);
   const cv::Mat hMat(3, 3, CV_32FC1, hmatrix);
 
   float transf[9] = {1.0, 0.0, -woffset, 0.0, 1.0, -hoffset, 0.0, 0.0, 1.0};
@@ -22,9 +23,14 @@ void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
   const cv::Mat coordBackTransf(3, 3, CV_32FC1, backTransf);
   const cv::Mat perspMat = coordBackTransf * hMat * coordTransf;
 
-  cv::warpPerspective(inImg, outImg, perspMat, cv::Size(iwidth, iheight),
-                      cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
-                      cv::BORDER_REPLICATE);
+  const auto warpImg = [&]() {
+    const cv::Mat inImg(height, width, CV_32FC1, InputImg);
+    const cv::Mat outImg(height, width, CV_32FC1, OutputImg);
+    cv::warpPerspective(inImg, outImg, perspMat, cv::Size(iwidth, iheight),
+                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                        cv::BORDER_REPLICATE);
+  };
+  auto warpImgTask = std::async(kExecutionPolicy, warpImg);
 
   const cv::Mat outWeight(height, width, CV_32FC1, outputWeight);
   const cv::Mat inWeight(height, width, CV_32FC1, inputWeight);
@@ -32,6 +38,8 @@ void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
                       cv::Size(iwidth, iheight),
                       cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
                       cv::BORDER_CONSTANT, cv::Scalar(0.01));
+
+  warpImgTask.get();
 }
 
 void warpImage(float* InputImgR, float* InputImgG, float* InputImgB,
@@ -57,15 +65,27 @@ void warpImage(float* InputImgR, float* InputImgG, float* InputImgB,
   const cv::Mat coordBackTransf(3, 3, CV_32FC1, backTransf);
   const cv::Mat perspMat = coordBackTransf * hMat * coordTransf;
 
-  cv::warpPerspective(inImgR, outImgR, perspMat, cv::Size(iwidth, iheight),
-                      cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
-                      cv::BORDER_REPLICATE);
-  cv::warpPerspective(inImgG, outImgG, perspMat, cv::Size(iwidth, iheight),
-                      cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
-                      cv::BORDER_REPLICATE);
-  cv::warpPerspective(inImgB, outImgB, perspMat, cv::Size(iwidth, iheight),
-                      cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
-                      cv::BORDER_REPLICATE);
+  const auto warpImgR = [&]() {
+    cv::warpPerspective(inImgR, outImgR, perspMat, cv::Size(iwidth, iheight),
+                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                        cv::BORDER_REPLICATE);
+  };
+
+  const auto warpImgG = [&]() {
+    cv::warpPerspective(inImgG, outImgG, perspMat, cv::Size(iwidth, iheight),
+                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                        cv::BORDER_REPLICATE);
+  };
+
+  const auto warpImgB = [&]() {
+    cv::warpPerspective(inImgB, outImgB, perspMat, cv::Size(iwidth, iheight),
+                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                        cv::BORDER_REPLICATE);
+  };
+
+  auto warpImgTaskR = std::async(kExecutionPolicy, warpImgR);
+  auto warpImgTaskG = std::async(kExecutionPolicy, warpImgG);
+  auto warpImgTaskB = std::async(kExecutionPolicy, warpImgB);
 
   const cv::Mat outWeight(height, width, CV_32FC1, outputWeight);
   const cv::Mat inWeight(height, width, CV_32FC1, inputWeight);
@@ -73,4 +93,8 @@ void warpImage(float* InputImgR, float* InputImgG, float* InputImgB,
                       cv::Size(iwidth, iheight),
                       cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
                       cv::BORDER_CONSTANT, cv::Scalar(0.01));
+
+  warpImgTaskR.get();
+  warpImgTaskG.get();
+  warpImgTaskB.get();
 }
