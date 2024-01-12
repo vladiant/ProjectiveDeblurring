@@ -27,19 +27,11 @@ void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
                       cv::BORDER_REPLICATE);
 
   const cv::Mat outWeight(height, width, CV_32FC1, outputWeight);
-  if (inputWeight) {
-    const cv::Mat inWeight(height, width, CV_32FC1, inputWeight);
-    cv::warpPerspective(inWeight + 0.01, outWeight, perspMat,
-                        cv::Size(iwidth, iheight),
-                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
-                        cv::BORDER_CONSTANT, cv::Scalar(0.01));
-  } else {
-    const cv::Mat inWeight(height, width, CV_32FC1, cv::Scalar(1.01));
-    cv::warpPerspective(inWeight, outWeight, perspMat,
-                        cv::Size(iwidth, iheight),
-                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
-                        cv::BORDER_CONSTANT, cv::Scalar(0.01));
-  }
+  const cv::Mat inWeight(height, width, CV_32FC1, inputWeight);
+  cv::warpPerspective(inWeight + 0.01, outWeight, perspMat,
+                      cv::Size(iwidth, iheight),
+                      cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                      cv::BORDER_CONSTANT, cv::Scalar(0.01));
 }
 
 void warpImage(float* InputImgR, float* InputImgG, float* InputImgB,
@@ -76,17 +68,9 @@ void warpImage(float* InputImgR, float* InputImgG, float* InputImgB,
                       cv::BORDER_REPLICATE);
 
   const cv::Mat outWeight(height, width, CV_32FC1, outputWeight);
-  if (inputWeight) {
-    const cv::Mat inWeight(height, width, CV_32FC1, inputWeight);
-    cv::warpPerspective(inWeight + 0.01, outWeight, perspMat,
-                        cv::Size(iwidth, iheight),
-                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
-                        cv::BORDER_CONSTANT, cv::Scalar(0.01));
-  } else {
-    const cv::Mat inWeight(height, width, CV_32FC1, cv::Scalar(1.01));
-    cv::warpPerspective(inWeight, outWeight, perspMat,
-                        cv::Size(iwidth, iheight),
-                        cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
-                        cv::BORDER_CONSTANT, cv::Scalar(0.01));
-  }
+  const cv::Mat inWeight(height, width, CV_32FC1, inputWeight);
+  cv::warpPerspective(inWeight + 0.01, outWeight, perspMat,
+                      cv::Size(iwidth, iheight),
+                      cv::INTER_LINEAR | cv::WARP_INVERSE_MAP,
+                      cv::BORDER_CONSTANT, cv::Scalar(0.01));
 }

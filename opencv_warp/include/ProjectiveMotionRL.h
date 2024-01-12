@@ -54,6 +54,8 @@ class ProjectiveMotionRL {
   // These functions are used to set Buffer for caching
   ////////////////////////////////////
   void SetBuffer(int width, int height) {
+    mInitialInputWeight.assign(width * height, 1.01);
+
     WarpImgBuffer.resize(width * height);
     WarpImgBufferR.resize(width * height);
     WarpImgBufferG.resize(width * height);
@@ -472,6 +474,7 @@ class ProjectiveMotionRL {
   // These are buffer and lookup table variables
   float BilateralTable[256];
   float SpsTable[256];
+  std::vector<float> mInitialInputWeight;
   std::vector<float> WarpImgBuffer;
   std::vector<float> WarpImgBufferR;
   std::vector<float> WarpImgBufferG;
