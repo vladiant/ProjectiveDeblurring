@@ -7,9 +7,9 @@
 
 constexpr static std::launch kExecutionPolicy = std::launch::async;
 
-void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
-               float* OutputImg, float* outputWeight, int width, int height,
-               float hmatrix[3][3]) {
+void warpImageGray(float* InputImg, float* inputWeight, int iwidth, int iheight,
+                   float* OutputImg, float* outputWeight, int width, int height,
+                   float hmatrix[3][3]) {
   const float woffset = width * 0.5f;
   const float hoffset = height * 0.5f;
   const float iwoffset = iwidth * 0.5f;
@@ -42,10 +42,11 @@ void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
   warpImgTask.get();
 }
 
-void warpImage(float* InputImgR, float* InputImgG, float* InputImgB,
-               float* inputWeight, int iwidth, int iheight, float* OutputImgR,
-               float* OutputImgG, float* OutputImgB, float* outputWeight,
-               int width, int height, float hmatrix[3][3]) {
+void warpImageRgb(float* InputImgR, float* InputImgG, float* InputImgB,
+                  float* inputWeight, int iwidth, int iheight,
+                  float* OutputImgR, float* OutputImgG, float* OutputImgB,
+                  float* outputWeight, int width, int height,
+                  float hmatrix[3][3]) {
   const float woffset = width * 0.5f;
   const float hoffset = height * 0.5f;
   const float iwoffset = iwidth * 0.5f;

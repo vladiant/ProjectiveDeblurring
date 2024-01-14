@@ -161,9 +161,9 @@ void readBMP(const std::string& fname, std::vector<float>& fImg, int& width,
   std::cout << "readBMP " << width << " " << height << '\n';
 }
 
-void readBMP(const std::string& fname, std::vector<float>& fImgR,
-             std::vector<float>& fImgG, std::vector<float>& fImgB, int& width,
-             int& height) {
+void readBMPchannels(const std::string& fname, std::vector<float>& fImgR,
+                     std::vector<float>& fImgG, std::vector<float>& fImgB,
+                     int& width, int& height) {
   std::cout << "readBMP fname " << fname << '\n';
   auto Img = readBMP(fname, width, height);
   fImgR.resize(width * height);
@@ -269,9 +269,10 @@ void writeBMP(const std::string& iname, int width, int height,
   }
   writeBMP(iname, width, height, Img);
 }
-void writeBMP(const std::string& iname, int width, int height,
-              const std::vector<float>& dataR, const std::vector<float>& dataG,
-              const std::vector<float>& dataB) {
+void writeBMPchannels(const std::string& iname, int width, int height,
+                      const std::vector<float>& dataR,
+                      const std::vector<float>& dataG,
+                      const std::vector<float>& dataB) {
   int x = 0, y = 0, index = 0;
   std::vector<uint8_t> Img(3 * width * height);
   for (y = 0, index = 0; y < height; y++) {

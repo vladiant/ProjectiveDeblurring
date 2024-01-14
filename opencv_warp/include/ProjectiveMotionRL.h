@@ -154,12 +154,12 @@ class ProjectiveMotionRL {
     //                       minWeight;
     // }
   }
-  void SetGroundTruthImg(float* GroundTruth, int width, int height) {
+  void SetGroundTruthImgGray(float* GroundTruth, int width, int height) {
     GroundTruthImg.resize(width * height);
     memcpy(GroundTruthImg.data(), GroundTruth, width * height * sizeof(float));
   }
-  void SetGroundTruthImg(float* GroundTruthR, float* GroundTruthG,
-                         float* GroundTruthB, int width, int height) {
+  void SetGroundTruthImgRgb(float* GroundTruthR, float* GroundTruthG,
+                            float* GroundTruthB, int width, int height) {
     GroundTruthImgR.resize(width * height);
     GroundTruthImgG.resize(width * height);
     GroundTruthImgB.resize(width * height);
@@ -311,22 +311,24 @@ class ProjectiveMotionRL {
   // These functions are used to generate the Projective Motion Blur Images
   ////////////////////////////////////
   // i: postive forward, negative backward
-  void WarpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
-                 float* OutputImg, float* outputWeight, int width, int height,
-                 int i);
-  void WarpImage(float* InputImgR, float* InputImgG, float* InputImgB,
-                 float* inputWeight, int iwidth, int iheight, float* OutputImgR,
-                 float* OutputImgG, float* OutputImgB, float* outputWeight,
-                 int width, int height, int i);
+  void WarpImageGray(float* InputImg, float* inputWeight, int iwidth,
+                     int iheight, float* OutputImg, float* outputWeight,
+                     int width, int height, int i);
+  void WarpImageRgb(float* InputImgR, float* InputImgG, float* InputImgB,
+                    float* inputWeight, int iwidth, int iheight,
+                    float* OutputImgR, float* OutputImgG, float* OutputImgB,
+                    float* outputWeight, int width, int height, int i);
   // bforward: true forward, false backward
-  void GenerateMotionBlurImg(float* InputImg, float* inputWeight, int iwidth,
-                             int iheight, float* BlurImg, float* outputWeight,
-                             int width, int height, bool bforward = true);
-  void GenerateMotionBlurImg(float* InputImgR, float* InputImgG,
-                             float* InputImgB, float* inputWeight, int iwidth,
-                             int iheight, float* BlurImgR, float* BlurImgG,
-                             float* BlurImgB, float* outputWeight, int width,
-                             int height, bool bforward = true);
+  void GenerateMotionBlurImgGray(float* InputImg, float* inputWeight,
+                                 int iwidth, int iheight, float* BlurImg,
+                                 float* outputWeight, int width, int height,
+                                 bool bforward = true);
+  void GenerateMotionBlurImgRgb(float* InputImgR, float* InputImgG,
+                                float* InputImgB, float* inputWeight,
+                                int iwidth, int iheight, float* BlurImgR,
+                                float* BlurImgG, float* BlurImgB,
+                                float* outputWeight, int width, int height,
+                                bool bforward = true);
 
   ////////////////////////////////////
   // These functions are deblurring algorithm
@@ -334,60 +336,64 @@ class ProjectiveMotionRL {
   // This is the Basic algorithm
   // DeblurImg: the Input itself is initialization, so you can load
   // yBilateralLap own initialization
-  void ProjectiveMotionRLDeblur(float* BlurImg, int iwidth, int iheight,
-                                float* DeblurImg, int width, int height,
-                                int Niter = 20, bool bPoisson = true);
-  void ProjectiveMotionRLDeblur(float* BlurImgR, float* BlurImgG,
-                                float* BlurImgB, int iwidth, int iheight,
-                                float* DeblurImgR, float* DeblurImgG,
-                                float* DeblurImgB, int width, int height,
-                                int Niter = 20, bool bPoisson = true);
+  void ProjectiveMotionRLDeblurGray(float* BlurImg, int iwidth, int iheight,
+                                    float* DeblurImg, int width, int height,
+                                    int Niter = 20, bool bPoisson = true);
+  void ProjectiveMotionRLDeblurRgb(float* BlurImgR, float* BlurImgG,
+                                   float* BlurImgB, int iwidth, int iheight,
+                                   float* DeblurImgR, float* DeblurImgG,
+                                   float* DeblurImgB, int width, int height,
+                                   int Niter = 20, bool bPoisson = true);
 
   // This are the deblurring algorithm with regularization
   // Details please refers to paper
   // The lambda in TV regularization is 0.002, but it's un-normalized weight
   // Intensity range is between 0 and 1, so, the actual weight is 0.002f * 255 =
   // 0.51f for normalized weight
-  void ProjectiveMotionRLDeblurTVReg(float* BlurImg, int iwidth, int iheight,
-                                     float* DeblurImg, int width, int height,
-                                     int Niter = 20, bool bPoisson = true,
-                                     float lambda = 0.50f);
-  void ProjectiveMotionRLDeblurTVReg(float* BlurImgR, float* BlurImgG,
-                                     float* BlurImgB, int iwidth, int iheight,
-                                     float* DeblurImgR, float* DeblurImgG,
-                                     float* DeblurImgB, int width, int height,
-                                     int Niter = 20, bool bPoisson = true,
-                                     float lambda = 0.50f);
+  void ProjectiveMotionRLDeblurTVRegGray(float* BlurImg, int iwidth,
+                                         int iheight, float* DeblurImg,
+                                         int width, int height, int Niter = 20,
+                                         bool bPoisson = true,
+                                         float lambda = 0.50f);
+  void ProjectiveMotionRLDeblurTVRegRgb(float* BlurImgR, float* BlurImgG,
+                                        float* BlurImgB, int iwidth,
+                                        int iheight, float* DeblurImgR,
+                                        float* DeblurImgG, float* DeblurImgB,
+                                        int width, int height, int Niter = 20,
+                                        bool bPoisson = true,
+                                        float lambda = 0.50f);
   // Value of lambda used in Levin et al is also un-normalized by minWeight,
   // hence it's much smaller The typical range of this Sps in their
   // implementation is between 0.001 - 0.004 We use the same lambda as in TV
   // regularization for better comparison
-  void ProjectiveMotionRLDeblurSpsReg(float* BlurImg, int iwidth, int iheight,
-                                      float* DeblurImg, int width, int height,
-                                      int Niter = 20, bool bPoisson = true,
-                                      float lambda = 0.50f);
-  void ProjectiveMotionRLDeblurSpsReg(float* BlurImgR, float* BlurImgG,
-                                      float* BlurImgB, int iwidth, int iheight,
-                                      float* DeblurImgR, float* DeblurImgG,
-                                      float* DeblurImgB, int width, int height,
-                                      int Niter = 20, bool bPoisson = true,
-                                      float lambda = 0.50f);
+  void ProjectiveMotionRLDeblurSpsRegGray(float* BlurImg, int iwidth,
+                                          int iheight, float* DeblurImg,
+                                          int width, int height, int Niter = 20,
+                                          bool bPoisson = true,
+                                          float lambda = 0.50f);
+  void ProjectiveMotionRLDeblurSpsRegRgb(float* BlurImgR, float* BlurImgG,
+                                         float* BlurImgB, int iwidth,
+                                         int iheight, float* DeblurImgR,
+                                         float* DeblurImgG, float* DeblurImgB,
+                                         int width, int height, int Niter = 20,
+                                         bool bPoisson = true,
+                                         float lambda = 0.50f);
   // We use the same lambda as in TV regularization for better comparison
   // Parameter setting, noise variance, for bilateral reg is the same as
   // laplacian reg.
-  void ProjectiveMotionRLDeblurBilateralReg(
+  void ProjectiveMotionRLDeblurBilateralRegGray(
       float* BlurImg, int iwidth, int iheight, float* DeblurImg, int width,
       int height, int Niter = 20, bool bPoisson = true, float lambda = 0.50f);
-  void ProjectiveMotionRLDeblurBilateralReg(
+  void ProjectiveMotionRLDeblurBilateralRegRgb(
       float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth,
       int iheight, float* DeblurImgR, float* DeblurImgG, float* DeblurImgB,
       int width, int height, int Niter = 20, bool bPoisson = true,
       float lambda = 0.50f);
   // This is the bilateral laplacian regularization
-  void ProjectiveMotionRLDeblurBilateralLapReg(
+  void ProjectiveMotionRLDeblurBilateralLapRegGray(
       float* BlurImg, int iwidth, int iheight, float* DeblurImg, int width,
       int height, int Niter = 20, bool bPoisson = true, float lambda = 0.50f);
-  void ProjectiveMotionRLDeblurBilateralLapReg(
+  void ProjectiveMotionRLDeblurBilateralLapRegRgb(
       float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth,
       int iheight, float* DeblurImgR, float* DeblurImgG, float* DeblurImgB,
       int width, int height, int Niter = 20, bool bPoisson = true,
@@ -396,19 +402,20 @@ class ProjectiveMotionRL {
   ////////////////////////////////////
   // These functions are used to compute derivatives for regularization
   ////////////////////////////////////
-  void ComputeGradientXImage(float* Img, int width, int height, float* DxImg,
-                             bool bflag = true);
-  void ComputeGradientYImage(float* Img, int width, int height, float* DyImg,
-                             bool bflag = true);
-  void ComputeGradientImage(float* Img, int width, int height, float* DxImg,
-                            float* DyImg, bool bflag = true);
-  void ComputeBilaterRegImage(float* Img, int width, int height, float* BRImg);
+  void ComputeGradientXImageGray(float* Img, int width, int height,
+                                 float* DxImg, bool bflag = true);
+  void ComputeGradientYImageGray(float* Img, int width, int height,
+                                 float* DyImg, bool bflag = true);
+  void ComputeGradientImageGray(float* Img, int width, int height, float* DxImg,
+                                float* DyImg, bool bflag = true);
+  void ComputeBilaterRegImageGray(float* Img, int width, int height,
+                                  float* BRImg);
 
   ////////////////////////////////////
   // These functions are used to compute Errors
   ////////////////////////////////////
-  float ComputeRMSError(float* GroundTruth, float* DeblurredImg, int width,
-                        int height) {
+  float ComputeRMSErrorGray(float* GroundTruth, float* DeblurredImg, int width,
+                            int height) {
     float RMS = 0;
     if (GroundTruth) {
       int x, y, index;
@@ -436,7 +443,7 @@ class ProjectiveMotionRL {
   }
 
   // Noise variance = amp
-  void gaussianNoise(float* Img, int width, int height, float amp) {
+  void gaussianNoiseGray(float* Img, int width, int height, float amp) {
     int x, y, index;
     float random, noise;
     for (y = 0, index = 0; y < height; y++) {
@@ -451,10 +458,11 @@ class ProjectiveMotionRL {
   }
 
   // Multiscale version: not very useful...
-  void ProjectiveMotionRLDeblurMultiScale(float* BlurImg, int iwidth,
-                                          int iheight, float* DeblurImg,
-                                          int width, int height, int Niter = 10,
-                                          int Nscale = 5, bool bPoisson = true);
+  void ProjectiveMotionRLDeblurMultiScaleGray(float* BlurImg, int iwidth,
+                                              int iheight, float* DeblurImg,
+                                              int width, int height,
+                                              int Niter = 10, int Nscale = 5,
+                                              bool bPoisson = true);
 
   // These are the homography sequence for Projective motion blur model
   Homography Hmatrix[NumSamples];

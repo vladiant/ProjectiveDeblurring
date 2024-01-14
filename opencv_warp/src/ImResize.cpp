@@ -24,8 +24,8 @@ void ImResize(float* Img, int width, int height, float* Rimg, int Rwidth,
   }
 }
 
-void ImChopping(float* Img, int width, int height, float* Rimg, int Rwidth,
-                int Rheight) {
+void ImChoppingGray(float* Img, int width, int height, float* Rimg, int Rwidth,
+                    int Rheight) {
   int x = 0, y = 0, index = 0, lindex = 0;
   int shiftx = (Rwidth - width) / 2, shifty = (Rheight - height) / 2;
 
@@ -48,8 +48,8 @@ void ImChopping(float* Img, int width, int height, float* Rimg, int Rwidth,
   }
 }
 
-void ImChopping(float* Img, int width, int height, float* Rimg, int Rwidth,
-                int Rheight, int CenterX, int CenterY) {
+void ImChoppingGray(float* Img, int width, int height, float* Rimg, int Rwidth,
+                    int Rheight, int CenterX, int CenterY) {
   int x = 0, y = 0, index = 0, lindex = 0;
   int shiftx = (Rwidth - width) / 2 + width / 2 - CenterX,
       shifty = (Rheight - height) / 2 + height / 2 - CenterY;
