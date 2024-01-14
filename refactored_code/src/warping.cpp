@@ -2,9 +2,9 @@
 
 #include "BicubicInterpolation.h"
 
-void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
-               float* OutputImg, float* outputWeight, int width, int height,
-               const Homography& homography) {
+void warpImageGray(float* InputImg, float* inputWeight, int iwidth, int iheight,
+                   float* OutputImg, float* outputWeight, int width, int height,
+                   const Homography& homography) {
   const float woffset = width * 0.5f;
   const float hoffset = height * 0.5f;
   const float iwoffset = iwidth * 0.5f;
@@ -41,10 +41,11 @@ void warpImage(float* InputImg, float* inputWeight, int iwidth, int iheight,
   }
 }
 
-void warpImage(float* InputImgR, float* InputImgG, float* InputImgB,
-               float* inputWeight, int iwidth, int iheight, float* OutputImgR,
-               float* OutputImgG, float* OutputImgB, float* outputWeight,
-               int width, int height, const Homography& homography) {
+void warpImageRgb(float* InputImgR, float* InputImgG, float* InputImgB,
+                  float* inputWeight, int iwidth, int iheight,
+                  float* OutputImgR, float* OutputImgG, float* OutputImgB,
+                  float* outputWeight, int width, int height,
+                  const Homography& homography) {
   const float woffset = width * 0.5f;
   const float hoffset = height * 0.5f;
   const float iwoffset = iwidth * 0.5f;
