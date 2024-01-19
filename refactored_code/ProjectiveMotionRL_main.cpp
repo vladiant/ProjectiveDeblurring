@@ -153,12 +153,12 @@ int main(int /*argc*/, char* /*argv*/[]) {
   ///////////////////////////////////
   // Main Deblurring algorithm
   printf("Initial Estimation is the blur image\n");
-  ImChoppingGray(bImg[0].data(), blurwidth, blurheight, deblurImg[0].data(), width,
-             height);
-  ImChoppingGray(bImg[1].data(), blurwidth, blurheight, deblurImg[1].data(), width,
-             height);
-  ImChoppingGray(bImg[2].data(), blurwidth, blurheight, deblurImg[2].data(), width,
-             height);
+  ImChoppingGray(bImg[0].data(), blurwidth, blurheight, deblurImg[0].data(),
+                 width, height);
+  ImChoppingGray(bImg[1].data(), blurwidth, blurheight, deblurImg[1].data(),
+                 width, height);
+  ImChoppingGray(bImg[2].data(), blurwidth, blurheight, deblurImg[2].data(),
+                 width, height);
   //	memset(deblurImg[0].data(), 0, width*height*sizeof(float));
   //	memset(deblurImg[1].data(), 0, width*height*sizeof(float));
   //	memset(deblurImg[2].data(), 0, width*height*sizeof(float));

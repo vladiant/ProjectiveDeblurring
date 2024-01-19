@@ -14,7 +14,7 @@ float ProjectiveMotionRL::getSpsWeight(float aValue) const {
     return 0.0f;
   }
 
-  return SpsTable[static_cast<int>(std::abs(aValue) * 255.0f)];
+  return mSpsTable[static_cast<int>(std::abs(aValue) * 255.0f)];
 }
 
 void ProjectiveMotionRL::WarpImageGray(float* InputImg, float* inputWeight,
@@ -52,7 +52,7 @@ void ProjectiveMotionRL::GenerateMotionBlurImgGray(
     float* BlurImg, float* outputWeight, int width, int height, bool bforward) {
   int i = 0, index = 0, totalpixel = width * height;
 
-  if (WarpImgBuffer.empty()) {
+  if (mWarpImgBuffer.empty()) {
     SetBuffer(width, height);
   }
 
@@ -61,16 +61,16 @@ void ProjectiveMotionRL::GenerateMotionBlurImgGray(
   for (i = 0; i < NumSamples; i++) {
     if (bforward) {
       WarpImageGray(InputImg, inputWeight, iwidth, iheight,
-                    WarpImgBuffer.data(), WarpWeightBuffer.data(), width,
+                    mWarpImgBuffer.data(), mWarpWeightBuffer.data(), width,
                     height, i);
     } else {
       WarpImageGray(InputImg, inputWeight, iwidth, iheight,
-                    WarpImgBuffer.data(), WarpWeightBuffer.data(), width,
+                    mWarpImgBuffer.data(), mWarpWeightBuffer.data(), width,
                     height, -i);
     }
     for (index = 0; index < totalpixel; index++) {
-      BlurImg[index] += WarpImgBuffer[index] * WarpWeightBuffer[index];
-      outputWeight[index] += WarpWeightBuffer[index];
+      BlurImg[index] += mWarpImgBuffer[index] * mWarpWeightBuffer[index];
+      outputWeight[index] += mWarpWeightBuffer[index];
     }
   }
 
@@ -85,7 +85,7 @@ void ProjectiveMotionRL::GenerateMotionBlurImgRgb(
     float* outputWeight, int width, int height, bool bforward) {
   int i = 0, index = 0, totalpixel = width * height;
 
-  if (WarpImgBuffer.empty()) {
+  if (mWarpImgBuffer.empty()) {
     SetBuffer(width, height);
   }
 
@@ -96,21 +96,21 @@ void ProjectiveMotionRL::GenerateMotionBlurImgRgb(
   for (i = 0; i < NumSamples; i++) {
     if (bforward) {
       WarpImageRgb(InputImgR, InputImgG, InputImgB, inputWeight, iwidth,
-                   iheight, WarpImgBufferR.data(), WarpImgBufferG.data(),
-                   WarpImgBufferB.data(), WarpWeightBuffer.data(), width,
+                   iheight, mWarpImgBufferR.data(), mWarpImgBufferG.data(),
+                   mWarpImgBufferB.data(), mWarpWeightBuffer.data(), width,
                    height, i);
     } else {
       WarpImageRgb(InputImgR, InputImgG, InputImgB, inputWeight, iwidth,
-                   iheight, WarpImgBufferR.data(), WarpImgBufferG.data(),
-                   WarpImgBufferB.data(), WarpWeightBuffer.data(), width,
+                   iheight, mWarpImgBufferR.data(), mWarpImgBufferG.data(),
+                   mWarpImgBufferB.data(), mWarpWeightBuffer.data(), width,
                    height, -i);
     }
 
     for (index = 0; index < totalpixel; index++) {
-      BlurImgR[index] += WarpImgBufferR[index] * WarpWeightBuffer[index];
-      BlurImgG[index] += WarpImgBufferG[index] * WarpWeightBuffer[index];
-      BlurImgB[index] += WarpImgBufferB[index] * WarpWeightBuffer[index];
-      outputWeight[index] += WarpWeightBuffer[index];
+      BlurImgR[index] += mWarpImgBufferR[index] * mWarpWeightBuffer[index];
+      BlurImgG[index] += mWarpImgBufferG[index] * mWarpWeightBuffer[index];
+      BlurImgB[index] += mWarpImgBufferB[index] * mWarpWeightBuffer[index];
+      outputWeight[index] += mWarpWeightBuffer[index];
     }
   }
 
@@ -137,30 +137,30 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurGray(
 
   for (itr = 0; itr < Niter; itr++) {
     GenerateMotionBlurImgGray(DeblurImg, InputWeight, width, height,
-                              BlurImgBuffer.data(), BlurWeightBuffer.data(),
+                              mBlurImgBuffer.data(), mBlurWeightBuffer.data(),
                               iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
-          if (BlurImgBuffer[index] > 0.001f) {
-            DeltaImg[index] = BlurImg[index] / BlurImgBuffer[index];
+          if (mBlurImgBuffer[index] > 0.001f) {
+            DeltaImg[index] = BlurImg[index] / mBlurImgBuffer[index];
           } else {
             DeltaImg[index] = BlurImg[index] / 0.001f;
           }
         } else {
-          DeltaImg[index] = BlurImg[index] - BlurImgBuffer[index];
+          DeltaImg[index] = BlurImg[index] - mBlurImgBuffer[index];
         }
       }
     }
-    GenerateMotionBlurImgGray(DeltaImg.data(), BlurWeightBuffer.data(), iwidth,
-                              iheight, ErrorImgBuffer.data(),
-                              ErrorWeightBuffer.data(), width, height, false);
+    GenerateMotionBlurImgGray(DeltaImg.data(), mBlurWeightBuffer.data(), iwidth,
+                              iheight, mErrorImgBuffer.data(),
+                              mErrorWeightBuffer.data(), width, height, false);
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
         if (bPoisson) {
-          DeblurImg[index] *= ErrorImgBuffer[index];
+          DeblurImg[index] *= mErrorImgBuffer[index];
         } else {
-          DeblurImg[index] += ErrorImgBuffer[index];
+          DeblurImg[index] += mErrorImgBuffer[index];
         }
 
         DeblurImg[index] = std::clamp(DeblurImg[index], 0.0f, 1.0f);
@@ -169,7 +169,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurGray(
 
 #ifdef __SHOWERROR__
     printf("RMS Error: %f\n",
-           ComputeRMSError(GroundTruthImg, DeblurImg, width, height));
+           ComputeRMSError(mGroundTruthImg, DeblurImg, width, height));
 #else
     printf(".");
 #endif
@@ -195,49 +195,49 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurRgb(
 
   for (itr = 0; itr < Niter; itr++) {
     GenerateMotionBlurImgRgb(DeblurImgR, DeblurImgG, DeblurImgB, InputWeight,
-                             width, height, BlurImgBufferR.data(),
-                             BlurImgBufferG.data(), BlurImgBufferB.data(),
-                             BlurWeightBuffer.data(), iwidth, iheight, true);
+                             width, height, mBlurImgBufferR.data(),
+                             mBlurImgBufferG.data(), mBlurImgBufferB.data(),
+                             mBlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
-          if (BlurImgBufferR[index] > 0.001f) {
-            DeltaImgR[index] = BlurImgR[index] / BlurImgBufferR[index];
+          if (mBlurImgBufferR[index] > 0.001f) {
+            DeltaImgR[index] = BlurImgR[index] / mBlurImgBufferR[index];
           } else {
             DeltaImgR[index] = BlurImgR[index] / 0.001f;
           }
-          if (BlurImgBufferG[index] > 0.001f) {
-            DeltaImgG[index] = BlurImgG[index] / BlurImgBufferG[index];
+          if (mBlurImgBufferG[index] > 0.001f) {
+            DeltaImgG[index] = BlurImgG[index] / mBlurImgBufferG[index];
           } else {
             DeltaImgG[index] = BlurImgG[index] / 0.001f;
           }
-          if (BlurImgBufferB[index] > 0.001f) {
-            DeltaImgB[index] = BlurImgB[index] / BlurImgBufferB[index];
+          if (mBlurImgBufferB[index] > 0.001f) {
+            DeltaImgB[index] = BlurImgB[index] / mBlurImgBufferB[index];
           } else {
             DeltaImgB[index] = BlurImgB[index] / 0.001f;
           }
         } else {
-          DeltaImgR[index] = BlurImgR[index] - BlurImgBufferR[index];
-          DeltaImgG[index] = BlurImgG[index] - BlurImgBufferG[index];
-          DeltaImgB[index] = BlurImgB[index] - BlurImgBufferB[index];
+          DeltaImgR[index] = BlurImgR[index] - mBlurImgBufferR[index];
+          DeltaImgG[index] = BlurImgG[index] - mBlurImgBufferG[index];
+          DeltaImgB[index] = BlurImgB[index] - mBlurImgBufferB[index];
         }
       }
     }
     GenerateMotionBlurImgRgb(DeltaImgR.data(), DeltaImgG.data(),
-                             DeltaImgB.data(), BlurWeightBuffer.data(), iwidth,
-                             iheight, ErrorImgBufferR.data(),
-                             ErrorImgBufferG.data(), ErrorImgBufferB.data(),
-                             ErrorWeightBuffer.data(), width, height, false);
+                             DeltaImgB.data(), mBlurWeightBuffer.data(), iwidth,
+                             iheight, mErrorImgBufferR.data(),
+                             mErrorImgBufferG.data(), mErrorImgBufferB.data(),
+                             mErrorWeightBuffer.data(), width, height, false);
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
         if (bPoisson) {
-          DeblurImgR[index] *= ErrorImgBufferR[index];
-          DeblurImgG[index] *= ErrorImgBufferG[index];
-          DeblurImgB[index] *= ErrorImgBufferB[index];
+          DeblurImgR[index] *= mErrorImgBufferR[index];
+          DeblurImgG[index] *= mErrorImgBufferG[index];
+          DeblurImgB[index] *= mErrorImgBufferB[index];
         } else {
-          DeblurImgR[index] += ErrorImgBufferR[index];
-          DeblurImgG[index] += ErrorImgBufferG[index];
-          DeblurImgB[index] += ErrorImgBufferB[index];
+          DeblurImgR[index] += mErrorImgBufferR[index];
+          DeblurImgG[index] += mErrorImgBufferG[index];
+          DeblurImgB[index] += mErrorImgBufferB[index];
         }
 
         DeblurImgR[index] = std::clamp(DeblurImgR[index], 0.0f, 1.0f);
@@ -247,11 +247,11 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurRgb(
     }
 #ifdef __SHOWERROR__
     printf("RMS Error R: %f\n",
-           ComputeRMSError(GroundTruthImgR, DeblurImgR, width, height));
+           ComputeRMSError(mGroundTruthImgR, DeblurImgR, width, height));
     printf("RMS Error G: %f\n",
-           ComputeRMSError(GroundTruthImgG, DeblurImgG, width, height));
+           ComputeRMSError(mGroundTruthImgG, DeblurImgG, width, height));
     printf("RMS Error B: %f\n",
-           ComputeRMSError(GroundTruthImgB, DeblurImgB, width, height));
+           ComputeRMSError(mGroundTruthImgB, DeblurImgB, width, height));
 #else
     printf(".");
 #endif
@@ -278,24 +278,24 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVRegGray(
 
   for (itr = 0; itr < Niter; itr++) {
     GenerateMotionBlurImgGray(DeblurImg, InputWeight, width, height,
-                              BlurImgBuffer.data(), BlurWeightBuffer.data(),
+                              mBlurImgBuffer.data(), mBlurWeightBuffer.data(),
                               iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
-          if (BlurImgBuffer[index] > 0.001f) {
-            DeltaImg[index] = BlurImg[index] / BlurImgBuffer[index];
+          if (mBlurImgBuffer[index] > 0.001f) {
+            DeltaImg[index] = BlurImg[index] / mBlurImgBuffer[index];
           } else {
             DeltaImg[index] = BlurImg[index] / 0.001f;
           }
         } else {
-          DeltaImg[index] = BlurImg[index] - BlurImgBuffer[index];
+          DeltaImg[index] = BlurImg[index] - mBlurImgBuffer[index];
         }
       }
     }
-    GenerateMotionBlurImgGray(DeltaImg.data(), BlurWeightBuffer.data(), iwidth,
-                              iheight, ErrorImgBuffer.data(),
-                              ErrorWeightBuffer.data(), width, height, false);
+    GenerateMotionBlurImgGray(DeltaImg.data(), mBlurWeightBuffer.data(), iwidth,
+                              iheight, mErrorImgBuffer.data(),
+                              mErrorWeightBuffer.data(), width, height, false);
 
     ComputeGradientImageGray(DeblurImg, width, height, DxImg.data(),
                              DyImg.data(), true);
@@ -315,11 +315,11 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVRegGray(
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
         if (bPoisson) {
-          DeblurImg[index] *= ErrorImgBuffer[index] /
+          DeblurImg[index] *= mErrorImgBuffer[index] /
                               (1 + lambda * (DxxImg[index] + DyyImg[index]));
         } else {
           DeblurImg[index] +=
-              ErrorImgBuffer[index] - lambda * (DxxImg[index] + DyyImg[index]);
+              mErrorImgBuffer[index] - lambda * (DxxImg[index] + DyyImg[index]);
         }
         DeblurImg[index] = std::clamp(DeblurImg[index], 0.0f, 1.0f);
       }
@@ -327,7 +327,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVRegGray(
 
 #ifdef __SHOWERROR__
     printf("RMS Error: %f\n",
-           ComputeRMSError(GroundTruthImg, DeblurImg, width, height));
+           ComputeRMSError(mGroundTruthImg, DeblurImg, width, height));
 #else
     printf(".");
 #endif
@@ -366,39 +366,39 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVRegRgb(
 
   for (itr = 0; itr < Niter; itr++) {
     GenerateMotionBlurImgRgb(DeblurImgR, DeblurImgG, DeblurImgB, InputWeight,
-                             width, height, BlurImgBufferR.data(),
-                             BlurImgBufferG.data(), BlurImgBufferB.data(),
-                             BlurWeightBuffer.data(), iwidth, iheight, true);
+                             width, height, mBlurImgBufferR.data(),
+                             mBlurImgBufferG.data(), mBlurImgBufferB.data(),
+                             mBlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
-          if (BlurImgBufferR[index] > 0.001f) {
-            DeltaImgR[index] = BlurImgR[index] / BlurImgBufferR[index];
+          if (mBlurImgBufferR[index] > 0.001f) {
+            DeltaImgR[index] = BlurImgR[index] / mBlurImgBufferR[index];
           } else {
             DeltaImgR[index] = BlurImgR[index] / 0.001f;
           }
-          if (BlurImgBufferG[index] > 0.001f) {
-            DeltaImgG[index] = BlurImgG[index] / BlurImgBufferG[index];
+          if (mBlurImgBufferG[index] > 0.001f) {
+            DeltaImgG[index] = BlurImgG[index] / mBlurImgBufferG[index];
           } else {
             DeltaImgG[index] = BlurImgG[index] / 0.001f;
           }
-          if (BlurImgBufferB[index] > 0.001f) {
-            DeltaImgB[index] = BlurImgB[index] / BlurImgBufferB[index];
+          if (mBlurImgBufferB[index] > 0.001f) {
+            DeltaImgB[index] = BlurImgB[index] / mBlurImgBufferB[index];
           } else {
             DeltaImgB[index] = BlurImgB[index] / 0.001f;
           }
         } else {
-          DeltaImgR[index] = BlurImgR[index] - BlurImgBufferR[index];
-          DeltaImgG[index] = BlurImgG[index] - BlurImgBufferG[index];
-          DeltaImgB[index] = BlurImgB[index] - BlurImgBufferB[index];
+          DeltaImgR[index] = BlurImgR[index] - mBlurImgBufferR[index];
+          DeltaImgG[index] = BlurImgG[index] - mBlurImgBufferG[index];
+          DeltaImgB[index] = BlurImgB[index] - mBlurImgBufferB[index];
         }
       }
     }
     GenerateMotionBlurImgRgb(DeltaImgR.data(), DeltaImgG.data(),
-                             DeltaImgB.data(), BlurWeightBuffer.data(), iwidth,
-                             iheight, ErrorImgBufferR.data(),
-                             ErrorImgBufferG.data(), ErrorImgBufferB.data(),
-                             ErrorWeightBuffer.data(), width, height, false);
+                             DeltaImgB.data(), mBlurWeightBuffer.data(), iwidth,
+                             iheight, mErrorImgBufferR.data(),
+                             mErrorImgBufferG.data(), mErrorImgBufferB.data(),
+                             mErrorWeightBuffer.data(), width, height, false);
 
     ComputeGradientImageGray(DeblurImgR, width, height, DxImgR.data(),
                              DyImgR.data(), true);
@@ -438,18 +438,18 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVRegRgb(
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
         if (bPoisson) {
-          DeblurImgR[index] *= ErrorImgBufferR[index] /
+          DeblurImgR[index] *= mErrorImgBufferR[index] /
                                (1 + lambda * (DxxImgR[index] + DyyImgR[index]));
-          DeblurImgG[index] *= ErrorImgBufferG[index] /
+          DeblurImgG[index] *= mErrorImgBufferG[index] /
                                (1 + lambda * (DxxImgG[index] + DyyImgG[index]));
-          DeblurImgB[index] *= ErrorImgBufferB[index] /
+          DeblurImgB[index] *= mErrorImgBufferB[index] /
                                (1 + lambda * (DxxImgB[index] + DyyImgB[index]));
         } else {
-          DeblurImgR[index] += ErrorImgBufferR[index] -
+          DeblurImgR[index] += mErrorImgBufferR[index] -
                                lambda * (DxxImgR[index] + DyyImgR[index]);
-          DeblurImgG[index] += ErrorImgBufferG[index] -
+          DeblurImgG[index] += mErrorImgBufferG[index] -
                                lambda * (DxxImgG[index] + DyyImgG[index]);
-          DeblurImgB[index] += ErrorImgBufferB[index] -
+          DeblurImgB[index] += mErrorImgBufferB[index] -
                                lambda * (DxxImgB[index] + DyyImgB[index]);
         }
         DeblurImgR[index] = std::clamp(DeblurImgR[index], 0.0f, 1.0f);
@@ -460,11 +460,11 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVRegRgb(
 
 #ifdef __SHOWERROR__
     printf("RMS Error R: %f\n",
-           ComputeRMSError(GroundTruthImgR, DeblurImgR, width, height));
+           ComputeRMSError(mGroundTruthImgR, DeblurImgR, width, height));
     printf("RMS Error G: %f\n",
-           ComputeRMSError(GroundTruthImgG, DeblurImgG, width, height));
+           ComputeRMSError(mGroundTruthImgG, DeblurImgG, width, height));
     printf("RMS Error B: %f\n",
-           ComputeRMSError(GroundTruthImgB, DeblurImgB, width, height));
+           ComputeRMSError(mGroundTruthImgB, DeblurImgB, width, height));
 #else
     printf(".");
 #endif
@@ -493,24 +493,24 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsRegGray(
 
   for (itr = 0; itr < Niter; itr++) {
     GenerateMotionBlurImgGray(DeblurImg, InputWeight, width, height,
-                              BlurImgBuffer.data(), BlurWeightBuffer.data(),
+                              mBlurImgBuffer.data(), mBlurWeightBuffer.data(),
                               iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
-          if (BlurImgBuffer[index] > 0.001f) {
-            DeltaImg[index] = BlurImg[index] / BlurImgBuffer[index];
+          if (mBlurImgBuffer[index] > 0.001f) {
+            DeltaImg[index] = BlurImg[index] / mBlurImgBuffer[index];
           } else {
             DeltaImg[index] = BlurImg[index] / 0.001f;
           }
         } else {
-          DeltaImg[index] = BlurImg[index] - BlurImgBuffer[index];
+          DeltaImg[index] = BlurImg[index] - mBlurImgBuffer[index];
         }
       }
     }
-    GenerateMotionBlurImgGray(DeltaImg.data(), BlurWeightBuffer.data(), iwidth,
-                              iheight, ErrorImgBuffer.data(),
-                              ErrorWeightBuffer.data(), width, height, false);
+    GenerateMotionBlurImgGray(DeltaImg.data(), mBlurWeightBuffer.data(), iwidth,
+                              iheight, mErrorImgBuffer.data(),
+                              mErrorWeightBuffer.data(), width, height, false);
 
     ComputeGradientImageGray(DeblurImg, width, height, DxImg.data(),
                              DyImg.data(), true);
@@ -529,9 +529,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsRegGray(
           DeblurImg[index] =
               DeblurImg[index] /
               (1 - lambda * (Wx * DxxImg[index] + Wy * DyyImg[index])) *
-              ErrorImgBuffer[index];
+              mErrorImgBuffer[index];
         } else {
-          DeblurImg[index] = DeblurImg[index] + ErrorImgBuffer[index] -
+          DeblurImg[index] = DeblurImg[index] + mErrorImgBuffer[index] -
                              lambda * (Wx * DxxImg[index] + Wy * DyyImg[index]);
         }
         DeblurImg[index] = std::clamp(DeblurImg[index], 0.0f, 1.0f);
@@ -541,7 +541,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsRegGray(
 
 #ifdef __SHOWERROR__
     printf("RMS Error: %f\n",
-           ComputeRMSError(GroundTruthImg, DeblurImg, width, height));
+           ComputeRMSError(mGroundTruthImg, DeblurImg, width, height));
 #else
     printf(".");
 #endif
@@ -581,40 +581,40 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsRegRgb(
 
   for (itr = 0; itr < Niter; itr++) {
     GenerateMotionBlurImgRgb(DeblurImgR, DeblurImgG, DeblurImgB, InputWeight,
-                             width, height, BlurImgBufferR.data(),
-                             BlurImgBufferG.data(), BlurImgBufferB.data(),
-                             BlurWeightBuffer.data(), iwidth, iheight, true);
+                             width, height, mBlurImgBufferR.data(),
+                             mBlurImgBufferG.data(), mBlurImgBufferB.data(),
+                             mBlurWeightBuffer.data(), iwidth, iheight, true);
 
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
-          if (BlurImgBufferR[index] > 0.001f) {
-            DeltaImgR[index] = BlurImgR[index] / BlurImgBufferR[index];
+          if (mBlurImgBufferR[index] > 0.001f) {
+            DeltaImgR[index] = BlurImgR[index] / mBlurImgBufferR[index];
           } else {
             DeltaImgR[index] = BlurImgR[index] / 0.001f;
           }
-          if (BlurImgBufferG[index] > 0.001f) {
-            DeltaImgG[index] = BlurImgG[index] / BlurImgBufferG[index];
+          if (mBlurImgBufferG[index] > 0.001f) {
+            DeltaImgG[index] = BlurImgG[index] / mBlurImgBufferG[index];
           } else {
             DeltaImgG[index] = BlurImgG[index] / 0.001f;
           }
-          if (BlurImgBufferB[index] > 0.001f) {
-            DeltaImgB[index] = BlurImgB[index] / BlurImgBufferB[index];
+          if (mBlurImgBufferB[index] > 0.001f) {
+            DeltaImgB[index] = BlurImgB[index] / mBlurImgBufferB[index];
           } else {
             DeltaImgB[index] = BlurImgB[index] / 0.001f;
           }
         } else {
-          DeltaImgR[index] = BlurImgR[index] - BlurImgBufferR[index];
-          DeltaImgG[index] = BlurImgG[index] - BlurImgBufferG[index];
-          DeltaImgB[index] = BlurImgB[index] - BlurImgBufferB[index];
+          DeltaImgR[index] = BlurImgR[index] - mBlurImgBufferR[index];
+          DeltaImgG[index] = BlurImgG[index] - mBlurImgBufferG[index];
+          DeltaImgB[index] = BlurImgB[index] - mBlurImgBufferB[index];
         }
       }
     }
     GenerateMotionBlurImgRgb(DeltaImgR.data(), DeltaImgG.data(),
-                             DeltaImgB.data(), BlurWeightBuffer.data(), iwidth,
-                             iheight, ErrorImgBufferR.data(),
-                             ErrorImgBufferG.data(), ErrorImgBufferB.data(),
-                             ErrorWeightBuffer.data(), width, height, false);
+                             DeltaImgB.data(), mBlurWeightBuffer.data(), iwidth,
+                             iheight, mErrorImgBufferR.data(),
+                             mErrorImgBufferG.data(), mErrorImgBufferB.data(),
+                             mErrorWeightBuffer.data(), width, height, false);
 
     ComputeGradientImageGray(DeblurImgR, width, height, DxImgR.data(),
                              DyImgR.data(), true);
@@ -647,23 +647,23 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsRegRgb(
 
         if (bPoisson) {
           DeblurImgR[index] *=
-              ErrorImgBufferR[index] /
+              mErrorImgBufferR[index] /
               (1 + lambda * (WxR * DxxImgR[index] + WyR * DyyImgR[index]));
           DeblurImgG[index] *=
-              ErrorImgBufferG[index] /
+              mErrorImgBufferG[index] /
               (1 + lambda * (WxG * DxxImgG[index] + WyG * DyyImgG[index]));
           DeblurImgB[index] *=
-              ErrorImgBufferB[index] /
+              mErrorImgBufferB[index] /
               (1 + lambda * (WxB * DxxImgB[index] + WyB * DyyImgB[index]));
         } else {
           DeblurImgR[index] +=
-              ErrorImgBufferR[index] -
+              mErrorImgBufferR[index] -
               lambda * (WxR * DxxImgR[index] + WyR * DyyImgR[index]);
           DeblurImgG[index] +=
-              ErrorImgBufferG[index] -
+              mErrorImgBufferG[index] -
               lambda * (WxG * DxxImgG[index] + WyG * DyyImgG[index]);
           DeblurImgB[index] +=
-              ErrorImgBufferB[index] -
+              mErrorImgBufferB[index] -
               lambda * (WxB * DxxImgB[index] + WyB * DyyImgB[index]);
         }
         DeblurImgR[index] = std::clamp(DeblurImgR[index], 0.0f, 1.0f);
@@ -678,11 +678,11 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsRegRgb(
 
 #ifdef __SHOWERROR__
     printf("RMS Error R: %f\n",
-           ComputeRMSError(GroundTruthImgR, DeblurImgR, width, height));
+           ComputeRMSError(mGroundTruthImgR, DeblurImgR, width, height));
     printf("RMS Error G: %f\n",
-           ComputeRMSError(GroundTruthImgG, DeblurImgG, width, height));
+           ComputeRMSError(mGroundTruthImgG, DeblurImgG, width, height));
     printf("RMS Error B: %f\n",
-           ComputeRMSError(GroundTruthImgB, DeblurImgB, width, height));
+           ComputeRMSError(mGroundTruthImgB, DeblurImgB, width, height));
 #else
     printf(".");
 #endif
@@ -706,24 +706,24 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegGray(
 
   for (itr = 0; itr < Niter; itr++) {
     GenerateMotionBlurImgGray(DeblurImg, InputWeight, width, height,
-                              BlurImgBuffer.data(), BlurWeightBuffer.data(),
+                              mBlurImgBuffer.data(), mBlurWeightBuffer.data(),
                               iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
-          if (BlurImgBuffer[index] > 0.001f) {
-            DeltaImg[index] = BlurImg[index] / BlurImgBuffer[index];
+          if (mBlurImgBuffer[index] > 0.001f) {
+            DeltaImg[index] = BlurImg[index] / mBlurImgBuffer[index];
           } else {
             DeltaImg[index] = BlurImg[index] / 0.001f;
           }
         } else {
-          DeltaImg[index] = BlurImg[index] - BlurImgBuffer[index];
+          DeltaImg[index] = BlurImg[index] - mBlurImgBuffer[index];
         }
       }
     }
-    GenerateMotionBlurImgGray(DeltaImg.data(), BlurWeightBuffer.data(), iwidth,
-                              iheight, ErrorImgBuffer.data(),
-                              ErrorWeightBuffer.data(), width, height, false);
+    GenerateMotionBlurImgGray(DeltaImg.data(), mBlurWeightBuffer.data(), iwidth,
+                              iheight, mErrorImgBuffer.data(),
+                              mErrorWeightBuffer.data(), width, height, false);
     ComputeBilaterRegImageGray(DeblurImg, width, height,
                                BilateralRegImg.data());
 
@@ -731,10 +731,10 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegGray(
       for (x = 0; x < width; x++, index++) {
         if (bPoisson) {
           DeblurImg[index] *=
-              ErrorImgBuffer[index] / (1 + lambda * BilateralRegImg[index]);
+              mErrorImgBuffer[index] / (1 + lambda * BilateralRegImg[index]);
         } else {
           DeblurImg[index] +=
-              ErrorImgBuffer[index] - lambda * BilateralRegImg[index];
+              mErrorImgBuffer[index] - lambda * BilateralRegImg[index];
         }
         DeblurImg[index] = std::clamp(DeblurImg[index], 0.0f, 1.0f);
       }
@@ -742,7 +742,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegGray(
 
 #ifdef __SHOWERROR__
     printf("RMS Error: %f\n",
-           ComputeRMSError(GroundTruthImg, DeblurImg, width, height));
+           ComputeRMSError(mGroundTruthImg, DeblurImg, width, height));
 #else
     printf(".");
 #endif
@@ -771,39 +771,39 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegRgb(
 
   for (itr = 0; itr < Niter; itr++) {
     GenerateMotionBlurImgRgb(DeblurImgR, DeblurImgG, DeblurImgB, InputWeight,
-                             width, height, BlurImgBufferR.data(),
-                             BlurImgBufferG.data(), BlurImgBufferB.data(),
-                             BlurWeightBuffer.data(), iwidth, iheight, true);
+                             width, height, mBlurImgBufferR.data(),
+                             mBlurImgBufferG.data(), mBlurImgBufferB.data(),
+                             mBlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
-          if (BlurImgBufferR[index] > 0.001f) {
-            DeltaImgR[index] = BlurImgR[index] / BlurImgBufferR[index];
+          if (mBlurImgBufferR[index] > 0.001f) {
+            DeltaImgR[index] = BlurImgR[index] / mBlurImgBufferR[index];
           } else {
             DeltaImgR[index] = BlurImgR[index] / 0.001f;
           }
-          if (BlurImgBufferG[index] > 0.001f) {
-            DeltaImgG[index] = BlurImgG[index] / BlurImgBufferG[index];
+          if (mBlurImgBufferG[index] > 0.001f) {
+            DeltaImgG[index] = BlurImgG[index] / mBlurImgBufferG[index];
           } else {
             DeltaImgG[index] = BlurImgG[index] / 0.001f;
           }
-          if (BlurImgBufferB[index] > 0.001f) {
-            DeltaImgB[index] = BlurImgB[index] / BlurImgBufferB[index];
+          if (mBlurImgBufferB[index] > 0.001f) {
+            DeltaImgB[index] = BlurImgB[index] / mBlurImgBufferB[index];
           } else {
             DeltaImgB[index] = BlurImgB[index] / 0.001f;
           }
         } else {
-          DeltaImgR[index] = BlurImgR[index] - BlurImgBufferR[index];
-          DeltaImgG[index] = BlurImgG[index] - BlurImgBufferG[index];
-          DeltaImgB[index] = BlurImgB[index] - BlurImgBufferB[index];
+          DeltaImgR[index] = BlurImgR[index] - mBlurImgBufferR[index];
+          DeltaImgG[index] = BlurImgG[index] - mBlurImgBufferG[index];
+          DeltaImgB[index] = BlurImgB[index] - mBlurImgBufferB[index];
         }
       }
     }
     GenerateMotionBlurImgRgb(DeltaImgR.data(), DeltaImgG.data(),
-                             DeltaImgB.data(), BlurWeightBuffer.data(), iwidth,
-                             iheight, ErrorImgBufferR.data(),
-                             ErrorImgBufferG.data(), ErrorImgBufferB.data(),
-                             ErrorWeightBuffer.data(), width, height, false);
+                             DeltaImgB.data(), mBlurWeightBuffer.data(), iwidth,
+                             iheight, mErrorImgBufferR.data(),
+                             mErrorImgBufferG.data(), mErrorImgBufferB.data(),
+                             mErrorWeightBuffer.data(), width, height, false);
     ComputeBilaterRegImageGray(DeblurImgR, width, height,
                                BilateralRegImgR.data());
     ComputeBilaterRegImageGray(DeblurImgG, width, height,
@@ -815,18 +815,18 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegRgb(
       for (x = 0; x < width; x++, index++) {
         if (bPoisson) {
           DeblurImgR[index] *=
-              ErrorImgBufferR[index] / (1 + lambda * BilateralRegImgR[index]);
+              mErrorImgBufferR[index] / (1 + lambda * BilateralRegImgR[index]);
           DeblurImgG[index] *=
-              ErrorImgBufferG[index] / (1 + lambda * BilateralRegImgG[index]);
+              mErrorImgBufferG[index] / (1 + lambda * BilateralRegImgG[index]);
           DeblurImgB[index] *=
-              ErrorImgBufferB[index] / (1 + lambda * BilateralRegImgB[index]);
+              mErrorImgBufferB[index] / (1 + lambda * BilateralRegImgB[index]);
         } else {
           DeblurImgR[index] +=
-              ErrorImgBufferR[index] - lambda * BilateralRegImgR[index];
+              mErrorImgBufferR[index] - lambda * BilateralRegImgR[index];
           DeblurImgG[index] +=
-              ErrorImgBufferG[index] - lambda * BilateralRegImgG[index];
+              mErrorImgBufferG[index] - lambda * BilateralRegImgG[index];
           DeblurImgB[index] +=
-              ErrorImgBufferB[index] - lambda * BilateralRegImgB[index];
+              mErrorImgBufferB[index] - lambda * BilateralRegImgB[index];
         }
 
         DeblurImgR[index] = std::clamp(DeblurImgR[index], 0.0f, 1.0f);
@@ -837,11 +837,11 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegRgb(
 
 #ifdef __SHOWERROR__
     printf("RMS Error R: %f\n",
-           ComputeRMSError(GroundTruthImgR, DeblurImgR, width, height));
+           ComputeRMSError(mGroundTruthImgR, DeblurImgR, width, height));
     printf("RMS Error G: %f\n",
-           ComputeRMSError(GroundTruthImgG, DeblurImgG, width, height));
+           ComputeRMSError(mGroundTruthImgG, DeblurImgG, width, height));
     printf("RMS Error B: %f\n",
-           ComputeRMSError(GroundTruthImgB, DeblurImgB, width, height));
+           ComputeRMSError(mGroundTruthImgB, DeblurImgB, width, height));
 #else
     printf(".");
 #endif
@@ -859,12 +859,12 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralLapRegGray(
 
   // Bilateral Laplician Regularization
   for (i = 0; i <= t; i++) {
-    BilateralTable[i] = 1.0f;
+    mBilateralTable[i] = 1.0f;
   }
   for (i = t + 1; i < 256; i++) {
-    BilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
-                         pow(i / 255.0f, powD - 1.0f)) /
-                        minWeight;
+    mBilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
+                          pow(i / 255.0f, powD - 1.0f)) /
+                         minWeight;
   }
 
   ProjectiveMotionRLDeblurBilateralRegGray(BlurImg, iwidth, iheight, DeblurImg,
@@ -873,7 +873,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralLapRegGray(
 
   // Restore the original table
   for (i = 0; i < 256; i++) {
-    BilateralTable[i] = exp(-i * i / (noiseVar * 65025.0f));
+    mBilateralTable[i] = exp(-i * i / (noiseVar * 65025.0f));
   }
 }
 
@@ -889,12 +889,12 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralLapRegRgb(
 
   // Bilateral Laplician Regularization
   for (i = 0; i <= t; i++) {
-    BilateralTable[i] = 1.0f;
+    mBilateralTable[i] = 1.0f;
   }
   for (i = t + 1; i < 256; i++) {
-    BilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
-                         pow(i / 255.0f, powD - 1.0f)) /
-                        minWeight;
+    mBilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
+                          pow(i / 255.0f, powD - 1.0f)) /
+                         minWeight;
   }
 
   ProjectiveMotionRLDeblurBilateralRegRgb(
@@ -903,7 +903,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralLapRegRgb(
 
   // Restore the original table
   for (i = 0; i < 256; i++) {
-    BilateralTable[i] = exp(-i * i / (noiseVar * 65025.0f));
+    mBilateralTable[i] = exp(-i * i / (noiseVar * 65025.0f));
   }
 }
 
@@ -1009,10 +1009,10 @@ void ProjectiveMotionRL::ComputeBilaterRegImageGray(float* Img, int width,
               iiindex = (y - yy) * width + (x - xx);
               BRImg[index] +=
                   GauFilter[xx + 2][yy + 2] * 0.5f *
-                  (BilateralTable[(int)(fabs(Img[iindex] - Img[index]) *
-                                        255.0f)] +
-                   BilateralTable[(int)(fabs(Img[iiindex] - Img[index]) *
-                                        255.0f)]) *
+                  (mBilateralTable[(int)(fabs(Img[iindex] - Img[index]) *
+                                         255.0f)] +
+                   mBilateralTable[(int)(fabs(Img[iiindex] - Img[index]) *
+                                         255.0f)]) *
                   (2 * Img[index] - Img[iindex] - Img[iiindex]);
             }
           }
@@ -1053,32 +1053,33 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurMultiScaleGray(
     for (itr = 0; itr < Niter; itr++) {
       printf("%d\n", itr);
       GenerateMotionBlurImgGray(DeblurImg, InputWeight, width, height,
-                                BlurImgBuffer.data(), BlurWeightBuffer.data(),
+                                mBlurImgBuffer.data(), mBlurWeightBuffer.data(),
                                 bwidth, bheight, true);
       for (y = 0, index = 0; y < bheight; y++) {
         for (x = 0; x < bwidth; x++, index++) {
           float bvalue = ReturnInterpolatedValueFast(x * bfactw, y * bfacth,
                                                      BlurImg, iwidth, iheight);
           if (bPoisson) {
-            if (BlurImgBuffer[index] > 0.0001f) {
-              DeltaImg[index] = bvalue / BlurImgBuffer[index];
+            if (mBlurImgBuffer[index] > 0.0001f) {
+              DeltaImg[index] = bvalue / mBlurImgBuffer[index];
             } else {
               DeltaImg[index] = bvalue / 0.0001f;
             }
           } else {
-            DeltaImg[index] = bvalue - BlurImgBuffer[index];
+            DeltaImg[index] = bvalue - mBlurImgBuffer[index];
           }
         }
       }
-      GenerateMotionBlurImgGray(DeltaImg.data(), BlurWeightBuffer.data(),
-                                bwidth, bheight, ErrorImgBuffer.data(),
-                                ErrorWeightBuffer.data(), width, height, false);
+      GenerateMotionBlurImgGray(DeltaImg.data(), mBlurWeightBuffer.data(),
+                                bwidth, bheight, mErrorImgBuffer.data(),
+                                mErrorWeightBuffer.data(), width, height,
+                                false);
       for (y = 0, index = 0; y < height; y++) {
         for (x = 0; x < width; x++, index++) {
           if (bPoisson) {
-            DeblurImg[index] *= ErrorImgBuffer[index];
+            DeblurImg[index] *= mErrorImgBuffer[index];
           } else {
-            DeblurImg[index] += ErrorImgBuffer[index];
+            DeblurImg[index] += mErrorImgBuffer[index];
           }
           DeblurImg[index] = std::clamp(DeblurImg[index], 0.0f, 1.0f);
         }

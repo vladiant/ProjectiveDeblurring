@@ -44,62 +44,62 @@ class ProjectiveMotionRL {
 
   ~ProjectiveMotionRL() {
     ClearBuffer();
-    GroundTruthImg.clear();
-    GroundTruthImgR.clear();
-    GroundTruthImgG.clear();
-    GroundTruthImgB.clear();
+    mGroundTruthImg.clear();
+    mGroundTruthImgR.clear();
+    mGroundTruthImgG.clear();
+    mGroundTruthImgB.clear();
   }
 
   ////////////////////////////////////
   // These functions are used to set Buffer for caching
   ////////////////////////////////////
   void SetBuffer(int width, int height) {
-    WarpImgBuffer.resize(width * height);
-    WarpImgBufferR.resize(width * height);
-    WarpImgBufferG.resize(width * height);
-    WarpImgBufferB.resize(width * height);
-    WarpWeightBuffer.resize(width * height);
-    BlurImgBuffer.resize(width * height);
-    BlurImgBufferR.resize(width * height);
-    BlurImgBufferG.resize(width * height);
-    BlurImgBufferB.resize(width * height);
-    BlurWeightBuffer.resize(width * height);
-    ErrorImgBuffer.resize(width * height);
-    ErrorImgBufferR.resize(width * height);
-    ErrorImgBufferG.resize(width * height);
-    ErrorImgBufferB.resize(width * height);
-    ErrorWeightBuffer.resize(width * height);
+    mWarpImgBuffer.resize(width * height);
+    mWarpImgBufferR.resize(width * height);
+    mWarpImgBufferG.resize(width * height);
+    mWarpImgBufferB.resize(width * height);
+    mWarpWeightBuffer.resize(width * height);
+    mBlurImgBuffer.resize(width * height);
+    mBlurImgBufferR.resize(width * height);
+    mBlurImgBufferG.resize(width * height);
+    mBlurImgBufferB.resize(width * height);
+    mBlurWeightBuffer.resize(width * height);
+    mErrorImgBuffer.resize(width * height);
+    mErrorImgBufferR.resize(width * height);
+    mErrorImgBufferG.resize(width * height);
+    mErrorImgBufferB.resize(width * height);
+    mErrorWeightBuffer.resize(width * height);
   }
   void ClearBuffer() {
-    WarpImgBuffer.clear();
+    mWarpImgBuffer.clear();
 
-    WarpImgBufferR.clear();
+    mWarpImgBufferR.clear();
 
-    WarpImgBufferG.clear();
+    mWarpImgBufferG.clear();
 
-    WarpImgBufferB.clear();
+    mWarpImgBufferB.clear();
 
-    WarpWeightBuffer.clear();
+    mWarpWeightBuffer.clear();
 
-    BlurImgBuffer.clear();
+    mBlurImgBuffer.clear();
 
-    BlurImgBufferR.clear();
+    mBlurImgBufferR.clear();
 
-    BlurImgBufferG.clear();
+    mBlurImgBufferG.clear();
 
-    BlurImgBufferB.clear();
+    mBlurImgBufferB.clear();
 
-    BlurWeightBuffer.clear();
+    mBlurWeightBuffer.clear();
 
-    ErrorImgBuffer.clear();
+    mErrorImgBuffer.clear();
 
-    ErrorImgBufferR.clear();
+    mErrorImgBufferR.clear();
 
-    ErrorImgBufferG.clear();
+    mErrorImgBufferG.clear();
 
-    ErrorImgBufferB.clear();
+    mErrorImgBufferB.clear();
 
-    ErrorWeightBuffer.clear();
+    mErrorWeightBuffer.clear();
   }
 
   void SetSpsTable() {
@@ -111,17 +111,17 @@ class ProjectiveMotionRL {
         exp(-pow(epilson, powD) / noiseVar) * pow(epilson, powD - 1.0f);
 
     for (i = 0; i <= t; i++) {
-      SpsTable[i] = 1.0f;
+      mSpsTable[i] = 1.0f;
     }
     for (i = t + 1; i < 256; i++) {
-      SpsTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
-                     pow(i / 255.0f, powD - 1.0f)) /
-                    minWeight;
+      mSpsTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
+                      pow(i / 255.0f, powD - 1.0f)) /
+                     minWeight;
 
       // Reweighting scheme from Levin et al Siggraph'07,
       // Similar Effect, smaller smoothing weight for large gradient
       // float minEpi = pow(epilson, powD - 2.0f);
-      // SpsTable[i] = pow(i / 255.0f, powD - 2.0f) / minEpi;
+      // mSpsTable[i] = pow(i / 255.0f, powD - 2.0f) / minEpi;
     }
   }
 
@@ -134,7 +134,7 @@ class ProjectiveMotionRL {
 
     // Standard Bilateral Weight
     for (i = 0; i < 256; i++) {
-      BilateralTable[i] = exp(-i * i / (noiseVar * 65025.0f));
+      mBilateralTable[i] = exp(-i * i / (noiseVar * 65025.0f));
     }
 
     // Bilateral Laplician Regularization
@@ -144,28 +144,28 @@ class ProjectiveMotionRL {
     // float minWeight =
     //     exp(-pow(epilson, powD) / noiseVar) * pow(epilson, powD - 1.0f);
     // for (i = 0; i <= t; i++) {
-    //   BilateralTable[i] = 1.0f;
+    //   mBilateralTable[i] = 1.0f;
     // }
     // for (i = t + 1; i < 256; i++) {
-    //   BilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
+    //   mBilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
     //                        pow(i / 255.0f, powD - 1.0f)) /
     //                       minWeight;
     // }
   }
   void SetGroundTruthImgGray(float* GroundTruth, int width, int height) {
-    GroundTruthImg.resize(width * height);
-    memcpy(GroundTruthImg.data(), GroundTruth, width * height * sizeof(float));
+    mGroundTruthImg.resize(width * height);
+    memcpy(mGroundTruthImg.data(), GroundTruth, width * height * sizeof(float));
   }
   void SetGroundTruthImgRgb(float* GroundTruthR, float* GroundTruthG,
                             float* GroundTruthB, int width, int height) {
-    GroundTruthImgR.resize(width * height);
-    GroundTruthImgG.resize(width * height);
-    GroundTruthImgB.resize(width * height);
-    memcpy(GroundTruthImgR.data(), GroundTruthR,
+    mGroundTruthImgR.resize(width * height);
+    mGroundTruthImgG.resize(width * height);
+    mGroundTruthImgB.resize(width * height);
+    memcpy(mGroundTruthImgR.data(), GroundTruthR,
            width * height * sizeof(float));
-    memcpy(GroundTruthImgG.data(), GroundTruthG,
+    memcpy(mGroundTruthImgG.data(), GroundTruthG,
            width * height * sizeof(float));
-    memcpy(GroundTruthImgB.data(), GroundTruthB,
+    memcpy(mGroundTruthImgB.data(), GroundTruthB,
            width * height * sizeof(float));
   }
 
@@ -470,29 +470,29 @@ class ProjectiveMotionRL {
   float getSpsWeight(float aValue) const;
 
   // These are buffer and lookup table variables
-  float BilateralTable[256];
-  float SpsTable[256];
-  std::vector<float> WarpImgBuffer;
-  std::vector<float> WarpImgBufferR;
-  std::vector<float> WarpImgBufferG;
-  std::vector<float> WarpImgBufferB;
-  std::vector<float> WarpWeightBuffer;
-  std::vector<float> BlurImgBuffer;
-  std::vector<float> BlurImgBufferR;
-  std::vector<float> BlurImgBufferG;
-  std::vector<float> BlurImgBufferB;
-  std::vector<float> BlurWeightBuffer;
-  std::vector<float> ErrorImgBuffer;
-  std::vector<float> ErrorImgBufferR;
-  std::vector<float> ErrorImgBufferG;
-  std::vector<float> ErrorImgBufferB;
-  std::vector<float> ErrorWeightBuffer;
+  float mBilateralTable[256];
+  float mSpsTable[256];
+  std::vector<float> mWarpImgBuffer;
+  std::vector<float> mWarpImgBufferR;
+  std::vector<float> mWarpImgBufferG;
+  std::vector<float> mWarpImgBufferB;
+  std::vector<float> mWarpWeightBuffer;
+  std::vector<float> mBlurImgBuffer;
+  std::vector<float> mBlurImgBufferR;
+  std::vector<float> mBlurImgBufferG;
+  std::vector<float> mBlurImgBufferB;
+  std::vector<float> mBlurWeightBuffer;
+  std::vector<float> mErrorImgBuffer;
+  std::vector<float> mErrorImgBufferR;
+  std::vector<float> mErrorImgBufferG;
+  std::vector<float> mErrorImgBufferB;
+  std::vector<float> mErrorWeightBuffer;
 
   // This variables are used for RMS computation
-  std::vector<float> GroundTruthImg;
-  std::vector<float> GroundTruthImgR;
-  std::vector<float> GroundTruthImgG;
-  std::vector<float> GroundTruthImgB;
+  std::vector<float> mGroundTruthImg;
+  std::vector<float> mGroundTruthImgR;
+  std::vector<float> mGroundTruthImgG;
+  std::vector<float> mGroundTruthImgB;
 
   // Random values generation
   std::random_device mRandomDevice;
