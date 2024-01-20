@@ -455,13 +455,6 @@ class ProjectiveMotionRL {
     }
   }
 
-  // Multiscale version: not very useful...
-  void ProjectiveMotionRLDeblurMultiScaleGray(float* BlurImg, int iwidth,
-                                              int iheight, float* DeblurImg,
-                                              int width, int height,
-                                              int Niter = 10, int Nscale = 5,
-                                              bool bPoisson = true);
-
   // These are the homography sequence for Projective motion blur model
   Homography Hmatrix[NumSamples];
   Homography IHmatrix[NumSamples];

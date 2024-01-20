@@ -18,6 +18,8 @@ add_executable(
     src/svdcmp.cpp
     include/ProjectiveMotionRL.h
     src/ProjectiveMotionRL.cpp
+    include/ProjectiveMotionRLMultiScaleGray.h
+    src/ProjectiveMotionRLMultiScaleGray.cpp
     ProjectiveMotionRL_main.cpp
 )
 
