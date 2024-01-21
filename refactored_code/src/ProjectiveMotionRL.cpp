@@ -6,11 +6,10 @@
 
 #include "BicubicInterpolation.h"
 #include "ImResize.h"
-#include "MotionBlurImageGenerator.h"
 #include "bitmap.h"
 #include "warping.h"
 
-ProjectiveMotionRL::ProjectiveMotionRL(MotionBlurImageGenerator& aBlurGenerator)
+ProjectiveMotionRL::ProjectiveMotionRL(IBlurImageGenerator& aBlurGenerator)
     : mBlurGenerator(aBlurGenerator) {
   mRandomEngine.seed(kSeed);
 

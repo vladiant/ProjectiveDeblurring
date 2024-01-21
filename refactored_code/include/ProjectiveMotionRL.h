@@ -4,18 +4,17 @@
 #include <cstring>
 #include <random>
 
+#include "IBlurImageGenerator.h"
 #include "homography.h"
 
 //#define __SHOWERROR__
-
-class MotionBlurImageGenerator;
 
 class ProjectiveMotionRL {
  public:
   // Random engine seed
   constexpr static int kSeed = 1234;
 
-  ProjectiveMotionRL(MotionBlurImageGenerator& aBlurGenerator);
+  ProjectiveMotionRL(IBlurImageGenerator& aBlurGenerator);
 
   ~ProjectiveMotionRL() {
     ClearBuffer();
@@ -228,7 +227,7 @@ class ProjectiveMotionRL {
  private:
   float getSpsWeight(float aValue) const;
 
-  MotionBlurImageGenerator& mBlurGenerator;
+  IBlurImageGenerator& mBlurGenerator;
 
   // These are buffer and lookup table variables
   float mBilateralTable[256];

@@ -2,9 +2,10 @@
 
 #include <vector>
 
+#include "IBlurImageGenerator.h"
 #include "homography.h"
 
-class MotionBlurImageGenerator {
+class MotionBlurImageGenerator : public IBlurImageGenerator {
  public:
   constexpr static int NumSamples = 30;
 
@@ -13,11 +14,11 @@ class MotionBlurImageGenerator {
   // bforward: true forward, false backward
   void blurGray(float* InputImg, float* inputWeight, int iwidth, int iheight,
                 float* BlurImg, float* outputWeight, int width, int height,
-                bool bforward = true);
+                bool bforward) override;
   void blurRgb(float* InputImgR, float* InputImgG, float* InputImgB,
                float* inputWeight, int iwidth, int iheight, float* BlurImgR,
                float* BlurImgG, float* BlurImgB, float* outputWeight, int width,
-               int height, bool bforward = true);
+               int height, bool bforward) override;
 
   void SetBuffer(int width, int height);
   void ClearBuffer();

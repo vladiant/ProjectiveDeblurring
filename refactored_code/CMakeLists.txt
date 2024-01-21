@@ -16,6 +16,7 @@ add_executable(
     src/ImResize.cpp
     include/svdcmp.h
     src/svdcmp.cpp
+    include/IBlurImageGenerator.h
     include/MotionBlurImageGenerator.h
     src/MotionBlurImageGenerator.cpp
     include/ProjectiveMotionRL.h
