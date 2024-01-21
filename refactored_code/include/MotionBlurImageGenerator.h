@@ -20,8 +20,8 @@ class MotionBlurImageGenerator : public IBlurImageGenerator {
                float* BlurImgG, float* BlurImgB, float* outputWeight, int width,
                int height, bool bforward) override;
 
-  void SetBuffer(int width, int height);
-  void ClearBuffer();
+  void SetBuffer(int width, int height) override;
+  void ClearBuffer() override;
 
   ////////////////////////////////////
   // These functions are used to set the homography
