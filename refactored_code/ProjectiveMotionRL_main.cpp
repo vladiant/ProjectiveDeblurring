@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "ImResize.h"
+#include "MotionBlurImageGenerator.h"
 #include "ProjectiveMotionRL.h"
 #include "bitmap.h"
 
@@ -37,20 +38,21 @@ int main(int /*argc*/, char* /*argv*/[]) {
 
   ///////////////////////////////////
   printf("Set Projective Model Parameter\n");
-  ProjectiveMotionRL m_ProjectiveMotionRL;
+  MotionBlurImageGenerator blurGenerator;
+  ProjectiveMotionRL m_ProjectiveMotionRL{blurGenerator};
 
-  m_ProjectiveMotionRL.SetGlobalParameters(
+  blurGenerator.SetGlobalParameters(
       10, 1.2f, 0.0003f, 0.0006f, 10,
       20);  // This is parameter setting for doll example
 
-  // m_ProjectiveMotionRL.SetGlobalParameters(-10, 1.1f, 0.0004f,0.0002f, 20,
+  // blurGenerator.SetGlobalParameters(-10, 1.1f, 0.0004f,0.0002f, 20,
   // -15); //This is parameter setting for Cameraman convergence example
 
   // Testing case for rotational motion
-  // m_ProjectiveMotionRL.SetGlobalRotation(10);
+  // blurGenerator.SetGlobalRotation(10);
 
   // Testing case for zooming motion
-  // m_ProjectiveMotionRL.SetGlobalScaling(1.2f);
+  // blurGenerator.SetGlobalScaling(1.2f);
 
   // Testing case for translational motion
   if (false) {
@@ -58,22 +60,22 @@ int main(int /*argc*/, char* /*argv*/[]) {
     for (int i = 0; i < ProjectiveMotionRL::NumSamples; i++) {
       float dy =
           5.0f * sin((float)(i) / ProjectiveMotionRL::NumSamples * 2 * M_PI);
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][0] = 1;
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][1] = 0;
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][2] = i * deltadx;
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][0] = 0;
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][1] = 1;
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][2] = dy;
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][0] = 0;
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][1] = 0;
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][2] = 1;
-      Homography::MatrixInverse(m_ProjectiveMotionRL.Hmatrix[i].Hmatrix,
-                                m_ProjectiveMotionRL.IHmatrix[i].Hmatrix);
+      blurGenerator.Hmatrix[i].Hmatrix[0][0] = 1;
+      blurGenerator.Hmatrix[i].Hmatrix[0][1] = 0;
+      blurGenerator.Hmatrix[i].Hmatrix[0][2] = i * deltadx;
+      blurGenerator.Hmatrix[i].Hmatrix[1][0] = 0;
+      blurGenerator.Hmatrix[i].Hmatrix[1][1] = 1;
+      blurGenerator.Hmatrix[i].Hmatrix[1][2] = dy;
+      blurGenerator.Hmatrix[i].Hmatrix[2][0] = 0;
+      blurGenerator.Hmatrix[i].Hmatrix[2][1] = 0;
+      blurGenerator.Hmatrix[i].Hmatrix[2][2] = 1;
+      Homography::MatrixInverse(blurGenerator.Hmatrix[i].Hmatrix,
+                                blurGenerator.IHmatrix[i].Hmatrix);
     }
   }
 
   // Testing case for projective motion
-  // m_ProjectiveMotionRL.SetGlobalPerspective(0.001f,0.001f);
+  // blurGenerator.SetGlobalPerspective(0.001f,0.001f);
 
   // Adjust the parameters for generating test case 1-15
   if (false) {
@@ -86,19 +88,19 @@ int main(int /*argc*/, char* /*argv*/[]) {
     for (int i = 0; i < ProjectiveMotionRL::NumSamples; i++) {
       float dy =
           5.0f * sin((float)(i) / ProjectiveMotionRL::NumSamples * 2 * M_PI);
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][0] =
+      blurGenerator.Hmatrix[i].Hmatrix[0][0] =
           (1 + i * deltascaling) * cos(deltadegree * i);
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][1] = sin(deltadegree * i);
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[0][2] = i * deltadx;
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][0] = -sin(deltadegree * i);
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][1] =
+      blurGenerator.Hmatrix[i].Hmatrix[0][1] = sin(deltadegree * i);
+      blurGenerator.Hmatrix[i].Hmatrix[0][2] = i * deltadx;
+      blurGenerator.Hmatrix[i].Hmatrix[1][0] = -sin(deltadegree * i);
+      blurGenerator.Hmatrix[i].Hmatrix[1][1] =
           (1 + i * deltascaling) * cos(deltadegree * i);
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[1][2] = dy;
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][0] = i * deltapx;
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][1] = i * deltapy;
-      m_ProjectiveMotionRL.Hmatrix[i].Hmatrix[2][2] = 1;
-      Homography::MatrixInverse(m_ProjectiveMotionRL.Hmatrix[i].Hmatrix,
-                                m_ProjectiveMotionRL.IHmatrix[i].Hmatrix);
+      blurGenerator.Hmatrix[i].Hmatrix[1][2] = dy;
+      blurGenerator.Hmatrix[i].Hmatrix[2][0] = i * deltapx;
+      blurGenerator.Hmatrix[i].Hmatrix[2][1] = i * deltapy;
+      blurGenerator.Hmatrix[i].Hmatrix[2][2] = 1;
+      Homography::MatrixInverse(blurGenerator.Hmatrix[i].Hmatrix,
+                                blurGenerator.IHmatrix[i].Hmatrix);
     }
   }
 
@@ -109,13 +111,13 @@ int main(int /*argc*/, char* /*argv*/[]) {
 
   ///////////////////////////////////
   printf("Generate Motion Blurred Image\n");
-  m_ProjectiveMotionRL.GenerateMotionBlurImgGray(
+  blurGenerator.GenerateMotionBlurImgGray(
       fImg[0].data(), inputWeight.data(), width, height, bImg[0].data(),
       outputWeight.data(), blurwidth, blurheight, true);
-  m_ProjectiveMotionRL.GenerateMotionBlurImgGray(
+  blurGenerator.GenerateMotionBlurImgGray(
       fImg[1].data(), inputWeight.data(), width, height, bImg[1].data(),
       outputWeight.data(), blurwidth, blurheight, true);
-  m_ProjectiveMotionRL.GenerateMotionBlurImgGray(
+  blurGenerator.GenerateMotionBlurImgGray(
       fImg[2].data(), inputWeight.data(), width, height, bImg[2].data(),
       outputWeight.data(), blurwidth, blurheight, true);
 

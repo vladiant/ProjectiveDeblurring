@@ -8,39 +8,15 @@
 
 //#define __SHOWERROR__
 
+class MotionBlurImageGenerator;
+
 class ProjectiveMotionRL {
  public:
   constexpr static int NumSamples = 30;
   // Random engine seed
   constexpr static int kSeed = 1234;
 
-  ProjectiveMotionRL() {
-    mRandomEngine.seed(kSeed);
-    int i;
-    for (i = 0; i < NumSamples; i++) {
-      Hmatrix[i].Hmatrix[0][0] = 1;
-      Hmatrix[i].Hmatrix[0][1] = 0;
-      Hmatrix[i].Hmatrix[0][2] = 0;
-      Hmatrix[i].Hmatrix[1][0] = 0;
-      Hmatrix[i].Hmatrix[1][1] = 1;
-      Hmatrix[i].Hmatrix[1][2] = 0;
-      Hmatrix[i].Hmatrix[2][0] = 0;
-      Hmatrix[i].Hmatrix[2][1] = 0;
-      Hmatrix[i].Hmatrix[2][2] = 1;
-      IHmatrix[i].Hmatrix[0][0] = 1;
-      IHmatrix[i].Hmatrix[0][1] = 0;
-      IHmatrix[i].Hmatrix[0][2] = 0;
-      IHmatrix[i].Hmatrix[1][0] = 0;
-      IHmatrix[i].Hmatrix[1][1] = 1;
-      IHmatrix[i].Hmatrix[1][2] = 0;
-      IHmatrix[i].Hmatrix[2][0] = 0;
-      IHmatrix[i].Hmatrix[2][1] = 0;
-      IHmatrix[i].Hmatrix[2][2] = 1;
-    }
-
-    SetSpsTable();
-    SetBilateralTable();
-  }
+  ProjectiveMotionRL(MotionBlurImageGenerator& aBlurGenerator);
 
   ~ProjectiveMotionRL() {
     ClearBuffer();
@@ -53,54 +29,8 @@ class ProjectiveMotionRL {
   ////////////////////////////////////
   // These functions are used to set Buffer for caching
   ////////////////////////////////////
-  void SetBuffer(int width, int height) {
-    mWarpImgBuffer.resize(width * height);
-    mWarpImgBufferR.resize(width * height);
-    mWarpImgBufferG.resize(width * height);
-    mWarpImgBufferB.resize(width * height);
-    mWarpWeightBuffer.resize(width * height);
-    mBlurImgBuffer.resize(width * height);
-    mBlurImgBufferR.resize(width * height);
-    mBlurImgBufferG.resize(width * height);
-    mBlurImgBufferB.resize(width * height);
-    mBlurWeightBuffer.resize(width * height);
-    mErrorImgBuffer.resize(width * height);
-    mErrorImgBufferR.resize(width * height);
-    mErrorImgBufferG.resize(width * height);
-    mErrorImgBufferB.resize(width * height);
-    mErrorWeightBuffer.resize(width * height);
-  }
-  void ClearBuffer() {
-    mWarpImgBuffer.clear();
-
-    mWarpImgBufferR.clear();
-
-    mWarpImgBufferG.clear();
-
-    mWarpImgBufferB.clear();
-
-    mWarpWeightBuffer.clear();
-
-    mBlurImgBuffer.clear();
-
-    mBlurImgBufferR.clear();
-
-    mBlurImgBufferG.clear();
-
-    mBlurImgBufferB.clear();
-
-    mBlurWeightBuffer.clear();
-
-    mErrorImgBuffer.clear();
-
-    mErrorImgBufferR.clear();
-
-    mErrorImgBufferG.clear();
-
-    mErrorImgBufferB.clear();
-
-    mErrorWeightBuffer.clear();
-  }
+  void SetBuffer(int width, int height);
+  void ClearBuffer();
 
   void SetSpsTable() {
     int i, t = 1;
@@ -168,165 +98,6 @@ class ProjectiveMotionRL {
     memcpy(mGroundTruthImgB.data(), GroundTruthB,
            width * height * sizeof(float));
   }
-
-  ////////////////////////////////////
-  // These functions are used to set the homography
-  ////////////////////////////////////
-  void SetHomography(Homography H, int i) {
-    if (i >= 0 && i < NumSamples) {
-      memcpy(Hmatrix[i].Hmatrix[0], H.Hmatrix[0], 3 * sizeof(float));
-      memcpy(Hmatrix[i].Hmatrix[1], H.Hmatrix[1], 3 * sizeof(float));
-      memcpy(Hmatrix[i].Hmatrix[2], H.Hmatrix[2], 3 * sizeof(float));
-
-      Homography::MatrixInverse(Hmatrix[i].Hmatrix, IHmatrix[i].Hmatrix);
-    }
-  }
-
-  void SetGlobalRotation(float degree) {
-    int i;
-    float deltadegree = (degree * M_PI / 180.0f) / NumSamples;
-    for (i = 0; i < NumSamples; i++) {
-      Hmatrix[i].Hmatrix[0][0] = cos(deltadegree * i);
-      Hmatrix[i].Hmatrix[0][1] = sin(deltadegree * i);
-      Hmatrix[i].Hmatrix[0][2] = 0;
-      Hmatrix[i].Hmatrix[1][0] = -sin(deltadegree * i);
-      Hmatrix[i].Hmatrix[1][1] = cos(deltadegree * i);
-      Hmatrix[i].Hmatrix[1][2] = 0;
-      Hmatrix[i].Hmatrix[2][0] = 0;
-      Hmatrix[i].Hmatrix[2][1] = 0;
-      Hmatrix[i].Hmatrix[2][2] = 1;
-      IHmatrix[i].Hmatrix[0][0] = cos(deltadegree * i);
-      IHmatrix[i].Hmatrix[0][1] = -sin(deltadegree * i);
-      IHmatrix[i].Hmatrix[0][2] = 0;
-      IHmatrix[i].Hmatrix[1][0] = sin(deltadegree * i);
-      IHmatrix[i].Hmatrix[1][1] = cos(deltadegree * i);
-      IHmatrix[i].Hmatrix[1][2] = 0;
-      IHmatrix[i].Hmatrix[2][0] = 0;
-      IHmatrix[i].Hmatrix[2][1] = 0;
-      IHmatrix[i].Hmatrix[2][2] = 1;
-    }
-  }
-  void SetGlobalScaling(float scalefactor) {
-    int i;
-    float deltascale = (scalefactor - 1.0f) / NumSamples;
-    for (i = 0; i < NumSamples; i++) {
-      Hmatrix[i].Hmatrix[0][0] = 1.0f + i * deltascale;
-      Hmatrix[i].Hmatrix[0][1] = 0;
-      Hmatrix[i].Hmatrix[0][2] = 0;
-      Hmatrix[i].Hmatrix[1][0] = 0;
-      Hmatrix[i].Hmatrix[1][1] = 1.0f + i * deltascale;
-      Hmatrix[i].Hmatrix[1][2] = 0;
-      Hmatrix[i].Hmatrix[2][0] = 0;
-      Hmatrix[i].Hmatrix[2][1] = 0;
-      Hmatrix[i].Hmatrix[2][2] = 1;
-      IHmatrix[i].Hmatrix[0][0] = 1.0f / (1.0f + i * deltascale);
-      IHmatrix[i].Hmatrix[0][1] = 0;
-      IHmatrix[i].Hmatrix[0][2] = 0;
-      IHmatrix[i].Hmatrix[1][0] = 0;
-      IHmatrix[i].Hmatrix[1][1] = 1.0f / (1.0f + i * deltascale);
-      IHmatrix[i].Hmatrix[1][2] = 0;
-      IHmatrix[i].Hmatrix[2][0] = 0;
-      IHmatrix[i].Hmatrix[2][1] = 0;
-      IHmatrix[i].Hmatrix[2][2] = 1;
-    }
-  }
-  void SetGlobalTranslation(float dx, float dy) {
-    int i;
-    float deltadx = dx / NumSamples;
-    float deltady = dy / NumSamples;
-    for (i = 0; i < NumSamples; i++) {
-      Hmatrix[i].Hmatrix[0][0] = 1;
-      Hmatrix[i].Hmatrix[0][1] = 0;
-      Hmatrix[i].Hmatrix[0][2] = i * deltadx;
-      Hmatrix[i].Hmatrix[1][0] = 0;
-      Hmatrix[i].Hmatrix[1][1] = 1;
-      Hmatrix[i].Hmatrix[1][2] = i * deltady;
-      Hmatrix[i].Hmatrix[2][0] = 0;
-      Hmatrix[i].Hmatrix[2][1] = 0;
-      Hmatrix[i].Hmatrix[2][2] = 1;
-      IHmatrix[i].Hmatrix[0][0] = 1;
-      IHmatrix[i].Hmatrix[0][1] = 0;
-      IHmatrix[i].Hmatrix[0][2] = -i * deltadx;
-      IHmatrix[i].Hmatrix[1][0] = 0;
-      IHmatrix[i].Hmatrix[1][1] = 1;
-      IHmatrix[i].Hmatrix[1][2] = -i * deltady;
-      IHmatrix[i].Hmatrix[2][0] = 0;
-      IHmatrix[i].Hmatrix[2][1] = 0;
-      IHmatrix[i].Hmatrix[2][2] = 1;
-    }
-  }
-  void SetGlobalPerspective(float px, float py) {
-    int i;
-    float deltapx = px / NumSamples;
-    float deltapy = py / NumSamples;
-    for (i = 0; i < NumSamples; i++) {
-      Hmatrix[i].Hmatrix[0][0] = 1;
-      Hmatrix[i].Hmatrix[0][1] = 0;
-      Hmatrix[i].Hmatrix[0][2] = 0;
-      Hmatrix[i].Hmatrix[1][0] = 0;
-      Hmatrix[i].Hmatrix[1][1] = 1;
-      Hmatrix[i].Hmatrix[1][2] = 0;
-      Hmatrix[i].Hmatrix[2][0] = i * deltapx;
-      Hmatrix[i].Hmatrix[2][1] = i * deltapy;
-      Hmatrix[i].Hmatrix[2][2] = 1;
-      IHmatrix[i].Hmatrix[0][0] = 1;
-      IHmatrix[i].Hmatrix[0][1] = 0;
-      IHmatrix[i].Hmatrix[0][2] = 0;
-      IHmatrix[i].Hmatrix[1][0] = 0;
-      IHmatrix[i].Hmatrix[1][1] = 1;
-      IHmatrix[i].Hmatrix[1][2] = 0;
-      IHmatrix[i].Hmatrix[2][0] = -i * deltapx;
-      IHmatrix[i].Hmatrix[2][1] = -i * deltapy;
-      IHmatrix[i].Hmatrix[2][2] = 1;
-    }
-  }
-
-  void SetGlobalParameters(float degree, float scalefactor, float px, float py,
-                           float dx, float dy) {
-    int i;
-    float deltadegree = (degree * M_PI / 180.0f) / NumSamples;
-    float deltascale = (scalefactor - 1.0f) / NumSamples;
-    float deltapx = px / NumSamples;
-    float deltapy = py / NumSamples;
-    float deltadx = dx / NumSamples;
-    float deltady = dy / NumSamples;
-    for (i = 0; i < NumSamples; i++) {
-      Hmatrix[i].Hmatrix[0][0] = cos(deltadegree * i) * (1.0f + i * deltascale);
-      Hmatrix[i].Hmatrix[0][1] = sin(deltadegree * i);
-      Hmatrix[i].Hmatrix[0][2] = i * deltadx;
-      Hmatrix[i].Hmatrix[1][0] = -sin(deltadegree * i);
-      Hmatrix[i].Hmatrix[1][1] = cos(deltadegree * i) * (1.0f + i * deltascale);
-      Hmatrix[i].Hmatrix[1][2] = i * deltady;
-      Hmatrix[i].Hmatrix[2][0] = i * deltapx;
-      Hmatrix[i].Hmatrix[2][1] = i * deltapy;
-      Hmatrix[i].Hmatrix[2][2] = 1;
-
-      Homography::MatrixInverse(Hmatrix[i].Hmatrix, IHmatrix[i].Hmatrix);
-    }
-  }
-
-  ////////////////////////////////////
-  // These functions are used to generate the Projective Motion Blur Images
-  ////////////////////////////////////
-  // i: postive forward, negative backward
-  void WarpImageGray(float* InputImg, float* inputWeight, int iwidth,
-                     int iheight, float* OutputImg, float* outputWeight,
-                     int width, int height, int i);
-  void WarpImageRgb(float* InputImgR, float* InputImgG, float* InputImgB,
-                    float* inputWeight, int iwidth, int iheight,
-                    float* OutputImgR, float* OutputImgG, float* OutputImgB,
-                    float* outputWeight, int width, int height, int i);
-  // bforward: true forward, false backward
-  void GenerateMotionBlurImgGray(float* InputImg, float* inputWeight,
-                                 int iwidth, int iheight, float* BlurImg,
-                                 float* outputWeight, int width, int height,
-                                 bool bforward = true);
-  void GenerateMotionBlurImgRgb(float* InputImgR, float* InputImgG,
-                                float* InputImgB, float* inputWeight,
-                                int iwidth, int iheight, float* BlurImgR,
-                                float* BlurImgG, float* BlurImgB,
-                                float* outputWeight, int width, int height,
-                                bool bforward = true);
 
   ////////////////////////////////////
   // These functions are deblurring algorithm
@@ -455,21 +226,14 @@ class ProjectiveMotionRL {
     }
   }
 
-  // These are the homography sequence for Projective motion blur model
-  Homography Hmatrix[NumSamples];
-  Homography IHmatrix[NumSamples];
-
  private:
   float getSpsWeight(float aValue) const;
+
+  MotionBlurImageGenerator& mBlurGenerator;
 
   // These are buffer and lookup table variables
   float mBilateralTable[256];
   float mSpsTable[256];
-  std::vector<float> mWarpImgBuffer;
-  std::vector<float> mWarpImgBufferR;
-  std::vector<float> mWarpImgBufferG;
-  std::vector<float> mWarpImgBufferB;
-  std::vector<float> mWarpWeightBuffer;
   std::vector<float> mBlurImgBuffer;
   std::vector<float> mBlurImgBufferR;
   std::vector<float> mBlurImgBufferG;

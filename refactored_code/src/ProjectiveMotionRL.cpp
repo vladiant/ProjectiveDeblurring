@@ -6,8 +6,17 @@
 
 #include "BicubicInterpolation.h"
 #include "ImResize.h"
+#include "MotionBlurImageGenerator.h"
 #include "bitmap.h"
 #include "warping.h"
+
+ProjectiveMotionRL::ProjectiveMotionRL(MotionBlurImageGenerator& aBlurGenerator)
+    : mBlurGenerator(aBlurGenerator) {
+  mRandomEngine.seed(kSeed);
+
+  SetSpsTable();
+  SetBilateralTable();
+}
 
 float ProjectiveMotionRL::getSpsWeight(float aValue) const {
   if (!std::isfinite(aValue)) {
@@ -15,110 +24,6 @@ float ProjectiveMotionRL::getSpsWeight(float aValue) const {
   }
 
   return mSpsTable[static_cast<int>(std::abs(aValue) * 255.0f)];
-}
-
-void ProjectiveMotionRL::WarpImageGray(float* InputImg, float* inputWeight,
-                                       int iwidth, int iheight,
-                                       float* OutputImg, float* outputWeight,
-                                       int width, int height, int i) {
-  if (i >= 0 && i < NumSamples) {
-    warpImageGray(InputImg, inputWeight, iwidth, iheight, OutputImg,
-                  outputWeight, width, height, IHmatrix[i]);
-  } else if (i < 0 && i > -NumSamples) {
-    warpImageGray(InputImg, inputWeight, iwidth, iheight, OutputImg,
-                  outputWeight, width, height, Hmatrix[-i]);
-  }
-}
-
-void ProjectiveMotionRL::WarpImageRgb(float* InputImgR, float* InputImgG,
-                                      float* InputImgB, float* inputWeight,
-                                      int iwidth, int iheight,
-                                      float* OutputImgR, float* OutputImgG,
-                                      float* OutputImgB, float* outputWeight,
-                                      int width, int height, int i) {
-  if (i >= 0 && i < NumSamples) {
-    warpImageRgb(InputImgR, InputImgG, InputImgB, inputWeight, iwidth, iheight,
-                 OutputImgR, OutputImgG, OutputImgB, outputWeight, width,
-                 height, IHmatrix[i]);
-  } else if (i < 0 && i > -NumSamples) {
-    warpImageRgb(InputImgR, InputImgG, InputImgB, inputWeight, iwidth, iheight,
-                 OutputImgR, OutputImgG, OutputImgB, outputWeight, width,
-                 height, Hmatrix[-i]);
-  }
-}
-
-void ProjectiveMotionRL::GenerateMotionBlurImgGray(
-    float* InputImg, float* inputWeight, int iwidth, int iheight,
-    float* BlurImg, float* outputWeight, int width, int height, bool bforward) {
-  int i = 0, index = 0, totalpixel = width * height;
-
-  if (mWarpImgBuffer.empty()) {
-    SetBuffer(width, height);
-  }
-
-  memset(BlurImg, 0, totalpixel * sizeof(float));
-  memset(outputWeight, 0, totalpixel * sizeof(float));
-  for (i = 0; i < NumSamples; i++) {
-    if (bforward) {
-      WarpImageGray(InputImg, inputWeight, iwidth, iheight,
-                    mWarpImgBuffer.data(), mWarpWeightBuffer.data(), width,
-                    height, i);
-    } else {
-      WarpImageGray(InputImg, inputWeight, iwidth, iheight,
-                    mWarpImgBuffer.data(), mWarpWeightBuffer.data(), width,
-                    height, -i);
-    }
-    for (index = 0; index < totalpixel; index++) {
-      BlurImg[index] += mWarpImgBuffer[index] * mWarpWeightBuffer[index];
-      outputWeight[index] += mWarpWeightBuffer[index];
-    }
-  }
-
-  for (index = 0; index < totalpixel; index++) {
-    BlurImg[index] /= outputWeight[index];
-  }
-}
-
-void ProjectiveMotionRL::GenerateMotionBlurImgRgb(
-    float* InputImgR, float* InputImgG, float* InputImgB, float* inputWeight,
-    int iwidth, int iheight, float* BlurImgR, float* BlurImgG, float* BlurImgB,
-    float* outputWeight, int width, int height, bool bforward) {
-  int i = 0, index = 0, totalpixel = width * height;
-
-  if (mWarpImgBuffer.empty()) {
-    SetBuffer(width, height);
-  }
-
-  memset(BlurImgR, 0, totalpixel * sizeof(float));
-  memset(BlurImgG, 0, totalpixel * sizeof(float));
-  memset(BlurImgB, 0, totalpixel * sizeof(float));
-  memset(outputWeight, 0, totalpixel * sizeof(float));
-  for (i = 0; i < NumSamples; i++) {
-    if (bforward) {
-      WarpImageRgb(InputImgR, InputImgG, InputImgB, inputWeight, iwidth,
-                   iheight, mWarpImgBufferR.data(), mWarpImgBufferG.data(),
-                   mWarpImgBufferB.data(), mWarpWeightBuffer.data(), width,
-                   height, i);
-    } else {
-      WarpImageRgb(InputImgR, InputImgG, InputImgB, inputWeight, iwidth,
-                   iheight, mWarpImgBufferR.data(), mWarpImgBufferG.data(),
-                   mWarpImgBufferB.data(), mWarpWeightBuffer.data(), width,
-                   height, -i);
-    }
-
-    for (index = 0; index < totalpixel; index++) {
-      BlurImgR[index] += mWarpImgBufferR[index] * mWarpWeightBuffer[index];
-      BlurImgG[index] += mWarpImgBufferG[index] * mWarpWeightBuffer[index];
-      BlurImgB[index] += mWarpImgBufferB[index] * mWarpWeightBuffer[index];
-      outputWeight[index] += mWarpWeightBuffer[index];
-    }
-  }
-
-  for (index = 0; index < totalpixel; index++) {
-    BlurImgR[index] /= outputWeight[index];
-    BlurImgG[index] /= outputWeight[index];
-    BlurImgB[index] /= outputWeight[index];
-  }
 }
 
 void ProjectiveMotionRL::ProjectiveMotionRLDeblurGray(
@@ -136,9 +41,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurGray(
     SetBuffer(iwidth, iheight);
 
   for (itr = 0; itr < Niter; itr++) {
-    GenerateMotionBlurImgGray(DeblurImg, InputWeight, width, height,
-                              mBlurImgBuffer.data(), mBlurWeightBuffer.data(),
-                              iwidth, iheight, true);
+    mBlurGenerator.GenerateMotionBlurImgGray(
+        DeblurImg, InputWeight, width, height, mBlurImgBuffer.data(),
+        mBlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -152,9 +57,10 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurGray(
         }
       }
     }
-    GenerateMotionBlurImgGray(DeltaImg.data(), mBlurWeightBuffer.data(), iwidth,
-                              iheight, mErrorImgBuffer.data(),
-                              mErrorWeightBuffer.data(), width, height, false);
+    mBlurGenerator.GenerateMotionBlurImgGray(
+        DeltaImg.data(), mBlurWeightBuffer.data(), iwidth, iheight,
+        mErrorImgBuffer.data(), mErrorWeightBuffer.data(), width, height,
+        false);
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
         if (bPoisson) {
@@ -194,10 +100,10 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurRgb(
     SetBuffer(iwidth, iheight);
 
   for (itr = 0; itr < Niter; itr++) {
-    GenerateMotionBlurImgRgb(DeblurImgR, DeblurImgG, DeblurImgB, InputWeight,
-                             width, height, mBlurImgBufferR.data(),
-                             mBlurImgBufferG.data(), mBlurImgBufferB.data(),
-                             mBlurWeightBuffer.data(), iwidth, iheight, true);
+    mBlurGenerator.GenerateMotionBlurImgRgb(
+        DeblurImgR, DeblurImgG, DeblurImgB, InputWeight, width, height,
+        mBlurImgBufferR.data(), mBlurImgBufferG.data(), mBlurImgBufferB.data(),
+        mBlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -223,11 +129,11 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurRgb(
         }
       }
     }
-    GenerateMotionBlurImgRgb(DeltaImgR.data(), DeltaImgG.data(),
-                             DeltaImgB.data(), mBlurWeightBuffer.data(), iwidth,
-                             iheight, mErrorImgBufferR.data(),
-                             mErrorImgBufferG.data(), mErrorImgBufferB.data(),
-                             mErrorWeightBuffer.data(), width, height, false);
+    mBlurGenerator.GenerateMotionBlurImgRgb(
+        DeltaImgR.data(), DeltaImgG.data(), DeltaImgB.data(),
+        mBlurWeightBuffer.data(), iwidth, iheight, mErrorImgBufferR.data(),
+        mErrorImgBufferG.data(), mErrorImgBufferB.data(),
+        mErrorWeightBuffer.data(), width, height, false);
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
         if (bPoisson) {
@@ -277,9 +183,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVRegGray(
     SetBuffer(iwidth, iheight);
 
   for (itr = 0; itr < Niter; itr++) {
-    GenerateMotionBlurImgGray(DeblurImg, InputWeight, width, height,
-                              mBlurImgBuffer.data(), mBlurWeightBuffer.data(),
-                              iwidth, iheight, true);
+    mBlurGenerator.GenerateMotionBlurImgGray(
+        DeblurImg, InputWeight, width, height, mBlurImgBuffer.data(),
+        mBlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -293,9 +199,10 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVRegGray(
         }
       }
     }
-    GenerateMotionBlurImgGray(DeltaImg.data(), mBlurWeightBuffer.data(), iwidth,
-                              iheight, mErrorImgBuffer.data(),
-                              mErrorWeightBuffer.data(), width, height, false);
+    mBlurGenerator.GenerateMotionBlurImgGray(
+        DeltaImg.data(), mBlurWeightBuffer.data(), iwidth, iheight,
+        mErrorImgBuffer.data(), mErrorWeightBuffer.data(), width, height,
+        false);
 
     ComputeGradientImageGray(DeblurImg, width, height, DxImg.data(),
                              DyImg.data(), true);
@@ -365,10 +272,10 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVRegRgb(
     SetBuffer(iwidth, iheight);
 
   for (itr = 0; itr < Niter; itr++) {
-    GenerateMotionBlurImgRgb(DeblurImgR, DeblurImgG, DeblurImgB, InputWeight,
-                             width, height, mBlurImgBufferR.data(),
-                             mBlurImgBufferG.data(), mBlurImgBufferB.data(),
-                             mBlurWeightBuffer.data(), iwidth, iheight, true);
+    mBlurGenerator.GenerateMotionBlurImgRgb(
+        DeblurImgR, DeblurImgG, DeblurImgB, InputWeight, width, height,
+        mBlurImgBufferR.data(), mBlurImgBufferG.data(), mBlurImgBufferB.data(),
+        mBlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -394,11 +301,11 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVRegRgb(
         }
       }
     }
-    GenerateMotionBlurImgRgb(DeltaImgR.data(), DeltaImgG.data(),
-                             DeltaImgB.data(), mBlurWeightBuffer.data(), iwidth,
-                             iheight, mErrorImgBufferR.data(),
-                             mErrorImgBufferG.data(), mErrorImgBufferB.data(),
-                             mErrorWeightBuffer.data(), width, height, false);
+    mBlurGenerator.GenerateMotionBlurImgRgb(
+        DeltaImgR.data(), DeltaImgG.data(), DeltaImgB.data(),
+        mBlurWeightBuffer.data(), iwidth, iheight, mErrorImgBufferR.data(),
+        mErrorImgBufferG.data(), mErrorImgBufferB.data(),
+        mErrorWeightBuffer.data(), width, height, false);
 
     ComputeGradientImageGray(DeblurImgR, width, height, DxImgR.data(),
                              DyImgR.data(), true);
@@ -492,9 +399,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsRegGray(
     SetBuffer(iwidth, iheight);
 
   for (itr = 0; itr < Niter; itr++) {
-    GenerateMotionBlurImgGray(DeblurImg, InputWeight, width, height,
-                              mBlurImgBuffer.data(), mBlurWeightBuffer.data(),
-                              iwidth, iheight, true);
+    mBlurGenerator.GenerateMotionBlurImgGray(
+        DeblurImg, InputWeight, width, height, mBlurImgBuffer.data(),
+        mBlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -508,9 +415,10 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsRegGray(
         }
       }
     }
-    GenerateMotionBlurImgGray(DeltaImg.data(), mBlurWeightBuffer.data(), iwidth,
-                              iheight, mErrorImgBuffer.data(),
-                              mErrorWeightBuffer.data(), width, height, false);
+    mBlurGenerator.GenerateMotionBlurImgGray(
+        DeltaImg.data(), mBlurWeightBuffer.data(), iwidth, iheight,
+        mErrorImgBuffer.data(), mErrorWeightBuffer.data(), width, height,
+        false);
 
     ComputeGradientImageGray(DeblurImg, width, height, DxImg.data(),
                              DyImg.data(), true);
@@ -580,10 +488,10 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsRegRgb(
     SetBuffer(iwidth, iheight);
 
   for (itr = 0; itr < Niter; itr++) {
-    GenerateMotionBlurImgRgb(DeblurImgR, DeblurImgG, DeblurImgB, InputWeight,
-                             width, height, mBlurImgBufferR.data(),
-                             mBlurImgBufferG.data(), mBlurImgBufferB.data(),
-                             mBlurWeightBuffer.data(), iwidth, iheight, true);
+    mBlurGenerator.GenerateMotionBlurImgRgb(
+        DeblurImgR, DeblurImgG, DeblurImgB, InputWeight, width, height,
+        mBlurImgBufferR.data(), mBlurImgBufferG.data(), mBlurImgBufferB.data(),
+        mBlurWeightBuffer.data(), iwidth, iheight, true);
 
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
@@ -610,11 +518,11 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsRegRgb(
         }
       }
     }
-    GenerateMotionBlurImgRgb(DeltaImgR.data(), DeltaImgG.data(),
-                             DeltaImgB.data(), mBlurWeightBuffer.data(), iwidth,
-                             iheight, mErrorImgBufferR.data(),
-                             mErrorImgBufferG.data(), mErrorImgBufferB.data(),
-                             mErrorWeightBuffer.data(), width, height, false);
+    mBlurGenerator.GenerateMotionBlurImgRgb(
+        DeltaImgR.data(), DeltaImgG.data(), DeltaImgB.data(),
+        mBlurWeightBuffer.data(), iwidth, iheight, mErrorImgBufferR.data(),
+        mErrorImgBufferG.data(), mErrorImgBufferB.data(),
+        mErrorWeightBuffer.data(), width, height, false);
 
     ComputeGradientImageGray(DeblurImgR, width, height, DxImgR.data(),
                              DyImgR.data(), true);
@@ -705,9 +613,9 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegGray(
     SetBuffer(iwidth, iheight);
 
   for (itr = 0; itr < Niter; itr++) {
-    GenerateMotionBlurImgGray(DeblurImg, InputWeight, width, height,
-                              mBlurImgBuffer.data(), mBlurWeightBuffer.data(),
-                              iwidth, iheight, true);
+    mBlurGenerator.GenerateMotionBlurImgGray(
+        DeblurImg, InputWeight, width, height, mBlurImgBuffer.data(),
+        mBlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -721,9 +629,10 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegGray(
         }
       }
     }
-    GenerateMotionBlurImgGray(DeltaImg.data(), mBlurWeightBuffer.data(), iwidth,
-                              iheight, mErrorImgBuffer.data(),
-                              mErrorWeightBuffer.data(), width, height, false);
+    mBlurGenerator.GenerateMotionBlurImgGray(
+        DeltaImg.data(), mBlurWeightBuffer.data(), iwidth, iheight,
+        mErrorImgBuffer.data(), mErrorWeightBuffer.data(), width, height,
+        false);
     ComputeBilaterRegImageGray(DeblurImg, width, height,
                                BilateralRegImg.data());
 
@@ -770,10 +679,10 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegRgb(
     SetBuffer(iwidth, iheight);
 
   for (itr = 0; itr < Niter; itr++) {
-    GenerateMotionBlurImgRgb(DeblurImgR, DeblurImgG, DeblurImgB, InputWeight,
-                             width, height, mBlurImgBufferR.data(),
-                             mBlurImgBufferG.data(), mBlurImgBufferB.data(),
-                             mBlurWeightBuffer.data(), iwidth, iheight, true);
+    mBlurGenerator.GenerateMotionBlurImgRgb(
+        DeblurImgR, DeblurImgG, DeblurImgB, InputWeight, width, height,
+        mBlurImgBufferR.data(), mBlurImgBufferG.data(), mBlurImgBufferB.data(),
+        mBlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {
@@ -799,11 +708,11 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegRgb(
         }
       }
     }
-    GenerateMotionBlurImgRgb(DeltaImgR.data(), DeltaImgG.data(),
-                             DeltaImgB.data(), mBlurWeightBuffer.data(), iwidth,
-                             iheight, mErrorImgBufferR.data(),
-                             mErrorImgBufferG.data(), mErrorImgBufferB.data(),
-                             mErrorWeightBuffer.data(), width, height, false);
+    mBlurGenerator.GenerateMotionBlurImgRgb(
+        DeltaImgR.data(), DeltaImgG.data(), DeltaImgB.data(),
+        mBlurWeightBuffer.data(), iwidth, iheight, mErrorImgBufferR.data(),
+        mErrorImgBufferG.data(), mErrorImgBufferB.data(),
+        mErrorWeightBuffer.data(), width, height, false);
     ComputeBilaterRegImageGray(DeblurImgR, width, height,
                                BilateralRegImgR.data());
     ComputeBilaterRegImageGray(DeblurImgG, width, height,
@@ -1020,4 +929,37 @@ void ProjectiveMotionRL::ComputeBilaterRegImageGray(float* Img, int width,
       }
     }
   }
+}
+
+void ProjectiveMotionRL::SetBuffer(int width, int height) {
+  mBlurGenerator.SetBuffer(width, height);
+
+  mBlurImgBuffer.resize(width * height);
+  mBlurImgBufferR.resize(width * height);
+  mBlurImgBufferG.resize(width * height);
+  mBlurImgBufferB.resize(width * height);
+  mBlurWeightBuffer.resize(width * height);
+  mErrorImgBuffer.resize(width * height);
+  mErrorImgBufferR.resize(width * height);
+  mErrorImgBufferG.resize(width * height);
+  mErrorImgBufferB.resize(width * height);
+  mErrorWeightBuffer.resize(width * height);
+}
+
+void ProjectiveMotionRL::ClearBuffer() {
+  mBlurGenerator.ClearBuffer();
+
+  mBlurImgBuffer.clear();
+  mBlurImgBufferR.clear();
+  mBlurImgBufferG.clear();
+  mBlurImgBufferB.clear();
+
+  mBlurWeightBuffer.clear();
+
+  mErrorImgBuffer.clear();
+  mErrorImgBufferR.clear();
+  mErrorImgBufferG.clear();
+  mErrorImgBufferB.clear();
+
+  mErrorWeightBuffer.clear();
 }
