@@ -12,7 +12,6 @@ class MotionBlurImageGenerator;
 
 class ProjectiveMotionRL {
  public:
-  constexpr static int NumSamples = 30;
   // Random engine seed
   constexpr static int kSeed = 1234;
 
