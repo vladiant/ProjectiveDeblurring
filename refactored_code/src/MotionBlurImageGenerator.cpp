@@ -60,9 +60,10 @@ void MotionBlurImageGenerator::WarpImageRgb(
   }
 }
 
-void MotionBlurImageGenerator::GenerateMotionBlurImgGray(
-    float* InputImg, float* inputWeight, int iwidth, int iheight,
-    float* BlurImg, float* outputWeight, int width, int height, bool bforward) {
+void MotionBlurImageGenerator::blurGray(float* InputImg, float* inputWeight,
+                                        int iwidth, int iheight, float* BlurImg,
+                                        float* outputWeight, int width,
+                                        int height, bool bforward) {
   int i = 0, index = 0, totalpixel = width * height;
 
   // TODO: Preinitialization, Gray only, check size
@@ -93,10 +94,12 @@ void MotionBlurImageGenerator::GenerateMotionBlurImgGray(
   }
 }
 
-void MotionBlurImageGenerator::GenerateMotionBlurImgRgb(
-    float* InputImgR, float* InputImgG, float* InputImgB, float* inputWeight,
-    int iwidth, int iheight, float* BlurImgR, float* BlurImgG, float* BlurImgB,
-    float* outputWeight, int width, int height, bool bforward) {
+void MotionBlurImageGenerator::blurRgb(float* InputImgR, float* InputImgG,
+                                       float* InputImgB, float* inputWeight,
+                                       int iwidth, int iheight, float* BlurImgR,
+                                       float* BlurImgG, float* BlurImgB,
+                                       float* outputWeight, int width,
+                                       int height, bool bforward) {
   int i = 0, index = 0, totalpixel = width * height;
 
   // TODO: Preinitialization, RGB only, chesk size

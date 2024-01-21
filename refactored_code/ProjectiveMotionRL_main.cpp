@@ -111,15 +111,15 @@ int main(int /*argc*/, char* /*argv*/[]) {
 
   ///////////////////////////////////
   printf("Generate Motion Blurred Image\n");
-  blurGenerator.GenerateMotionBlurImgGray(
-      fImg[0].data(), inputWeight.data(), width, height, bImg[0].data(),
-      outputWeight.data(), blurwidth, blurheight, true);
-  blurGenerator.GenerateMotionBlurImgGray(
-      fImg[1].data(), inputWeight.data(), width, height, bImg[1].data(),
-      outputWeight.data(), blurwidth, blurheight, true);
-  blurGenerator.GenerateMotionBlurImgGray(
-      fImg[2].data(), inputWeight.data(), width, height, bImg[2].data(),
-      outputWeight.data(), blurwidth, blurheight, true);
+  blurGenerator.blurGray(fImg[0].data(), inputWeight.data(), width, height,
+                         bImg[0].data(), outputWeight.data(), blurwidth,
+                         blurheight, true);
+  blurGenerator.blurGray(fImg[1].data(), inputWeight.data(), width, height,
+                         bImg[1].data(), outputWeight.data(), blurwidth,
+                         blurheight, true);
+  blurGenerator.blurGray(fImg[2].data(), inputWeight.data(), width, height,
+                         bImg[2].data(), outputWeight.data(), blurwidth,
+                         blurheight, true);
 
   RMSError = (m_ProjectiveMotionRL.ComputeRMSErrorGray(
                   fImg[0].data(), bImg[0].data(), width, height) +
