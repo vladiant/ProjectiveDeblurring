@@ -2,7 +2,6 @@
 
 #include <cmath>
 #include <cstring>
-#include <random>
 
 #include "IBlurImageGenerator.h"
 #include "homography.h"
@@ -11,9 +10,6 @@
 
 class ProjectiveMotionRL {
  public:
-  // Random engine seed
-  constexpr static int kSeed = 1234;
-
   ProjectiveMotionRL(IBlurImageGenerator& aBlurGenerator);
 
   ~ProjectiveMotionRL() {
@@ -197,33 +193,6 @@ class ProjectiveMotionRL {
     return sqrt(RMS / (width * height));
   }
 
-  ////////////////////////////////////
-  // These functions are used to generate noise
-  ////////////////////////////////////
-  // Normal random number generator, variance = 1
-  float normalrand() {
-    std::normal_distribution<float> normalDist(0.0f, 1.0f);
-    // float val = 0;
-    // for (int i = 0; i != 12; ++i) val += ((float)(rand()) / RAND_MAX);
-    // return val - 6.0f;
-    return normalDist(mRandomEngine);
-  }
-
-  // Noise variance = amp
-  void gaussianNoiseGray(float* Img, int width, int height, float amp) {
-    int x, y, index;
-    float random, noise;
-    for (y = 0, index = 0; y < height; y++) {
-      for (x = 0; x < width; x++, index++) {
-        random = normalrand() / 255.0f;
-        noise = amp * random;
-        Img[index] += noise;
-        if (Img[index] > 1.0f) Img[index] = 1.0f;
-        if (Img[index] < 0.0f) Img[index] = 0.0f;
-      }
-    }
-  }
-
  private:
   float getSpsWeight(float aValue) const;
 
@@ -248,8 +217,4 @@ class ProjectiveMotionRL {
   std::vector<float> mGroundTruthImgR;
   std::vector<float> mGroundTruthImgG;
   std::vector<float> mGroundTruthImgB;
-
-  // Random values generation
-  std::random_device mRandomDevice;
-  std::mt19937 mRandomEngine{mRandomDevice()};
 };

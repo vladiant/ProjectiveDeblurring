@@ -16,6 +16,8 @@ add_executable(
     src/ImResize.cpp
     include/svdcmp.h
     src/svdcmp.cpp
+    include/GaussianNoiseGenerator.h
+    src/GaussianNoiseGenerator.cpp
     include/IBlurImageGenerator.h
     include/MotionBlurImageGenerator.h
     src/MotionBlurImageGenerator.cpp

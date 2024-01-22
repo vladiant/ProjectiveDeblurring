@@ -11,8 +11,6 @@
 
 ProjectiveMotionRL::ProjectiveMotionRL(IBlurImageGenerator& aBlurGenerator)
     : mBlurGenerator(aBlurGenerator) {
-  mRandomEngine.seed(kSeed);
-
   SetSpsTable();
   SetBilateralTable();
 }

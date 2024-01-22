@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "GaussianNoiseGenerator.h"
 #include "ImResize.h"
 #include "MotionBlurImageGenerator.h"
 #include "ProjectiveMotionRL.h"
@@ -134,10 +135,11 @@ int main(int /*argc*/, char* /*argv*/[]) {
   writeBMPchannels(fname, blurwidth, blurheight, bImg[0], bImg[1], bImg[2]);
 
   // Add noise
+  GaussianNoiseGenerator noiseGenerator;
   float sigma = 2.0f;
-  m_ProjectiveMotionRL.gaussianNoiseGray(bImg[0].data(), width, height, sigma);
-  m_ProjectiveMotionRL.gaussianNoiseGray(bImg[1].data(), width, height, sigma);
-  m_ProjectiveMotionRL.gaussianNoiseGray(bImg[2].data(), width, height, sigma);
+  noiseGenerator.gaussianNoiseGray(bImg[0].data(), width, height, sigma);
+  noiseGenerator.gaussianNoiseGray(bImg[1].data(), width, height, sigma);
+  noiseGenerator.gaussianNoiseGray(bImg[2].data(), width, height, sigma);
   RMSError = (m_ProjectiveMotionRL.ComputeRMSErrorGray(
                   fImg[0].data(), bImg[0].data(), width, height) +
               m_ProjectiveMotionRL.ComputeRMSErrorGray(
