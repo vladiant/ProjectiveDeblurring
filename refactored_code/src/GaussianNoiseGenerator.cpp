@@ -11,8 +11,8 @@ float GaussianNoiseGenerator::normalrand() {
 }
 
 // Noise variance = amp
-void GaussianNoiseGenerator::gaussianNoiseGray(float* Img, int width,
-                                               int height, float amp) {
+void GaussianNoiseGenerator::addNoiseGray(float* Img, int width, int height,
+                                          float amp) {
   int x, y, index;
   float random, noise;
   for (y = 0, index = 0; y < height; y++) {

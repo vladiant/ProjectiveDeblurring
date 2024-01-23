@@ -16,7 +16,7 @@ class GaussianNoiseGenerator {
   float normalrand();
 
   // Noise variance = amp
-  void gaussianNoiseGray(float* Img, int width, int height, float amp);
+  void addNoiseGray(float* Img, int width, int height, float amp);
 
  private:
   // Random values generation
