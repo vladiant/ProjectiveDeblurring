@@ -135,11 +135,11 @@ int main(int /*argc*/, char* /*argv*/[]) {
   writeBMPchannels(fname, blurwidth, blurheight, bImg[0], bImg[1], bImg[2]);
 
   // Add noise
-  GaussianNoiseGenerator noiseGenerator;
-  float sigma = 2.0f;
-  noiseGenerator.addNoiseGray(bImg[0].data(), width, height, sigma);
-  noiseGenerator.addNoiseGray(bImg[1].data(), width, height, sigma);
-  noiseGenerator.addNoiseGray(bImg[2].data(), width, height, sigma);
+  const float sigma = 2.0f;
+  GaussianNoiseGenerator noiseGenerator(sigma);
+  noiseGenerator.addNoiseGray(bImg[0].data(), width, height);
+  noiseGenerator.addNoiseGray(bImg[1].data(), width, height);
+  noiseGenerator.addNoiseGray(bImg[2].data(), width, height);
   RMSError = (m_ProjectiveMotionRL.ComputeRMSErrorGray(
                   fImg[0].data(), bImg[0].data(), width, height) +
               m_ProjectiveMotionRL.ComputeRMSErrorGray(
