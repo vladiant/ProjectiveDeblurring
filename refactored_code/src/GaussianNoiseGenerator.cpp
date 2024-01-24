@@ -12,17 +12,17 @@ float GaussianNoiseGenerator::normalrand() {
   return normalDist(mRandomEngine);
 }
 
-// Noise variance = amp
-void GaussianNoiseGenerator::addNoiseGray(float* Img, int width, int height) {
+void GaussianNoiseGenerator::addNoiseGray(float* Img, int width, int height,
+                                          float* aOutImg) {
   int x, y, index;
   float random, noise;
   for (y = 0, index = 0; y < height; y++) {
     for (x = 0; x < width; x++, index++) {
       random = normalrand() / 255.0f;
       noise = mSigma * random;
-      Img[index] += noise;
-      if (Img[index] > 1.0f) Img[index] = 1.0f;
-      if (Img[index] < 0.0f) Img[index] = 0.0f;
+      aOutImg[index] = Img[index] + noise;
+      if (aOutImg[index] > 1.0f) aOutImg[index] = 1.0f;
+      if (aOutImg[index] < 0.0f) aOutImg[index] = 0.0f;
     }
   }
 }

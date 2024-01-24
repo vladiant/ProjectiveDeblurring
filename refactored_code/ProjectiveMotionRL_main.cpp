@@ -137,9 +137,9 @@ int main(int /*argc*/, char* /*argv*/[]) {
   // Add noise
   const float sigma = 2.0f;
   GaussianNoiseGenerator noiseGenerator(sigma);
-  noiseGenerator.addNoiseGray(bImg[0].data(), width, height);
-  noiseGenerator.addNoiseGray(bImg[1].data(), width, height);
-  noiseGenerator.addNoiseGray(bImg[2].data(), width, height);
+  noiseGenerator.addNoiseGray(bImg[0].data(), width, height, bImg[0].data());
+  noiseGenerator.addNoiseGray(bImg[1].data(), width, height, bImg[1].data());
+  noiseGenerator.addNoiseGray(bImg[2].data(), width, height, bImg[2].data());
   RMSError = (m_ProjectiveMotionRL.ComputeRMSErrorGray(
                   fImg[0].data(), bImg[0].data(), width, height) +
               m_ProjectiveMotionRL.ComputeRMSErrorGray(
