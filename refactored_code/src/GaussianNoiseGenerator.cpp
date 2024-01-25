@@ -1,4 +1,6 @@
-#include <GaussianNoiseGenerator.h>
+#include "GaussianNoiseGenerator.h"
+
+#include <algorithm>
 
 GaussianNoiseGenerator::GaussianNoiseGenerator(float aSigma) : mSigma(aSigma) {
   mRandomEngine.seed(kSeed);
@@ -14,15 +16,12 @@ float GaussianNoiseGenerator::normalrand() {
 
 void GaussianNoiseGenerator::addNoiseGray(float* Img, int width, int height,
                                           float* aOutImg) {
-  int x, y, index;
-  float random, noise;
-  for (y = 0, index = 0; y < height; y++) {
-    for (x = 0; x < width; x++, index++) {
-      random = normalrand() / 255.0f;
-      noise = mSigma * random;
+  for (int y = 0, index = 0; y < height; y++) {
+    for (int x = 0; x < width; x++, index++) {
+      const float random = normalrand() / 255.0f;
+      const float noise = mSigma * random;
       aOutImg[index] = Img[index] + noise;
-      if (aOutImg[index] > 1.0f) aOutImg[index] = 1.0f;
-      if (aOutImg[index] < 0.0f) aOutImg[index] = 0.0f;
+      aOutImg[index] = std::clamp(aOutImg[index], 0.0f, 1.0f);
     }
   }
 }
@@ -30,12 +29,10 @@ void GaussianNoiseGenerator::addNoiseGray(float* Img, int width, int height,
 void GaussianNoiseGenerator::addNoiseRgb(float* ImgR, float* ImgG, float* ImgB,
                                          int width, int height, float* aOutImgR,
                                          float* aOutImgG, float* aOutImgB) {
-  int x, y, index;
-  float random, noise;
-  for (y = 0, index = 0; y < height; y++) {
-    for (x = 0; x < width; x++, index++) {
-      random = normalrand() / 255.0f;
-      noise = mSigma * random;
+  for (int y = 0, index = 0; y < height; y++) {
+    for (int x = 0; x < width; x++, index++) {
+      const float random = normalrand() / 255.0f;
+      const float noise = mSigma * random;
       aOutImgR[index] = ImgR[index] + noise;
       aOutImgG[index] = ImgG[index] + noise;
       aOutImgB[index] = ImgB[index] + noise;
