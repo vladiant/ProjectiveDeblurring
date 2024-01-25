@@ -2,7 +2,9 @@
 
 #include <random>
 
-class GaussianNoiseGenerator {
+#include "INoiseGenerator.h"
+
+class GaussianNoiseGenerator : public INoiseGenerator {
  public:
   // Random engine seed
   constexpr static int kSeed = 1234;
@@ -13,10 +15,10 @@ class GaussianNoiseGenerator {
   ////////////////////////////////////
   // These functions are used to generate noise
   ////////////////////////////////////
-  void addNoiseGray(float* Img, int width, int height, float* aOutImg);
+  void addNoiseGray(float* Img, int width, int height, float* aOutImg) override;
 
   void addNoiseRgb(float* ImgR, float* ImgG, float* ImgB, int width, int height,
-                   float* aOutImgR, float* aOutImgG, float* aOutImgB);
+                   float* aOutImgR, float* aOutImgG, float* aOutImgB) override;
 
  private:
   // Random values generation
