@@ -15,6 +15,9 @@ class GaussianNoiseGenerator {
   ////////////////////////////////////
   void addNoiseGray(float* Img, int width, int height, float* aOutImg);
 
+  void addNoiseRgb(float* ImgR, float* ImgG, float* ImgB, int width, int height,
+                   float* aOutImgR, float* aOutImgG, float* aOutImgB);
+
  private:
   // Random values generation
   std::random_device mRandomDevice;
