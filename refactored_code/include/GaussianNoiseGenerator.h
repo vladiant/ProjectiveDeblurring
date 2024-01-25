@@ -9,7 +9,6 @@ class GaussianNoiseGenerator : public INoiseGenerator {
   // Random engine seed
   constexpr static int kSeed = 1234;
 
-  // Noise variance = amp
   GaussianNoiseGenerator(float aSigma);
 
   ////////////////////////////////////

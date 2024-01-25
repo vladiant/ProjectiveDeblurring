@@ -36,12 +36,9 @@ void GaussianNoiseGenerator::addNoiseRgb(float* ImgR, float* ImgG, float* ImgB,
       aOutImgR[index] = ImgR[index] + noise;
       aOutImgG[index] = ImgG[index] + noise;
       aOutImgB[index] = ImgB[index] + noise;
-      if (aOutImgR[index] > 1.0f) aOutImgR[index] = 1.0f;
-      if (aOutImgR[index] < 0.0f) aOutImgR[index] = 0.0f;
-      if (aOutImgG[index] > 1.0f) aOutImgG[index] = 1.0f;
-      if (aOutImgG[index] < 0.0f) aOutImgG[index] = 0.0f;
-      if (aOutImgB[index] > 1.0f) aOutImgB[index] = 1.0f;
-      if (aOutImgB[index] < 0.0f) aOutImgB[index] = 0.0f;
+      aOutImgR[index] = std::clamp(aOutImgR[index], 0.0f, 1.0f);
+      aOutImgG[index] = std::clamp(aOutImgG[index], 0.0f, 1.0f);
+      aOutImgB[index] = std::clamp(aOutImgB[index], 0.0f, 1.0f);
     }
   }
 }
