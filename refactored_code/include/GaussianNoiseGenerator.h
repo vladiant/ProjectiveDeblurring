@@ -13,15 +13,15 @@ class GaussianNoiseGenerator {
   ////////////////////////////////////
   // These functions are used to generate noise
   ////////////////////////////////////
-  // Normal random number generator, variance = 1
-  float normalrand();
-
   void addNoiseGray(float* Img, int width, int height, float* aOutImg);
 
  private:
   // Random values generation
   std::random_device mRandomDevice;
   std::mt19937 mRandomEngine{mRandomDevice()};
+
+  // Normal random number generator, variance = 1
+  float normalrand();
 
   // Noise parameters
   float mSigma;
