@@ -10,6 +10,7 @@ class MotionBlurImageGenerator : public IBlurImageGenerator {
   constexpr static int NumSamples = 30;
 
   MotionBlurImageGenerator();
+  ~MotionBlurImageGenerator() override = default;
 
   // bforward: true forward, false backward
   void blurGray(float* InputImg, float* inputWeight, int iwidth, int iheight,

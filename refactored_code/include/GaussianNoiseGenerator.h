@@ -10,6 +10,7 @@ class GaussianNoiseGenerator : public INoiseGenerator {
   constexpr static int kSeed = 1234;
 
   GaussianNoiseGenerator(float aSigma);
+  ~GaussianNoiseGenerator() override = default;
 
   ////////////////////////////////////
   // These functions are used to generate noise
