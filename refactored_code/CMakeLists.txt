@@ -17,6 +17,8 @@ add_executable(
     include/svdcmp.h
     src/svdcmp.cpp
     include/IErrorCalculator.h
+    include/EmptyErrorCalculator.h
+    src/EmptyErrorCalculator.cpp
     include/RMSErrorCalculator.h
     src/RMSErrorCalculator.cpp
     include/INoiseGenerator.h

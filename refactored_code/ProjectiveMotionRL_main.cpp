@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "EmptyErrorCalculator.h"
 #include "GaussianNoiseGenerator.h"
 #include "ImResize.h"
 #include "MotionBlurImageGenerator.h"
@@ -42,7 +43,8 @@ int main(int /*argc*/, char* /*argv*/[]) {
   printf("Set Projective Model Parameter\n");
   MotionBlurImageGenerator blurGenerator;
   RMSErrorCalculator errorCalculator;
-  ProjectiveMotionRL m_ProjectiveMotionRL{blurGenerator, errorCalculator};
+  EmptyErrorCalculator emptyErrorCalculator;
+  ProjectiveMotionRL m_ProjectiveMotionRL{blurGenerator, emptyErrorCalculator};
 
   blurGenerator.SetGlobalParameters(
       10, 1.2f, 0.0003f, 0.0006f, 10,
