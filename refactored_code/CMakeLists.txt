@@ -16,6 +16,7 @@ add_executable(
     src/ImResize.cpp
     include/svdcmp.h
     src/svdcmp.cpp
+    include/IErrorCalculator.h
     include/RMSErrorCalculator.h
     src/RMSErrorCalculator.cpp
     include/INoiseGenerator.h

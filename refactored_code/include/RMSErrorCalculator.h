@@ -2,9 +2,11 @@
 
 #include <vector>
 
-class RMSErrorCalculator {
+#include "IErrorCalculator.h"
+
+class RMSErrorCalculator : public IErrorCalculator {
  public:
-  ~RMSErrorCalculator();
+  ~RMSErrorCalculator() override;
 
   void SetGroundTruthImgGray(float* GroundTruth, int width, int height);
 
@@ -15,9 +17,9 @@ class RMSErrorCalculator {
   // These functions are used to compute Errors
   ////////////////////////////////////
   float calculateErrorRgb(float* ImgR, float* ImgG, float* ImgB, int width,
-                          int height);
+                          int height) override;
 
-  float calculateErrorGray(float* Img, int width, int height);
+  float calculateErrorGray(float* Img, int width, int height) override;
 
   float ComputeRMSErrorGray(float* GroundTruth, float* DeblurredImg, int width,
                             int height);
