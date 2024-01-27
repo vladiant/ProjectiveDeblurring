@@ -6,7 +6,7 @@
 #include "IBlurImageGenerator.h"
 #include "homography.h"
 
-//#define __SHOWERROR__
+#define __SHOWERROR__
 
 class ProjectiveMotionRL {
  public:

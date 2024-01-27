@@ -70,8 +70,8 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurGray(
     }
 
 #ifdef __SHOWERROR__
-    printf("RMS Error: %f\n",
-           ComputeRMSError(mGroundTruthImg, DeblurImg, width, height));
+    printf("RMS Error: %f\n", ComputeRMSErrorGray(mGroundTruthImg.data(),
+                                                  DeblurImg, width, height));
 #else
     printf(".");
 #endif
@@ -148,12 +148,12 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurRgb(
       }
     }
 #ifdef __SHOWERROR__
-    printf("RMS Error R: %f\n",
-           ComputeRMSError(mGroundTruthImgR, DeblurImgR, width, height));
-    printf("RMS Error G: %f\n",
-           ComputeRMSError(mGroundTruthImgG, DeblurImgG, width, height));
-    printf("RMS Error B: %f\n",
-           ComputeRMSError(mGroundTruthImgB, DeblurImgB, width, height));
+    printf("RMS Error R: %f\n", ComputeRMSErrorGray(mGroundTruthImgR.data(),
+                                                    DeblurImgR, width, height));
+    printf("RMS Error G: %f\n", ComputeRMSErrorGray(mGroundTruthImgG.data(),
+                                                    DeblurImgG, width, height));
+    printf("RMS Error B: %f\n", ComputeRMSErrorGray(mGroundTruthImgB.data(),
+                                                    DeblurImgB, width, height));
 #else
     printf(".");
 #endif
@@ -228,8 +228,8 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVRegGray(
     }
 
 #ifdef __SHOWERROR__
-    printf("RMS Error: %f\n",
-           ComputeRMSError(mGroundTruthImg, DeblurImg, width, height));
+    printf("RMS Error: %f\n", ComputeRMSErrorGray(mGroundTruthImg.data(),
+                                                  DeblurImg, width, height));
 #else
     printf(".");
 #endif
@@ -361,12 +361,12 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurTVRegRgb(
     }
 
 #ifdef __SHOWERROR__
-    printf("RMS Error R: %f\n",
-           ComputeRMSError(mGroundTruthImgR, DeblurImgR, width, height));
-    printf("RMS Error G: %f\n",
-           ComputeRMSError(mGroundTruthImgG, DeblurImgG, width, height));
-    printf("RMS Error B: %f\n",
-           ComputeRMSError(mGroundTruthImgB, DeblurImgB, width, height));
+    printf("RMS Error R: %f\n", ComputeRMSErrorGray(mGroundTruthImgR.data(),
+                                                    DeblurImgR, width, height));
+    printf("RMS Error G: %f\n", ComputeRMSErrorGray(mGroundTruthImgG.data(),
+                                                    DeblurImgG, width, height));
+    printf("RMS Error B: %f\n", ComputeRMSErrorGray(mGroundTruthImgB.data(),
+                                                    DeblurImgB, width, height));
 #else
     printf(".");
 #endif
@@ -442,8 +442,8 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsRegGray(
     }
 
 #ifdef __SHOWERROR__
-    printf("RMS Error: %f\n",
-           ComputeRMSError(mGroundTruthImg, DeblurImg, width, height));
+    printf("RMS Error: %f\n", ComputeRMSErrorGray(mGroundTruthImg.data(),
+                                                  DeblurImg, width, height));
 #else
     printf(".");
 #endif
@@ -579,12 +579,12 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurSpsRegRgb(
     }
 
 #ifdef __SHOWERROR__
-    printf("RMS Error R: %f\n",
-           ComputeRMSError(mGroundTruthImgR, DeblurImgR, width, height));
-    printf("RMS Error G: %f\n",
-           ComputeRMSError(mGroundTruthImgG, DeblurImgG, width, height));
-    printf("RMS Error B: %f\n",
-           ComputeRMSError(mGroundTruthImgB, DeblurImgB, width, height));
+    printf("RMS Error R: %f\n", ComputeRMSErrorGray(mGroundTruthImgR.data(),
+                                                    DeblurImgR, width, height));
+    printf("RMS Error G: %f\n", ComputeRMSErrorGray(mGroundTruthImgG.data(),
+                                                    DeblurImgG, width, height));
+    printf("RMS Error B: %f\n", ComputeRMSErrorGray(mGroundTruthImgB.data(),
+                                                    DeblurImgB, width, height));
 #else
     printf(".");
 #endif
@@ -643,8 +643,8 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegGray(
     }
 
 #ifdef __SHOWERROR__
-    printf("RMS Error: %f\n",
-           ComputeRMSError(mGroundTruthImg, DeblurImg, width, height));
+    printf("RMS Error: %f\n", ComputeRMSErrorGray(mGroundTruthImg.data(),
+                                                  DeblurImg, width, height));
 #else
     printf(".");
 #endif
@@ -738,12 +738,12 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegRgb(
     }
 
 #ifdef __SHOWERROR__
-    printf("RMS Error R: %f\n",
-           ComputeRMSError(mGroundTruthImgR, DeblurImgR, width, height));
-    printf("RMS Error G: %f\n",
-           ComputeRMSError(mGroundTruthImgG, DeblurImgG, width, height));
-    printf("RMS Error B: %f\n",
-           ComputeRMSError(mGroundTruthImgB, DeblurImgB, width, height));
+    printf("RMS Error R: %f\n", ComputeRMSErrorGray(mGroundTruthImgR.data(),
+                                                    DeblurImgR, width, height));
+    printf("RMS Error G: %f\n", ComputeRMSErrorGray(mGroundTruthImgG.data(),
+                                                    DeblurImgG, width, height));
+    printf("RMS Error B: %f\n", ComputeRMSErrorGray(mGroundTruthImgB.data(),
+                                                    DeblurImgB, width, height));
 #else
     printf(".");
 #endif
