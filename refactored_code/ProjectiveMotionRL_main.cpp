@@ -8,6 +8,7 @@
 #include "ImResize.h"
 #include "MotionBlurImageGenerator.h"
 #include "ProjectiveMotionRL.h"
+#include "RMSErrorCalculator.h"
 #include "bitmap.h"
 
 int main(int /*argc*/, char* /*argv*/[]) {
@@ -40,7 +41,8 @@ int main(int /*argc*/, char* /*argv*/[]) {
   ///////////////////////////////////
   printf("Set Projective Model Parameter\n");
   MotionBlurImageGenerator blurGenerator;
-  ProjectiveMotionRL m_ProjectiveMotionRL{blurGenerator};
+  RMSErrorCalculator errorCalculator;
+  ProjectiveMotionRL m_ProjectiveMotionRL{blurGenerator, errorCalculator};
 
   blurGenerator.SetGlobalParameters(
       10, 1.2f, 0.0003f, 0.0006f, 10,
@@ -106,7 +108,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
   }
 
   ///////////////////////////////////
-  m_ProjectiveMotionRL.SetGroundTruthImgRgb(
+  errorCalculator.SetGroundTruthImgRgb(
       fImg[0].data(), fImg[1].data(), fImg[2].data(), width,
       height);  // This is for error computation
 
@@ -122,13 +124,8 @@ int main(int /*argc*/, char* /*argv*/[]) {
                          bImg[2].data(), outputWeight.data(), blurwidth,
                          blurheight, true);
 
-  RMSError = (m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[0].data(), bImg[0].data(), width, height) +
-              m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[1].data(), bImg[1].data(), width, height) +
-              m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[2].data(), bImg[2].data(), width, height)) /
-             3.0f;
+  RMSError = errorCalculator.calculateErrorRgb(bImg[0].data(), bImg[1].data(),
+                                               bImg[2].data(), width, height);
   //   sprintf(fname, "%s_blur_%.6f.bmp", prefix, RMSError * 255.0f);
   fname = prefix + "_blur_" + std::to_string(RMSError * 255.0f) + ".bmp";
   printf("Save Blurred Image to: %s\n", fname.c_str());
@@ -140,13 +137,8 @@ int main(int /*argc*/, char* /*argv*/[]) {
   noiseGenerator.addNoiseGray(bImg[0].data(), width, height, bImg[0].data());
   noiseGenerator.addNoiseGray(bImg[1].data(), width, height, bImg[1].data());
   noiseGenerator.addNoiseGray(bImg[2].data(), width, height, bImg[2].data());
-  RMSError = (m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[0].data(), bImg[0].data(), width, height) +
-              m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[1].data(), bImg[1].data(), width, height) +
-              m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[2].data(), bImg[2].data(), width, height)) /
-             3.0f;
+  RMSError = errorCalculator.calculateErrorRgb(bImg[0].data(), bImg[1].data(),
+                                               bImg[2].data(), width, height);
   //   sprintf(fname, "%s_blur_noise_sigma%.2f_%.6f.bmp", prefix, sigma,
   //   RMSError * 255.0f);
   fname = prefix + "_blur_noise_sigma" + std::to_string(sigma) + "_" +
@@ -193,13 +185,9 @@ int main(int /*argc*/, char* /*argv*/[]) {
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 500, true);
-  RMSError = (m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[0].data(), deblurImg[0].data(), width, height) +
-              m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[1].data(), deblurImg[1].data(), width, height) +
-              m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[2].data(), deblurImg[2].data(), width, height)) /
-             3.0f;
+  RMSError = errorCalculator.calculateErrorRgb(
+      deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
+      height);
   //   sprintf(fname, "%s_deblurBasic_%f.bmp", prefix, RMSError * 255.0f);
   fname = prefix + "_deblurBasic_" + std::to_string(RMSError * 255.0f) + ".bmp";
   printf("Done, RMS Error: %f\n", RMSError * 255.0f);
@@ -241,13 +229,9 @@ int main(int /*argc*/, char* /*argv*/[]) {
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true);
-  RMSError = (m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[0].data(), deblurImg[0].data(), width, height) +
-              m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[1].data(), deblurImg[1].data(), width, height) +
-              m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[2].data(), deblurImg[2].data(), width, height)) /
-             3.0f;
+  RMSError = errorCalculator.calculateErrorRgb(
+      deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
+      height);
   //   sprintf(fname, "%s_deblurTVReg_%f.bmp", prefix, RMSError * 255.0f);
   fname = prefix + "_deblurTVReg_" + std::to_string(RMSError * 255.0f) + ".bmp";
   printf("Done, RMS Error: %f\n", RMSError * 255.0f);
@@ -286,13 +270,9 @@ int main(int /*argc*/, char* /*argv*/[]) {
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true);
-  RMSError = (m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[0].data(), deblurImg[0].data(), width, height) +
-              m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[1].data(), deblurImg[1].data(), width, height) +
-              m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[2].data(), deblurImg[2].data(), width, height)) /
-             3.0f;
+  RMSError = errorCalculator.calculateErrorRgb(
+      deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
+      height);
   //   sprintf(fname, "%s_deblurSpsReg_%f.bmp", prefix, RMSError * 255.0f);
   fname =
       prefix + "_deblurSpsReg_" + std::to_string(RMSError * 255.0f) + ".bmp";
@@ -332,13 +312,9 @@ int main(int /*argc*/, char* /*argv*/[]) {
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true);
-  RMSError = (m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[0].data(), deblurImg[0].data(), width, height) +
-              m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[1].data(), deblurImg[1].data(), width, height) +
-              m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[2].data(), deblurImg[2].data(), width, height)) /
-             3.0f;
+  RMSError = errorCalculator.calculateErrorRgb(
+      deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
+      height);
   //   sprintf(fname, "%s_deblurBilateralReg_%f.bmp", prefix, RMSError *
   //   255.0f);
   fname = prefix + "_deblurBilateralReg_" + std::to_string(RMSError * 255.0f) +
@@ -379,13 +355,9 @@ int main(int /*argc*/, char* /*argv*/[]) {
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true);
-  RMSError = (m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[0].data(), deblurImg[0].data(), width, height) +
-              m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[1].data(), deblurImg[1].data(), width, height) +
-              m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                  fImg[2].data(), deblurImg[2].data(), width, height)) /
-             3.0f;
+  RMSError = errorCalculator.calculateErrorRgb(
+      deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
+      height);
   //   sprintf(fname, "%s_deblurBilateralLapReg_%f.bmp", prefix, RMSError *
   //   255.0f);
   fname = prefix + "_deblurBilateralLapReg_" +
@@ -413,13 +385,9 @@ int main(int /*argc*/, char* /*argv*/[]) {
             bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
             blurheight, deblurImg[0].data(), deblurImg[1].data(),
             deblurImg[2].data(), width, height, 1, true);
-        RMSError = (m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                        fImg[0].data(), deblurImg[0].data(), width, height) +
-                    m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                        fImg[1].data(), deblurImg[1].data(), width, height) +
-                    m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                        fImg[2].data(), deblurImg[2].data(), width, height)) /
-                   3.0f;
+        RMSError = errorCalculator.calculateErrorRgb(
+            deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(),
+            width, height);
         fp << std::setprecision(12) << RMSError * 255.0f << '\n';
         if (iteration % 100 == 0 || iteration == 20 || iteration == 50) {
           //   sprintf(fname.c_str(), "%s_deblurBasic_pitr%d_%f.bmp", prefix,
@@ -447,13 +415,9 @@ int main(int /*argc*/, char* /*argv*/[]) {
             bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
             blurheight, deblurImg[0].data(), deblurImg[1].data(),
             deblurImg[2].data(), width, height, 1, false);
-        RMSError = (m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                        fImg[0].data(), deblurImg[0].data(), width, height) +
-                    m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                        fImg[1].data(), deblurImg[1].data(), width, height) +
-                    m_ProjectiveMotionRL.ComputeRMSErrorGray(
-                        fImg[2].data(), deblurImg[2].data(), width, height)) /
-                   3.0f;
+        RMSError = errorCalculator.calculateErrorRgb(
+            deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(),
+            width, height);
         fp << std::setprecision(12) << RMSError * 255.0f << '\n';
         if (iteration % 100 == 0 || iteration == 20 || iteration == 50) {
           //   sprintf(fname, "%s_deblurBasic_gitr%d_%f.bmp", prefix, iteration,

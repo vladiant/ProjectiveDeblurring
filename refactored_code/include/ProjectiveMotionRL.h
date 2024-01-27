@@ -4,21 +4,15 @@
 #include <cstring>
 
 #include "IBlurImageGenerator.h"
+#include "IErrorCalculator.h"
 #include "homography.h"
-
-//#define __SHOWERROR__
 
 class ProjectiveMotionRL {
  public:
-  ProjectiveMotionRL(IBlurImageGenerator& aBlurGenerator);
+  ProjectiveMotionRL(IBlurImageGenerator& aBlurGenerator,
+                     IErrorCalculator& aErrorCalculator);
 
-  ~ProjectiveMotionRL() {
-    ClearBuffer();
-    mGroundTruthImg.clear();
-    mGroundTruthImgR.clear();
-    mGroundTruthImgG.clear();
-    mGroundTruthImgB.clear();
-  }
+  ~ProjectiveMotionRL() { ClearBuffer(); }
 
   ////////////////////////////////////
   // These functions are used to set Buffer for caching
@@ -75,22 +69,6 @@ class ProjectiveMotionRL {
     //                        pow(i / 255.0f, powD - 1.0f)) /
     //                       minWeight;
     // }
-  }
-  void SetGroundTruthImgGray(float* GroundTruth, int width, int height) {
-    mGroundTruthImg.resize(width * height);
-    memcpy(mGroundTruthImg.data(), GroundTruth, width * height * sizeof(float));
-  }
-  void SetGroundTruthImgRgb(float* GroundTruthR, float* GroundTruthG,
-                            float* GroundTruthB, int width, int height) {
-    mGroundTruthImgR.resize(width * height);
-    mGroundTruthImgG.resize(width * height);
-    mGroundTruthImgB.resize(width * height);
-    memcpy(mGroundTruthImgR.data(), GroundTruthR,
-           width * height * sizeof(float));
-    memcpy(mGroundTruthImgG.data(), GroundTruthG,
-           width * height * sizeof(float));
-    memcpy(mGroundTruthImgB.data(), GroundTruthB,
-           width * height * sizeof(float));
   }
 
   ////////////////////////////////////
@@ -174,29 +152,11 @@ class ProjectiveMotionRL {
   void ComputeBilaterRegImageGray(float* Img, int width, int height,
                                   float* BRImg);
 
-  ////////////////////////////////////
-  // These functions are used to compute Errors
-  ////////////////////////////////////
-  float ComputeRMSErrorGray(float* GroundTruth, float* DeblurredImg, int width,
-                            int height) {
-    float RMS = 0;
-    if (GroundTruth) {
-      int x, y, index;
-      for (y = 0, index = 0; y < height; y++) {
-        for (x = 0; x < width; x++, index++) {
-          RMS += (GroundTruth[index] - DeblurredImg[index]) *
-                 (GroundTruth[index] - DeblurredImg[index]);
-        }
-      }
-    }
-    // The RMS error output in paper have been multiplied by 255
-    return sqrt(RMS / (width * height));
-  }
-
  private:
   float getSpsWeight(float aValue) const;
 
   IBlurImageGenerator& mBlurGenerator;
+  IErrorCalculator& mErrorCalculator;
 
   // These are buffer and lookup table variables
   float mBilateralTable[256];
@@ -211,10 +171,4 @@ class ProjectiveMotionRL {
   std::vector<float> mErrorImgBufferG;
   std::vector<float> mErrorImgBufferB;
   std::vector<float> mErrorWeightBuffer;
-
-  // This variables are used for RMS computation
-  std::vector<float> mGroundTruthImg;
-  std::vector<float> mGroundTruthImgR;
-  std::vector<float> mGroundTruthImgG;
-  std::vector<float> mGroundTruthImgB;
 };
