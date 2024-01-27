@@ -38,9 +38,7 @@ float RMSErrorCalculator::calculateErrorRgb(float* ImgR, float* ImgG,
       ComputeRMSErrorGray(mGroundTruthImgG.data(), ImgG, width, height);
   const float rmseErrorB =
       ComputeRMSErrorGray(mGroundTruthImgB.data(), ImgB, width, height);
-  printf("RMS Error R: %f\n", rmseErrorR);
-  printf("RMS Error G: %f\n", rmseErrorG);
-  printf("RMS Error B: %f\n", rmseErrorB);
+  printf("RMS Error R: %f G: %f B: %f\n", rmseErrorR, rmseErrorG, rmseErrorB);
   return (rmseErrorR + rmseErrorG + rmseErrorB) / 3.0f;
 }
 
