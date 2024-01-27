@@ -16,6 +16,8 @@ add_executable(
     src/ImResize.cpp
     include/svdcmp.h
     src/svdcmp.cpp
+    include/RMSErrorCalculator.h
+    src/RMSErrorCalculator.cpp
     include/INoiseGenerator.h
     include/GaussianNoiseGenerator.h
     src/GaussianNoiseGenerator.cpp
