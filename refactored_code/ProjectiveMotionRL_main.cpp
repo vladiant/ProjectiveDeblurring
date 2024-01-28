@@ -9,6 +9,7 @@
 #include "ImResize.h"
 #include "MotionBlurImageGenerator.h"
 #include "ProjectiveMotionRL.h"
+#include "RLDeblurrer.hpp"
 #include "RMSErrorCalculator.h"
 #include "bitmap.h"
 
@@ -183,7 +184,10 @@ int main(int /*argc*/, char* /*argv*/[]) {
   memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
          width * height * sizeof(float));
 
-  m_ProjectiveMotionRL.ProjectiveMotionRLDeblurRgb(
+  RLDeblurrer rLDeblurrer{blurGenerator, emptyErrorCalculator};
+  ;
+
+  rLDeblurrer.ProjectiveMotionRLDeblurRgb(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 500, true);
@@ -227,7 +231,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 0.125f);
-  m_ProjectiveMotionRL.ProjectiveMotionRLDeblurRgb(
+  rLDeblurrer.ProjectiveMotionRLDeblurRgb(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true);
@@ -268,7 +272,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 0.125f);
-  m_ProjectiveMotionRL.ProjectiveMotionRLDeblurRgb(
+  rLDeblurrer.ProjectiveMotionRLDeblurRgb(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true);
@@ -310,7 +314,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 0.125f);
-  m_ProjectiveMotionRL.ProjectiveMotionRLDeblurRgb(
+  rLDeblurrer.ProjectiveMotionRLDeblurRgb(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true);
@@ -353,7 +357,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 0.125f);
-  m_ProjectiveMotionRL.ProjectiveMotionRLDeblurRgb(
+  rLDeblurrer.ProjectiveMotionRLDeblurRgb(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true);
@@ -383,7 +387,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     {
       std::fstream fp(fname, std::fstream::out);
       for (int iteration = 0; iteration < 5000; iteration++) {
-        m_ProjectiveMotionRL.ProjectiveMotionRLDeblurRgb(
+        rLDeblurrer.ProjectiveMotionRLDeblurRgb(
             bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
             blurheight, deblurImg[0].data(), deblurImg[1].data(),
             deblurImg[2].data(), width, height, 1, true);
@@ -413,7 +417,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     {
       std::fstream fp(fname, std::fstream::out);
       for (int iteration = 0; iteration < 5000; iteration++) {
-        m_ProjectiveMotionRL.ProjectiveMotionRLDeblurRgb(
+        rLDeblurrer.ProjectiveMotionRLDeblurRgb(
             bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
             blurheight, deblurImg[0].data(), deblurImg[1].data(),
             deblurImg[2].data(), width, height, 1, false);

@@ -74,17 +74,6 @@ class ProjectiveMotionRL {
   ////////////////////////////////////
   // These functions are deblurring algorithm
   ////////////////////////////////////
-  // This is the Basic algorithm
-  // DeblurImg: the Input itself is initialization, so you can load
-  // yBilateralLap own initialization
-  void ProjectiveMotionRLDeblurGray(float* BlurImg, int iwidth, int iheight,
-                                    float* DeblurImg, int width, int height,
-                                    int Niter = 20, bool bPoisson = true);
-  void ProjectiveMotionRLDeblurRgb(float* BlurImgR, float* BlurImgG,
-                                   float* BlurImgB, int iwidth, int iheight,
-                                   float* DeblurImgR, float* DeblurImgG,
-                                   float* DeblurImgB, int width, int height,
-                                   int Niter = 20, bool bPoisson = true);
 
   // This are the deblurring algorithm with regularization
   // Details please refers to paper
