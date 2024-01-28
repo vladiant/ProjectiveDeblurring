@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "homography.h"
+#include "Homography.hpp"
 
 // Multiscale version: not very useful...
 class ProjectiveMotionRLMultiScaleGray {

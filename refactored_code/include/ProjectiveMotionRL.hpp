@@ -3,9 +3,9 @@
 #include <cmath>
 #include <cstring>
 
-#include "IBlurImageGenerator.h"
-#include "IErrorCalculator.h"
-#include "homography.h"
+#include "Homography.hpp"
+#include "IBlurImageGenerator.hpp"
+#include "IErrorCalculator.hpp"
 
 class ProjectiveMotionRL {
  public:

@@ -1,4 +1,4 @@
-#include "ProjectiveMotionRL.h"
+#include "ProjectiveMotionRL.hpp"
 
 #include <algorithm>
 #include <cmath>

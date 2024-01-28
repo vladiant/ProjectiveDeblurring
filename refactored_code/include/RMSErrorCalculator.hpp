@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "IErrorCalculator.h"
+#include "IErrorCalculator.hpp"
 
 class RMSErrorCalculator : public IErrorCalculator {
  public:

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IErrorCalculator.h"
+#include "IErrorCalculator.hpp"
 
 class EmptyErrorCalculator : public IErrorCalculator {
  public:

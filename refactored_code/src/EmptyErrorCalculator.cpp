@@ -1,4 +1,4 @@
-#include "EmptyErrorCalculator.h"
+#include "EmptyErrorCalculator.hpp"
 
 #include <cstdio>
 

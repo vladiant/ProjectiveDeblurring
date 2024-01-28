@@ -2,13 +2,13 @@
 
 #include <vector>
 
-#include "IBlurImageGenerator.h"
-#include "IErrorCalculator.h"
+#include "IBlurImageGenerator.hpp"
+#include "IErrorCalculator.hpp"
 
 class RLDeblurrer {
-public:
+ public:
   RLDeblurrer(IBlurImageGenerator& aBlurGenerator,
-                     IErrorCalculator& aErrorCalculator);
+              IErrorCalculator& aErrorCalculator);
 
   ~RLDeblurrer() { ClearBuffer(); }
 
@@ -33,7 +33,7 @@ public:
                                    float* DeblurImgB, int width, int height,
                                    int Niter = 20, bool bPoisson = true);
 
-private:
+ private:
   IBlurImageGenerator& mBlurGenerator;
   IErrorCalculator& mErrorCalculator;
 

@@ -4,13 +4,13 @@
 #include <string>
 #include <vector>
 
-#include "EmptyErrorCalculator.h"
-#include "GaussianNoiseGenerator.h"
+#include "EmptyErrorCalculator.hpp"
+#include "GaussianNoiseGenerator.hpp"
 #include "ImResize.h"
-#include "MotionBlurImageGenerator.h"
-#include "ProjectiveMotionRL.h"
+#include "MotionBlurImageGenerator.hpp"
+#include "ProjectiveMotionRL.hpp"
 #include "RLDeblurrer.hpp"
-#include "RMSErrorCalculator.h"
+#include "RMSErrorCalculator.hpp"
 #include "bitmap.h"
 
 int main(int /*argc*/, char* /*argv*/[]) {

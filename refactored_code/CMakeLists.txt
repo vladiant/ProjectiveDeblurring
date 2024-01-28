@@ -10,28 +10,28 @@ add_executable(
     src/warping.cpp
     include/bitmap.h
     src/bitmap.cpp
-    include/homography.h
-    src/homography.cpp
+    include/Homography.hpp
+    src/Homography.cpp
     include/ImResize.h
     src/ImResize.cpp
     include/svdcmp.h
     src/svdcmp.cpp
-    include/IErrorCalculator.h
-    include/EmptyErrorCalculator.h
+    include/IErrorCalculator.hpp
+    include/EmptyErrorCalculator.hpp
     src/EmptyErrorCalculator.cpp
-    include/RMSErrorCalculator.h
+    include/RMSErrorCalculator.hpp
     src/RMSErrorCalculator.cpp
-    include/INoiseGenerator.h
-    include/GaussianNoiseGenerator.h
+    include/INoiseGenerator.hpp
+    include/GaussianNoiseGenerator.hpp
     src/GaussianNoiseGenerator.cpp
-    include/IBlurImageGenerator.h
-    include/MotionBlurImageGenerator.h
+    include/IBlurImageGenerator.hpp
+    include/MotionBlurImageGenerator.hpp
     src/MotionBlurImageGenerator.cpp
     include/RLDeblurrer.hpp
     src/RLDeblurrer.cpp
-    include/ProjectiveMotionRL.h
+    include/ProjectiveMotionRL.hpp
     src/ProjectiveMotionRL.cpp
-    include/ProjectiveMotionRLMultiScaleGray.h
+    include/ProjectiveMotionRLMultiScaleGray.hpp
     src/ProjectiveMotionRLMultiScaleGray.cpp
     ProjectiveMotionRL_main.cpp
 )

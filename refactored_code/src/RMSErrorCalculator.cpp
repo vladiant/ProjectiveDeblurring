@@ -1,4 +1,4 @@
-#include "RMSErrorCalculator.h"
+#include "RMSErrorCalculator.hpp"
 
 #include <cmath>
 #include <cstdio>

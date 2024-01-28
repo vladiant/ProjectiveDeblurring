@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "IBlurImageGenerator.h"
-#include "homography.h"
+#include "Homography.hpp"
+#include "IBlurImageGenerator.hpp"
 
 class MotionBlurImageGenerator : public IBlurImageGenerator {
  public:

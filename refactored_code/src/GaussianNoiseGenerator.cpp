@@ -1,4 +1,4 @@
-#include "GaussianNoiseGenerator.h"
+#include "GaussianNoiseGenerator.hpp"
 
 #include <algorithm>
 

@@ -1,4 +1,4 @@
-#include "ProjectiveMotionRLMultiScaleGray.h"
+#include "ProjectiveMotionRLMultiScaleGray.hpp"
 
 #include <cmath>
 #include <cstdio>

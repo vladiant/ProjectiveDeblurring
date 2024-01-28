@@ -1,4 +1,4 @@
-#include "MotionBlurImageGenerator.h"
+#include "MotionBlurImageGenerator.hpp"
 
 #include <cmath>
 #include <cstring>

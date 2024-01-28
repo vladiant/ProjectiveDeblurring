@@ -2,7 +2,7 @@
 
 #include <random>
 
-#include "INoiseGenerator.h"
+#include "INoiseGenerator.hpp"
 
 class GaussianNoiseGenerator : public INoiseGenerator {
  public:
