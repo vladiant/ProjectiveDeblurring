@@ -29,6 +29,8 @@ add_executable(
     src/MotionBlurImageGenerator.cpp
     include/RLDeblurrer.hpp
     src/RLDeblurrer.cpp
+    include/RLDeblurrerTVReg.hpp
+    src/RLDeblurrerTVReg.cpp
     include/ProjectiveMotionRL.hpp
     src/ProjectiveMotionRL.cpp
     include/ProjectiveMotionRLMultiScaleGray.hpp

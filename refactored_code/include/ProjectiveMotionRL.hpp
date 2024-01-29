@@ -75,23 +75,6 @@ class ProjectiveMotionRL {
   // These functions are deblurring algorithm
   ////////////////////////////////////
 
-  // This are the deblurring algorithm with regularization
-  // Details please refers to paper
-  // The lambda in TV regularization is 0.002, but it's un-normalized weight
-  // Intensity range is between 0 and 1, so, the actual weight is 0.002f * 255 =
-  // 0.51f for normalized weight
-  void ProjectiveMotionRLDeblurTVRegGray(float* BlurImg, int iwidth,
-                                         int iheight, float* DeblurImg,
-                                         int width, int height, int Niter = 20,
-                                         bool bPoisson = true,
-                                         float lambda = 0.50f);
-  void ProjectiveMotionRLDeblurTVRegRgb(float* BlurImgR, float* BlurImgG,
-                                        float* BlurImgB, int iwidth,
-                                        int iheight, float* DeblurImgR,
-                                        float* DeblurImgG, float* DeblurImgB,
-                                        int width, int height, int Niter = 20,
-                                        bool bPoisson = true,
-                                        float lambda = 0.50f);
   // Value of lambda used in Levin et al is also un-normalized by minWeight,
   // hence it's much smaller The typical range of this Sps in their
   // implementation is between 0.001 - 0.004 We use the same lambda as in TV

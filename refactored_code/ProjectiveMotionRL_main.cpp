@@ -10,6 +10,7 @@
 #include "MotionBlurImageGenerator.hpp"
 #include "ProjectiveMotionRL.hpp"
 #include "RLDeblurrer.hpp"
+#include "RLDeblurrerTVReg.hpp"
 #include "RMSErrorCalculator.hpp"
 #include "bitmap.h"
 
@@ -185,7 +186,6 @@ int main(int /*argc*/, char* /*argv*/[]) {
          width * height * sizeof(float));
 
   RLDeblurrer rLDeblurrer{blurGenerator, emptyErrorCalculator};
-  ;
 
   rLDeblurrer.ProjectiveMotionRLDeblurRgb(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
@@ -208,26 +208,28 @@ int main(int /*argc*/, char* /*argv*/[]) {
   memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
          width * height * sizeof(float));
 
+  RLDeblurrerTVReg rLDeblurrerTVReg{blurGenerator, emptyErrorCalculator};
+
   // Gradually decrease the regularization weight, otherwise, the result will be
   // over smooth. Actually, the following regularization produce similar
   // results....
-  //   m_ProjectiveMotionRL.ProjectiveMotionRLDeblurTVReg(
+  //   rLDeblurrerTVReg.ProjectiveMotionRLDeblurTVReg(
   //       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
   //       blurheight, deblurImg[0].data(), deblurImg[1].data(),
   //       deblurImg[2].data(), width, height, 500, true, 0.5f);
-  m_ProjectiveMotionRL.ProjectiveMotionRLDeblurTVRegRgb(
+  rLDeblurrerTVReg.ProjectiveMotionRLDeblurTVRegRgb(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 1.0f);
-  m_ProjectiveMotionRL.ProjectiveMotionRLDeblurTVRegRgb(
+  rLDeblurrerTVReg.ProjectiveMotionRLDeblurTVRegRgb(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 0.5f);
-  m_ProjectiveMotionRL.ProjectiveMotionRLDeblurTVRegRgb(
+  rLDeblurrerTVReg.ProjectiveMotionRLDeblurTVRegRgb(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 0.25f);
-  m_ProjectiveMotionRL.ProjectiveMotionRLDeblurTVRegRgb(
+  rLDeblurrerTVReg.ProjectiveMotionRLDeblurTVRegRgb(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 0.125f);
