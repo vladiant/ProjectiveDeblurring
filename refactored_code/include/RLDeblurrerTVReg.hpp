@@ -18,6 +18,9 @@ class RLDeblurrerTVReg {
   void SetBuffer(int width, int height);
   void ClearBuffer();
 
+  ////////////////////////////////////
+  // These functions are deblurring algorithm
+  ////////////////////////////////////
   // This are the deblurring algorithm with regularization
   // Details please refers to paper
   // The lambda in TV regularization is 0.002, but it's un-normalized weight
