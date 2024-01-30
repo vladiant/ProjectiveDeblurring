@@ -10,6 +10,7 @@
 #include "MotionBlurImageGenerator.hpp"
 #include "ProjectiveMotionRL.hpp"
 #include "RLDeblurrer.hpp"
+#include "RLDeblurrerLaplReg.hpp"
 #include "RLDeblurrerTVReg.hpp"
 #include "RMSErrorCalculator.hpp"
 #include "bitmap.h"
@@ -254,23 +255,25 @@ int main(int /*argc*/, char* /*argv*/[]) {
   memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
          width * height * sizeof(float));
 
-  //   m_ProjectiveMotionRL.ProjectiveMotionRLDeblurSpsReg(
+  RLDeblurrerLaplReg rLDeblurrerLaplReg{blurGenerator, emptyErrorCalculator};
+
+  //   rLDeblurrerLaplReg.ProjectiveMotionRLDeblurSpsReg(
   //       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
   //       blurheight, deblurImg[0].data(), deblurImg[1].data(),
   //       deblurImg[2].data(), width, height, 500, true, 0.5f);
-  m_ProjectiveMotionRL.ProjectiveMotionRLDeblurSpsRegRgb(
+  rLDeblurrerLaplReg.ProjectiveMotionRLDeblurSpsRegRgb(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 1.0f);
-  m_ProjectiveMotionRL.ProjectiveMotionRLDeblurSpsRegRgb(
+  rLDeblurrerLaplReg.ProjectiveMotionRLDeblurSpsRegRgb(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 0.5f);
-  m_ProjectiveMotionRL.ProjectiveMotionRLDeblurSpsRegRgb(
+  rLDeblurrerLaplReg.ProjectiveMotionRLDeblurSpsRegRgb(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 0.25f);
-  m_ProjectiveMotionRL.ProjectiveMotionRLDeblurSpsRegRgb(
+  rLDeblurrerLaplReg.ProjectiveMotionRLDeblurSpsRegRgb(
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 0.125f);
