@@ -52,17 +52,6 @@ class ProjectiveMotionRL {
   // These functions are deblurring algorithm
   ////////////////////////////////////
 
-  // We use the same lambda as in TV regularization for better comparison
-  // Parameter setting, noise variance, for bilateral reg is the same as
-  // laplacian reg.
-  void ProjectiveMotionRLDeblurBilateralRegGray(
-      float* BlurImg, int iwidth, int iheight, float* DeblurImg, int width,
-      int height, int Niter = 20, bool bPoisson = true, float lambda = 0.50f);
-  void ProjectiveMotionRLDeblurBilateralRegRgb(
-      float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth,
-      int iheight, float* DeblurImgR, float* DeblurImgG, float* DeblurImgB,
-      int width, int height, int Niter = 20, bool bPoisson = true,
-      float lambda = 0.50f);
   // This is the bilateral laplacian regularization
   void ProjectiveMotionRLDeblurBilateralLapRegGray(
       float* BlurImg, int iwidth, int iheight, float* DeblurImg, int width,
@@ -72,12 +61,6 @@ class ProjectiveMotionRL {
       int iheight, float* DeblurImgR, float* DeblurImgG, float* DeblurImgB,
       int width, int height, int Niter = 20, bool bPoisson = true,
       float lambda = 0.50f);
-
-  ////////////////////////////////////
-  // These functions are used to compute derivatives for regularization
-  ////////////////////////////////////
-  void ComputeBilaterRegImageGray(float* Img, int width, int height,
-                                  float* BRImg);
 
  private:
   IBlurImageGenerator& mBlurGenerator;
@@ -95,4 +78,19 @@ class ProjectiveMotionRL {
   std::vector<float> mErrorImgBufferG;
   std::vector<float> mErrorImgBufferB;
   std::vector<float> mErrorWeightBuffer;
+
+  void ProjectiveMotionRLDeblurBilateralRegGray(
+      float* BlurImg, int iwidth, int iheight, float* DeblurImg, int width,
+      int height, int Niter = 20, bool bPoisson = true, float lambda = 0.50f);
+  void ProjectiveMotionRLDeblurBilateralRegRgb(
+      float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth,
+      int iheight, float* DeblurImgR, float* DeblurImgG, float* DeblurImgB,
+      int width, int height, int Niter = 20, bool bPoisson = true,
+      float lambda = 0.50f);
+
+  ////////////////////////////////////
+  // These functions are used to compute derivatives for regularization
+  ////////////////////////////////////
+  void ComputeBilaterRegImageGray(float* Img, int width, int height,
+                                  float* BRImg);
 };
