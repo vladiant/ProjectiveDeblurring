@@ -7,46 +7,18 @@
 #include "IBlurImageGenerator.hpp"
 #include "IErrorCalculator.hpp"
 
-class ProjectiveMotionRL {
+class RLDeblurrerBilateralLaplReg {
  public:
-  ProjectiveMotionRL(IBlurImageGenerator& aBlurGenerator,
-                     IErrorCalculator& aErrorCalculator);
+  RLDeblurrerBilateralLaplReg(IBlurImageGenerator& aBlurGenerator,
+                              IErrorCalculator& aErrorCalculator);
 
-  ~ProjectiveMotionRL() { ClearBuffer(); }
+  ~RLDeblurrerBilateralLaplReg() { ClearBuffer(); }
 
   ////////////////////////////////////
   // These functions are used to set Buffer for caching
   ////////////////////////////////////
   void SetBuffer(int width, int height);
   void ClearBuffer();
-
-  void SetBilateralTable() {
-    int i;
-    // Parameters are set according to Levin et al Siggraph'07
-    // Better result can be obtained by using smaller noiseVar, but for
-    // fairness, we use the same setting.
-    float noiseVar = 0.005f;
-
-    // Standard Bilateral Weight
-    for (i = 0; i < 256; i++) {
-      mBilateralTable[i] = exp(-i * i / (noiseVar * 65025.0f));
-    }
-
-    // Bilateral Laplician Regularization
-    // int t = 1;
-    // float powD = 0.8f;
-    // float epilson = t / 255.0f;
-    // float minWeight =
-    //     exp(-pow(epilson, powD) / noiseVar) * pow(epilson, powD - 1.0f);
-    // for (i = 0; i <= t; i++) {
-    //   mBilateralTable[i] = 1.0f;
-    // }
-    // for (i = t + 1; i < 256; i++) {
-    //   mBilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
-    //                        pow(i / 255.0f, powD - 1.0f)) /
-    //                       minWeight;
-    // }
-  }
 
   ////////////////////////////////////
   // These functions are deblurring algorithm
@@ -87,6 +59,8 @@ class ProjectiveMotionRL {
       int iheight, float* DeblurImgR, float* DeblurImgG, float* DeblurImgB,
       int width, int height, int Niter = 20, bool bPoisson = true,
       float lambda = 0.50f);
+
+  void SetBilateralTable();
 
   ////////////////////////////////////
   // These functions are used to compute derivatives for regularization

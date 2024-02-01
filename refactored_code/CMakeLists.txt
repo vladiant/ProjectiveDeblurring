@@ -35,8 +35,8 @@ add_executable(
     src/RLDeblurrerLaplReg.cpp
     include/RLDeblurrerBilateralReg.hpp
     src/RLDeblurrerBilateralReg.cpp
-    include/ProjectiveMotionRL.hpp
-    src/ProjectiveMotionRL.cpp
+    include/RLDeblurrerBilateralLaplReg.hpp
+    src/RLDeblurrerBilateralLaplReg.cpp
     include/ProjectiveMotionRLMultiScaleGray.hpp
     src/ProjectiveMotionRLMultiScaleGray.cpp
     ProjectiveMotionRL_main.cpp

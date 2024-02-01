@@ -1,4 +1,4 @@
-#include "ProjectiveMotionRL.hpp"
+#include "RLDeblurrerBilateralLaplReg.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -9,13 +9,41 @@
 #include "bitmap.h"
 #include "warping.h"
 
-ProjectiveMotionRL::ProjectiveMotionRL(IBlurImageGenerator& aBlurGenerator,
-                                       IErrorCalculator& aErrorCalculator)
+RLDeblurrerBilateralLaplReg::RLDeblurrerBilateralLaplReg(
+    IBlurImageGenerator& aBlurGenerator, IErrorCalculator& aErrorCalculator)
     : mBlurGenerator(aBlurGenerator), mErrorCalculator(aErrorCalculator) {
   SetBilateralTable();
 }
 
-void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegGray(
+void RLDeblurrerBilateralLaplReg::SetBilateralTable() {
+  int i;
+  // Parameters are set according to Levin et al Siggraph'07
+  // Better result can be obtained by using smaller noiseVar, but for
+  // fairness, we use the same setting.
+  float noiseVar = 0.005f;
+
+  // Standard Bilateral Weight
+  for (i = 0; i < 256; i++) {
+    mBilateralTable[i] = exp(-i * i / (noiseVar * 65025.0f));
+  }
+
+  // Bilateral Laplician Regularization
+  // int t = 1;
+  // float powD = 0.8f;
+  // float epilson = t / 255.0f;
+  // float minWeight =
+  //     exp(-pow(epilson, powD) / noiseVar) * pow(epilson, powD - 1.0f);
+  // for (i = 0; i <= t; i++) {
+  //   mBilateralTable[i] = 1.0f;
+  // }
+  // for (i = t + 1; i < 256; i++) {
+  //   mBilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
+  //                        pow(i / 255.0f, powD - 1.0f)) /
+  //                       minWeight;
+  // }
+}
+
+void RLDeblurrerBilateralLaplReg::ProjectiveMotionRLDeblurBilateralRegGray(
     float* BlurImg, int iwidth, int iheight, float* DeblurImg, int width,
     int height, int Niter, bool bPoisson, float lambda) {
   int x = 0, y = 0, index = 0, itr = 0;
@@ -70,7 +98,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegGray(
   }
 }
 
-void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegRgb(
+void RLDeblurrerBilateralLaplReg::ProjectiveMotionRLDeblurBilateralRegRgb(
     float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth, int iheight,
     float* DeblurImgR, float* DeblurImgG, float* DeblurImgB, int width,
     int height, int Niter, bool bPoisson, float lambda) {
@@ -161,7 +189,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralRegRgb(
   }
 }
 
-void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralLapRegGray(
+void RLDeblurrerBilateralLaplReg::ProjectiveMotionRLDeblurBilateralLapRegGray(
     float* BlurImg, int iwidth, int iheight, float* DeblurImg, int width,
     int height, int Niter, bool bPoisson, float lambda) {
   int i = 0, t = 1;
@@ -190,7 +218,7 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralLapRegGray(
   }
 }
 
-void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralLapRegRgb(
+void RLDeblurrerBilateralLaplReg::ProjectiveMotionRLDeblurBilateralLapRegRgb(
     float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth, int iheight,
     float* DeblurImgR, float* DeblurImgG, float* DeblurImgB, int width,
     int height, int Niter, bool bPoisson, float lambda) {
@@ -220,8 +248,10 @@ void ProjectiveMotionRL::ProjectiveMotionRLDeblurBilateralLapRegRgb(
   }
 }
 
-void ProjectiveMotionRL::ComputeBilaterRegImageGray(float* Img, int width,
-                                                    int height, float* BRImg) {
+void RLDeblurrerBilateralLaplReg::ComputeBilaterRegImageGray(float* Img,
+                                                             int width,
+                                                             int height,
+                                                             float* BRImg) {
   // Sigma approximately equal to 1
   float GauFilter[5][5] = {{0.01f, 0.02f, 0.03f, 0.02f, 0.01f},
                            {0.02f, 0.03f, 0.04f, 0.03f, 0.02f},
@@ -256,7 +286,7 @@ void ProjectiveMotionRL::ComputeBilaterRegImageGray(float* Img, int width,
   }
 }
 
-void ProjectiveMotionRL::SetBuffer(int width, int height) {
+void RLDeblurrerBilateralLaplReg::SetBuffer(int width, int height) {
   mBlurGenerator.SetBuffer(width, height);
 
   mBlurImgBuffer.resize(width * height);
@@ -271,7 +301,7 @@ void ProjectiveMotionRL::SetBuffer(int width, int height) {
   mErrorWeightBuffer.resize(width * height);
 }
 
-void ProjectiveMotionRL::ClearBuffer() {
+void RLDeblurrerBilateralLaplReg::ClearBuffer() {
   mBlurGenerator.ClearBuffer();
 
   mBlurImgBuffer.clear();
