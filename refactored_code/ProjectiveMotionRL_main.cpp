@@ -8,6 +8,7 @@
 #include "GaussianNoiseGenerator.hpp"
 #include "ImResize.h"
 #include "MotionBlurImageGenerator.hpp"
+#include "ProjectiveMotionRLMultiScaleGray.hpp"
 #include "RLDeblurrer.hpp"
 #include "RLDeblurrerBilateralLaplReg.hpp"
 #include "RLDeblurrerBilateralReg.hpp"
@@ -382,6 +383,36 @@ int main(int /*argc*/, char* /*argv*/[]) {
   printf("Done, RMS Error: %f\n", RMSError * 255.0f);
   writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
                    deblurImg[2]);
+
+  ///////////////////////////////////
+  // Projective Motion RL Multi Scale Gray
+  {
+    printf("Multiscale Algorithm:\n");
+    memcpy(deblurImg[0].data(), intermediatedeblurImg[0].data(),
+           width * height * sizeof(float));
+    memcpy(deblurImg[1].data(), intermediatedeblurImg[1].data(),
+           width * height * sizeof(float));
+    memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
+           width * height * sizeof(float));
+
+    ProjectiveMotionRLMultiScaleGray rLDeblurrerMultiscale;
+
+    for (int i = 0; i < MotionBlurImageGenerator::NumSamples; i++) {
+      rLDeblurrerMultiscale.Hmatrix[i] = blurGenerator.Hmatrix[i];
+      Homography::MatrixInverse(rLDeblurrerMultiscale.Hmatrix[i].Hmatrix,
+                                rLDeblurrerMultiscale.IHmatrix[i].Hmatrix);
+    }
+
+    rLDeblurrerMultiscale.ProjectiveMotionRLDeblurMultiScaleGray(
+        bImg[0].data(), blurwidth, blurheight, deblurImg[0].data(), width,
+        height, 100, 5, true);
+
+    fname = prefix + "_deblurMultiscale_" + std::to_string(RMSError * 255.0f) +
+            ".bmp";
+    printf("Done, RMS Error: %f\n", RMSError * 255.0f);
+    writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[0],
+                     deblurImg[0]);
+  }
 
   ///////////////////////////////////
   if (false) {

@@ -95,7 +95,7 @@ void ProjectiveMotionRLMultiScaleGray::ProjectiveMotionRLDeblurMultiScaleGray(
     }
 
     for (itr = 0; itr < Niter; itr++) {
-      printf("%d\n", itr);
+      // printf("%d\n", itr);
       GenerateMotionBlurImgGray(DeblurImg, InputWeight, width, height,
                                 mBlurImgBuffer.data(), mBlurWeightBuffer.data(),
                                 bwidth, bheight, true);
