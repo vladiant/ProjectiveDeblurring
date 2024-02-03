@@ -37,8 +37,8 @@ class MotionBlurImageGenerator : public IBlurImageGenerator {
                            float dx, float dy);
 
   // These are the homography sequence for Projective motion blur model
-  Homography Hmatrix[NumSamples];
-  Homography IHmatrix[NumSamples];
+  Homography Hmatrix[NumSamples]{};
+  Homography IHmatrix[NumSamples]{};
 
  private:
   std::vector<float> mWarpImgBuffer;

@@ -67,7 +67,7 @@ class RLDeblurrerLaplReg {
   std::vector<float> mErrorWeightBuffer;
 
   // These are buffer and lookup table variables
-  float mSpsTable[256];
+  float mSpsTable[256]{};
 
   void SetSpsTable();
   float getSpsWeight(float aValue) const;

@@ -150,7 +150,7 @@ void MotionBlurImageGenerator::SetHomography(Homography H, int i) {
 }
 
 void MotionBlurImageGenerator::SetGlobalRotation(float degree) {
-  int i;
+  int i = 0;
   float deltadegree = (degree * M_PI / 180.0f) / NumSamples;
   for (i = 0; i < NumSamples; i++) {
     Hmatrix[i].Hmatrix[0][0] = cos(deltadegree * i);
@@ -174,7 +174,7 @@ void MotionBlurImageGenerator::SetGlobalRotation(float degree) {
   }
 }
 void MotionBlurImageGenerator::SetGlobalScaling(float scalefactor) {
-  int i;
+  int i = 0;
   float deltascale = (scalefactor - 1.0f) / NumSamples;
   for (i = 0; i < NumSamples; i++) {
     Hmatrix[i].Hmatrix[0][0] = 1.0f + i * deltascale;
@@ -198,7 +198,7 @@ void MotionBlurImageGenerator::SetGlobalScaling(float scalefactor) {
   }
 }
 void MotionBlurImageGenerator::SetGlobalTranslation(float dx, float dy) {
-  int i;
+  int i = 0;
   float deltadx = dx / NumSamples;
   float deltady = dy / NumSamples;
   for (i = 0; i < NumSamples; i++) {
@@ -224,7 +224,7 @@ void MotionBlurImageGenerator::SetGlobalTranslation(float dx, float dy) {
 }
 
 void MotionBlurImageGenerator::SetGlobalPerspective(float px, float py) {
-  int i;
+  int i = 0;
   float deltapx = px / NumSamples;
   float deltapy = py / NumSamples;
   for (i = 0; i < NumSamples; i++) {
@@ -253,7 +253,7 @@ void MotionBlurImageGenerator::SetGlobalParameters(float degree,
                                                    float scalefactor, float px,
                                                    float py, float dx,
                                                    float dy) {
-  int i;
+  int i = 0;
   float deltadegree = (degree * M_PI / 180.0f) / NumSamples;
   float deltascale = (scalefactor - 1.0f) / NumSamples;
   float deltapx = px / NumSamples;

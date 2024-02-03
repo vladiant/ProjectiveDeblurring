@@ -39,7 +39,7 @@ class RLDeblurrerBilateralLaplReg {
   IErrorCalculator& mErrorCalculator;
 
   // These are buffer and lookup table variables
-  float mBilateralTable[256];
+  float mBilateralTable[256]{};
   std::vector<float> mBlurImgBuffer;
   std::vector<float> mBlurImgBufferR;
   std::vector<float> mBlurImgBufferG;

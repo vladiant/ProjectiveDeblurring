@@ -55,7 +55,7 @@ float RMSErrorCalculator::ComputeRMSErrorGray(float* GroundTruth,
                                               int height) {
   float RMS = 0;
   if (GroundTruth) {
-    int x, y, index;
+    int x = 0, y = 0, index = 0;
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
         RMS += (GroundTruth[index] - DeblurredImg[index]) *

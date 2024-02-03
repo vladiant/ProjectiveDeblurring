@@ -17,7 +17,7 @@ float RLDeblurrerLaplReg::getSpsWeight(float aValue) const {
 }
 
 void RLDeblurrerLaplReg::SetSpsTable() {
-  int i, t = 1;
+  int i = 0, t = 1;
   // Parameters, e.g. noiseVar and epilson, are set according to Levin et al
   // Siggraph'07
   float powD = 0.8f, noiseVar = 0.005f, epilson = t / 255.0f;

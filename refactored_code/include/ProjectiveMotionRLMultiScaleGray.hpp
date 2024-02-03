@@ -19,8 +19,8 @@ class ProjectiveMotionRLMultiScaleGray {
                                               bool bPoisson = true);
 
   // These are the homography sequence for Projective motion blur model
-  Homography Hmatrix[NumSamples];
-  Homography IHmatrix[NumSamples];
+  Homography Hmatrix[NumSamples]{};
+  Homography IHmatrix[NumSamples]{};
 
  private:
   ////////////////////////////////////

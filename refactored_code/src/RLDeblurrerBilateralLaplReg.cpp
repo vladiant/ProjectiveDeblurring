@@ -16,7 +16,7 @@ RLDeblurrerBilateralLaplReg::RLDeblurrerBilateralLaplReg(
 }
 
 void RLDeblurrerBilateralLaplReg::SetBilateralTable() {
-  int i;
+  int i = 0;
   // Parameters are set according to Levin et al Siggraph'07
   // Better result can be obtained by using smaller noiseVar, but for
   // fairness, we use the same setting.
