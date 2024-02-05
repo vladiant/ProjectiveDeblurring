@@ -180,7 +180,6 @@ void RLDeblurrerLaplReg::ProjectiveMotionRLDeblurSpsRegRgb(
                            width, height, mBlurImgBufferR.data(),
                            mBlurImgBufferG.data(), mBlurImgBufferB.data(),
                            mBlurWeightBuffer.data(), iwidth, iheight, true);
-
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
         if (bPoisson) {

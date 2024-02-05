@@ -37,10 +37,9 @@ void RLDeblurrer::ClearBuffer() {
   mErrorWeightBuffer.clear();
 }
 
-void RLDeblurrer::ProjectiveMotionRLDeblurGray(float* BlurImg, int iwidth,
-                                               int iheight, float* DeblurImg,
-                                               int width, int height, int Niter,
-                                               bool bPoisson) {
+void RLDeblurrer::deblurGray(float* BlurImg, int iwidth, int iheight,
+                             float* DeblurImg, int width, int height, int Niter,
+                             bool bPoisson) {
   int x = 0, y = 0, index = 0, itr = 0;
   float* InputWeight = nullptr;
 
@@ -79,7 +78,6 @@ void RLDeblurrer::ProjectiveMotionRLDeblurGray(float* BlurImg, int iwidth,
         } else {
           DeblurImg[index] += mErrorImgBuffer[index];
         }
-
         DeblurImg[index] = std::clamp(DeblurImg[index], 0.0f, 1.0f);
       }
     }
@@ -88,10 +86,10 @@ void RLDeblurrer::ProjectiveMotionRLDeblurGray(float* BlurImg, int iwidth,
   }
 }
 
-void RLDeblurrer::ProjectiveMotionRLDeblurRgb(
-    float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth, int iheight,
-    float* DeblurImgR, float* DeblurImgG, float* DeblurImgB, int width,
-    int height, int Niter, bool bPoisson) {
+void RLDeblurrer::deblurRgb(float* BlurImgR, float* BlurImgG, float* BlurImgB,
+                            int iwidth, int iheight, float* DeblurImgR,
+                            float* DeblurImgG, float* DeblurImgB, int width,
+                            int height, int Niter, bool bPoisson) {
   int x = 0, y = 0, index = 0, itr = 0;
   float* InputWeight = nullptr;
 

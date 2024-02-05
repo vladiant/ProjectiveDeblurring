@@ -189,10 +189,10 @@ int main(int /*argc*/, char* /*argv*/[]) {
 
   RLDeblurrer rLDeblurrer{blurGenerator, emptyErrorCalculator};
 
-  rLDeblurrer.ProjectiveMotionRLDeblurRgb(
-      bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-      deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-      height, 500, true);
+  rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
+                        blurwidth, blurheight, deblurImg[0].data(),
+                        deblurImg[1].data(), deblurImg[2].data(), width, height,
+                        500, true);
   RMSError = errorCalculator.calculateErrorRgb(
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height);
@@ -235,10 +235,10 @@ int main(int /*argc*/, char* /*argv*/[]) {
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 0.125f);
-  rLDeblurrer.ProjectiveMotionRLDeblurRgb(
-      bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-      deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-      height, 100, true);
+  rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
+                        blurwidth, blurheight, deblurImg[0].data(),
+                        deblurImg[1].data(), deblurImg[2].data(), width, height,
+                        100, true);
   RMSError = errorCalculator.calculateErrorRgb(
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height);
@@ -278,10 +278,10 @@ int main(int /*argc*/, char* /*argv*/[]) {
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 0.125f);
-  rLDeblurrer.ProjectiveMotionRLDeblurRgb(
-      bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-      deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-      height, 100, true);
+  rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
+                        blurwidth, blurheight, deblurImg[0].data(),
+                        deblurImg[1].data(), deblurImg[2].data(), width, height,
+                        100, true);
   RMSError = errorCalculator.calculateErrorRgb(
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height);
@@ -323,10 +323,10 @@ int main(int /*argc*/, char* /*argv*/[]) {
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 0.125f);
-  rLDeblurrer.ProjectiveMotionRLDeblurRgb(
-      bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-      deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-      height, 100, true);
+  rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
+                        blurwidth, blurheight, deblurImg[0].data(),
+                        deblurImg[1].data(), deblurImg[2].data(), width, height,
+                        100, true);
   RMSError = errorCalculator.calculateErrorRgb(
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height);
@@ -369,10 +369,10 @@ int main(int /*argc*/, char* /*argv*/[]) {
       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height, 100, true, 0.125f);
-  rLDeblurrer.ProjectiveMotionRLDeblurRgb(
-      bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-      deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-      height, 100, true);
+  rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
+                        blurwidth, blurheight, deblurImg[0].data(),
+                        deblurImg[1].data(), deblurImg[2].data(), width, height,
+                        100, true);
   RMSError = errorCalculator.calculateErrorRgb(
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
       height);
@@ -429,10 +429,10 @@ int main(int /*argc*/, char* /*argv*/[]) {
     {
       std::fstream fp(fname, std::fstream::out);
       for (int iteration = 0; iteration < 5000; iteration++) {
-        rLDeblurrer.ProjectiveMotionRLDeblurRgb(
-            bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
-            blurheight, deblurImg[0].data(), deblurImg[1].data(),
-            deblurImg[2].data(), width, height, 1, true);
+        rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
+                              blurwidth, blurheight, deblurImg[0].data(),
+                              deblurImg[1].data(), deblurImg[2].data(), width,
+                              height, 1, true);
         RMSError = errorCalculator.calculateErrorRgb(
             deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(),
             width, height);
@@ -459,10 +459,10 @@ int main(int /*argc*/, char* /*argv*/[]) {
     {
       std::fstream fp(fname, std::fstream::out);
       for (int iteration = 0; iteration < 5000; iteration++) {
-        rLDeblurrer.ProjectiveMotionRLDeblurRgb(
-            bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
-            blurheight, deblurImg[0].data(), deblurImg[1].data(),
-            deblurImg[2].data(), width, height, 1, false);
+        rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
+                              blurwidth, blurheight, deblurImg[0].data(),
+                              deblurImg[1].data(), deblurImg[2].data(), width,
+                              height, 1, false);
         RMSError = errorCalculator.calculateErrorRgb(
             deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(),
             width, height);

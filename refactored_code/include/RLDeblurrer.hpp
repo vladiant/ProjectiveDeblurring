@@ -24,14 +24,12 @@ class RLDeblurrer {
   // This is the Basic algorithm
   // DeblurImg: the Input itself is initialization, so you can load
   // yBilateralLap own initialization
-  void ProjectiveMotionRLDeblurGray(float* BlurImg, int iwidth, int iheight,
-                                    float* DeblurImg, int width, int height,
-                                    int Niter = 20, bool bPoisson = true);
-  void ProjectiveMotionRLDeblurRgb(float* BlurImgR, float* BlurImgG,
-                                   float* BlurImgB, int iwidth, int iheight,
-                                   float* DeblurImgR, float* DeblurImgG,
-                                   float* DeblurImgB, int width, int height,
-                                   int Niter = 20, bool bPoisson = true);
+  void deblurGray(float* BlurImg, int iwidth, int iheight, float* DeblurImg,
+                  int width, int height, int Niter = 20, bool bPoisson = true);
+  void deblurRgb(float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth,
+                 int iheight, float* DeblurImgR, float* DeblurImgG,
+                 float* DeblurImgB, int width, int height, int Niter = 20,
+                 bool bPoisson = true);
 
  private:
   IBlurImageGenerator& mBlurGenerator;
