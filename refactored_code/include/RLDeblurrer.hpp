@@ -12,6 +12,11 @@ class RLDeblurrer {
 
   ~RLDeblurrer() { ClearBuffer(); }
 
+  struct Parameters {
+    int Niter = 20;
+    bool bPoisson = true;
+  };
+
   ////////////////////////////////////
   // These functions are used to set Buffer for caching
   ////////////////////////////////////
@@ -25,11 +30,11 @@ class RLDeblurrer {
   // DeblurImg: the Input itself is initialization, so you can load
   // yBilateralLap own initialization
   void deblurGray(float* BlurImg, int iwidth, int iheight, float* DeblurImg,
-                  int width, int height, int Niter = 20, bool bPoisson = true);
+                  int width, int height, const Parameters& aParameters);
   void deblurRgb(float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth,
                  int iheight, float* DeblurImgR, float* DeblurImgG,
-                 float* DeblurImgB, int width, int height, int Niter = 20,
-                 bool bPoisson = true);
+                 float* DeblurImgB, int width, int height,
+                 const Parameters& aParameters);
 
  private:
   IBlurImageGenerator& mBlurGenerator;

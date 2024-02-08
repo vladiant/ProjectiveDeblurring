@@ -38,8 +38,8 @@ void RLDeblurrer::ClearBuffer() {
 }
 
 void RLDeblurrer::deblurGray(float* BlurImg, int iwidth, int iheight,
-                             float* DeblurImg, int width, int height, int Niter,
-                             bool bPoisson) {
+                             float* DeblurImg, int width, int height,
+                             const Parameters& aParameters) {
   int x = 0, y = 0, index = 0, itr = 0;
   float* InputWeight = nullptr;
 
@@ -51,13 +51,13 @@ void RLDeblurrer::deblurGray(float* BlurImg, int iwidth, int iheight,
   else
     SetBuffer(iwidth, iheight);
 
-  for (itr = 0; itr < Niter; itr++) {
+  for (itr = 0; itr < aParameters.Niter; itr++) {
     mBlurGenerator.blurGray(DeblurImg, InputWeight, width, height,
                             mBlurImgBuffer.data(), mBlurWeightBuffer.data(),
                             iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
-        if (bPoisson) {
+        if (aParameters.bPoisson) {
           if (mBlurImgBuffer[index] > 0.001f) {
             DeltaImg[index] = BlurImg[index] / mBlurImgBuffer[index];
           } else {
@@ -73,7 +73,7 @@ void RLDeblurrer::deblurGray(float* BlurImg, int iwidth, int iheight,
                             mErrorWeightBuffer.data(), width, height, false);
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
-        if (bPoisson) {
+        if (aParameters.bPoisson) {
           DeblurImg[index] *= mErrorImgBuffer[index];
         } else {
           DeblurImg[index] += mErrorImgBuffer[index];
@@ -89,7 +89,7 @@ void RLDeblurrer::deblurGray(float* BlurImg, int iwidth, int iheight,
 void RLDeblurrer::deblurRgb(float* BlurImgR, float* BlurImgG, float* BlurImgB,
                             int iwidth, int iheight, float* DeblurImgR,
                             float* DeblurImgG, float* DeblurImgB, int width,
-                            int height, int Niter, bool bPoisson) {
+                            int height, const Parameters& aParameters) {
   int x = 0, y = 0, index = 0, itr = 0;
   float* InputWeight = nullptr;
 
@@ -103,14 +103,14 @@ void RLDeblurrer::deblurRgb(float* BlurImgR, float* BlurImgG, float* BlurImgB,
   else
     SetBuffer(iwidth, iheight);
 
-  for (itr = 0; itr < Niter; itr++) {
+  for (itr = 0; itr < aParameters.Niter; itr++) {
     mBlurGenerator.blurRgb(DeblurImgR, DeblurImgG, DeblurImgB, InputWeight,
                            width, height, mBlurImgBufferR.data(),
                            mBlurImgBufferG.data(), mBlurImgBufferB.data(),
                            mBlurWeightBuffer.data(), iwidth, iheight, true);
     for (y = 0, index = 0; y < iheight; y++) {
       for (x = 0; x < iwidth; x++, index++) {
-        if (bPoisson) {
+        if (aParameters.bPoisson) {
           if (mBlurImgBufferR[index] > 0.001f) {
             DeltaImgR[index] = BlurImgR[index] / mBlurImgBufferR[index];
           } else {
@@ -140,7 +140,7 @@ void RLDeblurrer::deblurRgb(float* BlurImgR, float* BlurImgG, float* BlurImgB,
                            width, height, false);
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
-        if (bPoisson) {
+        if (aParameters.bPoisson) {
           DeblurImgR[index] *= mErrorImgBufferR[index];
           DeblurImgG[index] *= mErrorImgBufferG[index];
           DeblurImgB[index] *= mErrorImgBufferB[index];
