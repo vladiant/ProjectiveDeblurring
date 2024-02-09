@@ -1,5 +1,7 @@
 #include "RLDeblurrer.hpp"
 
+#include "DeblurParameters.hpp"
+
 RLDeblurrer::RLDeblurrer(IBlurImageGenerator& aBlurGenerator,
                          IErrorCalculator& aErrorCalculator)
     : mBlurGenerator(aBlurGenerator), mErrorCalculator(aErrorCalculator) {}
@@ -39,7 +41,7 @@ void RLDeblurrer::ClearBuffer() {
 
 void RLDeblurrer::deblurGray(float* BlurImg, int iwidth, int iheight,
                              float* DeblurImg, int width, int height,
-                             const Parameters& aParameters) {
+                             const DeblurParameters& aParameters) {
   int x = 0, y = 0, index = 0, itr = 0;
   float* InputWeight = nullptr;
 
@@ -89,7 +91,7 @@ void RLDeblurrer::deblurGray(float* BlurImg, int iwidth, int iheight,
 void RLDeblurrer::deblurRgb(float* BlurImgR, float* BlurImgG, float* BlurImgB,
                             int iwidth, int iheight, float* DeblurImgR,
                             float* DeblurImgG, float* DeblurImgB, int width,
-                            int height, const Parameters& aParameters) {
+                            int height, const DeblurParameters& aParameters) {
   int x = 0, y = 0, index = 0, itr = 0;
   float* InputWeight = nullptr;
 

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "DeblurParameters.hpp"
 #include "EmptyErrorCalculator.hpp"
 #include "GaussianNoiseGenerator.hpp"
 #include "ImResize.h"
@@ -190,7 +191,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
            width * height * sizeof(float));
 
-    RLDeblurrer::Parameters rLParams{.Niter = 500, .bPoisson = true};
+    DeblurParameters rLParams{.Niter = 500, .bPoisson = true};
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
                           blurwidth, blurheight, deblurImg[0].data(),
                           deblurImg[1].data(), deblurImg[2].data(), width,
@@ -241,7 +242,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
         height, 100, true, 0.125f);
 
-    RLDeblurrer::Parameters rLParams{.Niter = 100, .bPoisson = true};
+    DeblurParameters rLParams{.Niter = 100, .bPoisson = true};
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
                           blurwidth, blurheight, deblurImg[0].data(),
                           deblurImg[1].data(), deblurImg[2].data(), width,
@@ -289,7 +290,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
         height, 100, true, 0.125f);
 
-    RLDeblurrer::Parameters rLParams{.Niter = 100, .bPoisson = true};
+    DeblurParameters rLParams{.Niter = 100, .bPoisson = true};
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
                           blurwidth, blurheight, deblurImg[0].data(),
                           deblurImg[1].data(), deblurImg[2].data(), width,
@@ -338,7 +339,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
         height, 100, true, 0.125f);
 
-    RLDeblurrer::Parameters rLParams{.Niter = 100, .bPoisson = true};
+    DeblurParameters rLParams{.Niter = 100, .bPoisson = true};
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
                           blurwidth, blurheight, deblurImg[0].data(),
                           deblurImg[1].data(), deblurImg[2].data(), width,
@@ -388,7 +389,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
         height, 100, true, 0.125f);
 
-    RLDeblurrer::Parameters rLParams{.Niter = 100, .bPoisson = true};
+    DeblurParameters rLParams{.Niter = 100, .bPoisson = true};
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
                           blurwidth, blurheight, deblurImg[0].data(),
                           deblurImg[1].data(), deblurImg[2].data(), width,
@@ -450,7 +451,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     {
       std::fstream fp(fname, std::fstream::out);
       for (int iteration = 0; iteration < 5000; iteration++) {
-        RLDeblurrer::Parameters rLParams{.Niter = 1, .bPoisson = true};
+        DeblurParameters rLParams{.Niter = 1, .bPoisson = true};
         rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
                               blurwidth, blurheight, deblurImg[0].data(),
                               deblurImg[1].data(), deblurImg[2].data(), width,
@@ -481,7 +482,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     {
       std::fstream fp(fname, std::fstream::out);
       for (int iteration = 0; iteration < 5000; iteration++) {
-        RLDeblurrer::Parameters rLParams{.Niter = 1, .bPoisson = false};
+        DeblurParameters rLParams{.Niter = 1, .bPoisson = false};
         rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
                               blurwidth, blurheight, deblurImg[0].data(),
                               deblurImg[1].data(), deblurImg[2].data(), width,

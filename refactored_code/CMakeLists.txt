@@ -27,6 +27,7 @@ add_executable(
     include/IBlurImageGenerator.hpp
     include/MotionBlurImageGenerator.hpp
     src/MotionBlurImageGenerator.cpp
+    include/DeblurParameters.hpp
     include/RLDeblurrer.hpp
     src/RLDeblurrer.cpp
     include/RLDeblurrerTVReg.hpp

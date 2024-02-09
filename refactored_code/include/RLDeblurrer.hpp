@@ -5,17 +5,14 @@
 #include "IBlurImageGenerator.hpp"
 #include "IErrorCalculator.hpp"
 
+struct DeblurParameters;
+
 class RLDeblurrer {
  public:
   RLDeblurrer(IBlurImageGenerator& aBlurGenerator,
               IErrorCalculator& aErrorCalculator);
 
   ~RLDeblurrer() { ClearBuffer(); }
-
-  struct Parameters {
-    int Niter = 20;
-    bool bPoisson = true;
-  };
 
   ////////////////////////////////////
   // These functions are used to set Buffer for caching
@@ -30,11 +27,11 @@ class RLDeblurrer {
   // DeblurImg: the Input itself is initialization, so you can load
   // yBilateralLap own initialization
   void deblurGray(float* BlurImg, int iwidth, int iheight, float* DeblurImg,
-                  int width, int height, const Parameters& aParameters);
+                  int width, int height, const DeblurParameters& aParameters);
   void deblurRgb(float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth,
                  int iheight, float* DeblurImgR, float* DeblurImgG,
                  float* DeblurImgB, int width, int height,
-                 const Parameters& aParameters);
+                 const DeblurParameters& aParameters);
 
  private:
   IBlurImageGenerator& mBlurGenerator;
