@@ -9,16 +9,22 @@ RLDeblurrer::RLDeblurrer(IBlurImageGenerator& aBlurGenerator,
 void RLDeblurrer::SetBuffer(int width, int height) {
   mBlurGenerator.SetBuffer(width, height);
 
-  mBlurImgBuffer.resize(width * height);
-  mBlurImgBufferR.resize(width * height);
-  mBlurImgBufferG.resize(width * height);
-  mBlurImgBufferB.resize(width * height);
-  mBlurWeightBuffer.resize(width * height);
-  mErrorImgBuffer.resize(width * height);
-  mErrorImgBufferR.resize(width * height);
-  mErrorImgBufferG.resize(width * height);
-  mErrorImgBufferB.resize(width * height);
-  mErrorWeightBuffer.resize(width * height);
+  const size_t newSize = width * height;
+
+  if (newSize <= mBlurImgBuffer.size()) {
+    return;
+  }
+
+  mBlurImgBuffer.resize(newSize);
+  mBlurImgBufferR.resize(newSize);
+  mBlurImgBufferG.resize(newSize);
+  mBlurImgBufferB.resize(newSize);
+  mBlurWeightBuffer.resize(newSize);
+  mErrorImgBuffer.resize(newSize);
+  mErrorImgBufferR.resize(newSize);
+  mErrorImgBufferG.resize(newSize);
+  mErrorImgBufferB.resize(newSize);
+  mErrorWeightBuffer.resize(newSize);
 }
 
 void RLDeblurrer::ClearBuffer() {
