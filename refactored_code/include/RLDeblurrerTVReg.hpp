@@ -49,6 +49,13 @@ class RLDeblurrerTVReg {
   void ComputeGradientImageGray(float* Img, int width, int height, float* DxImg,
                                 float* DyImg, bool bflag = true);
 
+  void applyRegularizationGray(float* DeblurImg, int width, int height,
+                               bool bPoisson, float lambda);
+
+  void applyRegularizationRgb(float* DeblurImgR, float* DeblurImgG,
+                              float* DeblurImgB, int width, int height,
+                              bool bPoisson, float lambda);
+
  private:
   IBlurImageGenerator& mBlurGenerator;
   IErrorCalculator& mErrorCalculator;
