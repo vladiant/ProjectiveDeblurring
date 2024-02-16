@@ -39,7 +39,8 @@ void RLDeblurrerTVReg::ClearBuffer() {
 
 void RLDeblurrerTVReg::ProjectiveMotionRLDeblurTVRegGray(
     float* BlurImg, int iwidth, int iheight, float* DeblurImg, int width,
-    int height, int Niter, bool bPoisson, float lambda) {
+    int height, int Niter, bool bPoisson, float lambda,
+    IRegularizer& regularizer) {
   int x = 0, y = 0, index = 0, itr = 0;
   float* InputWeight = nullptr;
 
@@ -72,7 +73,8 @@ void RLDeblurrerTVReg::ProjectiveMotionRLDeblurTVRegGray(
                             iheight, mErrorImgBuffer.data(),
                             mErrorWeightBuffer.data(), width, height, false);
 
-    applyRegularizationGray(DeblurImg, width, height, bPoisson, lambda);
+    regularizer.applyRegularizationGray(DeblurImg, width, height, bPoisson,
+                                        lambda);
 
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
@@ -92,7 +94,8 @@ void RLDeblurrerTVReg::ProjectiveMotionRLDeblurTVRegGray(
 void RLDeblurrerTVReg::ProjectiveMotionRLDeblurTVRegRgb(
     float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth, int iheight,
     float* DeblurImgR, float* DeblurImgG, float* DeblurImgB, int width,
-    int height, int Niter, bool bPoisson, float lambda) {
+    int height, int Niter, bool bPoisson, float lambda,
+    IRegularizer& regularizer) {
   int x = 0, y = 0, index = 0, itr = 0;
   float* InputWeight = nullptr;
 
@@ -142,8 +145,8 @@ void RLDeblurrerTVReg::ProjectiveMotionRLDeblurTVRegRgb(
                            mErrorImgBufferB.data(), mErrorWeightBuffer.data(),
                            width, height, false);
 
-    applyRegularizationRgb(DeblurImgR, DeblurImgG, DeblurImgB, width, height,
-                           bPoisson, lambda);
+    regularizer.applyRegularizationRgb(DeblurImgR, DeblurImgG, DeblurImgB,
+                                       width, height, bPoisson, lambda);
 
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
@@ -168,9 +171,55 @@ void RLDeblurrerTVReg::ProjectiveMotionRLDeblurTVRegRgb(
   }
 }
 
-void RLDeblurrerTVReg::ComputeGradientImageGray(float* Img, int width,
-                                                int height, float* DxImg,
-                                                float* DyImg, bool bflag) {
+void TVRegularizer::SetBuffer(int width, int height) {
+  const size_t newSize = width * height;
+
+  if (newSize <= mDxImg.size()) {
+    return;
+  }
+
+  mDxImg.resize(newSize);
+  mDyImg.resize(newSize);
+  mDxxImg.resize(newSize);
+  mDyyImg.resize(newSize);
+
+  mDxImgR.resize(newSize);
+  mDyImgR.resize(newSize);
+  mDxxImgR.resize(newSize);
+  mDyyImgR.resize(newSize);
+  mDxImgG.resize(newSize);
+  mDyImgG.resize(newSize);
+  mDxxImgG.resize(newSize);
+  mDyyImgG.resize(newSize);
+  mDxImgB.resize(newSize);
+  mDyImgB.resize(newSize);
+  mDxxImgB.resize(newSize);
+  mDyyImgB.resize(newSize);
+}
+
+void TVRegularizer::ClearBuffer() {
+  mDxImg.clear();
+  mDyImg.clear();
+  mDxxImg.clear();
+  mDyyImg.clear();
+
+  mDxImgR.clear();
+  mDyImgR.clear();
+  mDxxImgR.clear();
+  mDyyImgR.clear();
+  mDxImgG.clear();
+  mDyImgG.clear();
+  mDxxImgG.clear();
+  mDyyImgG.clear();
+  mDxImgB.clear();
+  mDyImgB.clear();
+  mDxxImgB.clear();
+  mDyyImgB.clear();
+}
+
+void TVRegularizer::ComputeGradientImageGray(float* Img, int width, int height,
+                                             float* DxImg, float* DyImg,
+                                             bool bflag) {
   int x = 0, y = 0, index = 0;
   for (y = 0, index = 0; y < height; y++) {
     for (x = 0; x < width; x++, index++) {
@@ -201,9 +250,8 @@ void RLDeblurrerTVReg::ComputeGradientImageGray(float* Img, int width,
   }
 }
 
-void RLDeblurrerTVReg::ComputeGradientXImageGray(float* Img, int width,
-                                                 int height, float* DxImg,
-                                                 bool bflag) {
+void TVRegularizer::ComputeGradientXImageGray(float* Img, int width, int height,
+                                              float* DxImg, bool bflag) {
   int x = 0, y = 0, index = 0;
   for (y = 0, index = 0; y < height; y++) {
     for (x = 0; x < width; x++, index++) {
@@ -224,9 +272,8 @@ void RLDeblurrerTVReg::ComputeGradientXImageGray(float* Img, int width,
   }
 }
 
-void RLDeblurrerTVReg::ComputeGradientYImageGray(float* Img, int width,
-                                                 int height, float* DyImg,
-                                                 bool bflag) {
+void TVRegularizer::ComputeGradientYImageGray(float* Img, int width, int height,
+                                              float* DyImg, bool bflag) {
   int x = 0, y = 0, index = 0;
   for (y = 0, index = 0; y < height; y++) {
     for (x = 0; x < width; x++, index++) {
@@ -247,109 +294,96 @@ void RLDeblurrerTVReg::ComputeGradientYImageGray(float* Img, int width,
   }
 }
 
-void RLDeblurrerTVReg::applyRegularizationGray(float* DeblurImg, int width,
-                                               int height, bool bPoisson,
-                                               float lambda) {
-  std::vector<float> DxImg(width * height);
-  std::vector<float> DyImg(width * height);
-  std::vector<float> DxxImg(width * height);
-  std::vector<float> DyyImg(width * height);
+void TVRegularizer::applyRegularizationGray(float* DeblurImg, int width,
+                                            int height, bool bPoisson,
+                                            float lambda) {
+  SetBuffer(width, height);
 
   int x = 0, y = 0, index = 0;
 
-  ComputeGradientImageGray(DeblurImg, width, height, DxImg.data(), DyImg.data(),
-                           true);
+  ComputeGradientImageGray(DeblurImg, width, height, mDxImg.data(),
+                           mDyImg.data(), true);
   for (y = 0, index = 0; y < height; y++) {  // Normalize the gradient
     for (x = 0; x < width; x++, index++) {
-      if (DxImg[index] > 0) DxImg[index] = 1.0f / 255.0f;
-      if (DxImg[index] < 0) DxImg[index] = -1.0f / 255.0f;
-      if (DyImg[index] > 0) DyImg[index] = 1.0f / 255.0f;
-      if (DyImg[index] < 0) DyImg[index] = -1.0f / 255.0f;
+      if (mDxImg[index] > 0) mDxImg[index] = 1.0f / 255.0f;
+      if (mDxImg[index] < 0) mDxImg[index] = -1.0f / 255.0f;
+      if (mDyImg[index] > 0) mDyImg[index] = 1.0f / 255.0f;
+      if (mDyImg[index] < 0) mDyImg[index] = -1.0f / 255.0f;
     }
   }
-  ComputeGradientXImageGray(DxImg.data(), width, height, DxxImg.data(), false);
-  ComputeGradientYImageGray(DyImg.data(), width, height, DyyImg.data(), false);
+  ComputeGradientXImageGray(mDxImg.data(), width, height, mDxxImg.data(),
+                            false);
+  ComputeGradientYImageGray(mDyImg.data(), width, height, mDyyImg.data(),
+                            false);
 
   for (y = 0, index = 0; y < height; y++) {  // Normalize the gradient
     for (x = 0; x < width; x++, index++) {
       if (bPoisson) {
         DeblurImg[index] *=
-            1.0 / (1.0 + lambda * (DxxImg[index] + DyyImg[index]));
+            1.0 / (1.0 + lambda * (mDxxImg[index] + mDyyImg[index]));
       } else {
-        DeblurImg[index] -= lambda * (DxxImg[index] + DyyImg[index]);
+        DeblurImg[index] -= lambda * (mDxxImg[index] + mDyyImg[index]);
       }
     }
   }
 }
 
-void RLDeblurrerTVReg::applyRegularizationRgb(float* DeblurImgR,
-                                              float* DeblurImgG,
-                                              float* DeblurImgB, int width,
-                                              int height, bool bPoisson,
-                                              float lambda) {
-  std::vector<float> DxImgR(width * height);
-  std::vector<float> DyImgR(width * height);
-  std::vector<float> DxxImgR(width * height);
-  std::vector<float> DyyImgR(width * height);
-  std::vector<float> DxImgG(width * height);
-  std::vector<float> DyImgG(width * height);
-  std::vector<float> DxxImgG(width * height);
-  std::vector<float> DyyImgG(width * height);
-  std::vector<float> DxImgB(width * height);
-  std::vector<float> DyImgB(width * height);
-  std::vector<float> DxxImgB(width * height);
-  std::vector<float> DyyImgB(width * height);
+void TVRegularizer::applyRegularizationRgb(float* DeblurImgR, float* DeblurImgG,
+                                           float* DeblurImgB, int width,
+                                           int height, bool bPoisson,
+                                           float lambda) {
+  SetBuffer(width, height);
 
   int x = 0, y = 0, index = 0;
 
-  ComputeGradientImageGray(DeblurImgR, width, height, DxImgR.data(),
-                           DyImgR.data(), true);
-  ComputeGradientImageGray(DeblurImgG, width, height, DxImgG.data(),
-                           DyImgG.data(), true);
-  ComputeGradientImageGray(DeblurImgB, width, height, DxImgB.data(),
-                           DyImgB.data(), true);
+  ComputeGradientImageGray(DeblurImgR, width, height, mDxImgR.data(),
+                           mDyImgR.data(), true);
+  ComputeGradientImageGray(DeblurImgG, width, height, mDxImgG.data(),
+                           mDyImgG.data(), true);
+  ComputeGradientImageGray(DeblurImgB, width, height, mDxImgB.data(),
+                           mDyImgB.data(), true);
   for (y = 0, index = 0; y < height; y++) {
     for (x = 0; x < width; x++, index++) {
-      if (DxImgR[index] > 0) DxImgR[index] = 1.0f / 255.0f;
-      if (DxImgR[index] < 0) DxImgR[index] = -1.0f / 255.0f;
-      if (DyImgR[index] > 0) DyImgR[index] = 1.0f / 255.0f;
-      if (DyImgR[index] < 0) DyImgR[index] = -1.0f / 255.0f;
-      if (DxImgG[index] > 0) DxImgG[index] = 1.0f / 255.0f;
-      if (DxImgG[index] < 0) DxImgG[index] = -1.0f / 255.0f;
-      if (DyImgG[index] > 0) DyImgG[index] = 1.0f / 255.0f;
-      if (DyImgG[index] < 0) DyImgG[index] = -1.0f / 255.0f;
-      if (DxImgB[index] > 0) DxImgB[index] = 1.0f / 255.0f;
-      if (DxImgB[index] < 0) DxImgB[index] = -1.0f / 255.0f;
-      if (DyImgB[index] > 0) DyImgB[index] = 1.0f / 255.0f;
-      if (DyImgB[index] < 0) DyImgB[index] = -1.0f / 255.0f;
+      if (mDxImgR[index] > 0) mDxImgR[index] = 1.0f / 255.0f;
+      if (mDxImgR[index] < 0) mDxImgR[index] = -1.0f / 255.0f;
+      if (mDyImgR[index] > 0) mDyImgR[index] = 1.0f / 255.0f;
+      if (mDyImgR[index] < 0) mDyImgR[index] = -1.0f / 255.0f;
+      if (mDxImgG[index] > 0) mDxImgG[index] = 1.0f / 255.0f;
+      if (mDxImgG[index] < 0) mDxImgG[index] = -1.0f / 255.0f;
+      if (mDyImgG[index] > 0) mDyImgG[index] = 1.0f / 255.0f;
+      if (mDyImgG[index] < 0) mDyImgG[index] = -1.0f / 255.0f;
+      if (mDxImgB[index] > 0) mDxImgB[index] = 1.0f / 255.0f;
+      if (mDxImgB[index] < 0) mDxImgB[index] = -1.0f / 255.0f;
+      if (mDyImgB[index] > 0) mDyImgB[index] = 1.0f / 255.0f;
+      if (mDyImgB[index] < 0) mDyImgB[index] = -1.0f / 255.0f;
     }
   }
-  ComputeGradientXImageGray(DxImgR.data(), width, height, DxxImgR.data(),
+  ComputeGradientXImageGray(mDxImgR.data(), width, height, mDxxImgR.data(),
                             false);
-  ComputeGradientYImageGray(DyImgR.data(), width, height, DyyImgR.data(),
+  ComputeGradientYImageGray(mDyImgR.data(), width, height, mDyyImgR.data(),
                             false);
-  ComputeGradientXImageGray(DxImgG.data(), width, height, DxxImgG.data(),
+  ComputeGradientXImageGray(mDxImgG.data(), width, height, mDxxImgG.data(),
                             false);
-  ComputeGradientYImageGray(DyImgG.data(), width, height, DyyImgG.data(),
+  ComputeGradientYImageGray(mDyImgG.data(), width, height, mDyyImgG.data(),
                             false);
-  ComputeGradientXImageGray(DxImgB.data(), width, height, DxxImgB.data(),
+  ComputeGradientXImageGray(mDxImgB.data(), width, height, mDxxImgB.data(),
                             false);
-  ComputeGradientYImageGray(DyImgB.data(), width, height, DyyImgB.data(),
+  ComputeGradientYImageGray(mDyImgB.data(), width, height, mDyyImgB.data(),
                             false);
 
   for (y = 0, index = 0; y < height; y++) {  // Normalize the gradient
     for (x = 0; x < width; x++, index++) {
       if (bPoisson) {
         DeblurImgR[index] *=
-            1.0 / (1.0 + lambda * (DxxImgR[index] + DyyImgR[index]));
+            1.0 / (1.0 + lambda * (mDxxImgR[index] + mDyyImgR[index]));
         DeblurImgG[index] *=
-            1.0 / (1.0 + lambda * (DxxImgG[index] + DyyImgG[index]));
+            1.0 / (1.0 + lambda * (mDxxImgG[index] + mDyyImgG[index]));
         DeblurImgB[index] *=
-            1.0 / (1.0 + lambda * (DxxImgB[index] + DyyImgB[index]));
+            1.0 / (1.0 + lambda * (mDxxImgB[index] + mDyyImgB[index]));
       } else {
-        DeblurImgR[index] -= lambda * (DxxImgR[index] + DyyImgR[index]);
-        DeblurImgG[index] -= lambda * (DxxImgG[index] + DyyImgG[index]);
-        DeblurImgB[index] -= lambda * (DxxImgB[index] + DyyImgB[index]);
+        DeblurImgR[index] -= lambda * (mDxxImgR[index] + mDyyImgR[index]);
+        DeblurImgG[index] -= lambda * (mDxxImgG[index] + mDyyImgG[index]);
+        DeblurImgB[index] -= lambda * (mDxxImgB[index] + mDyyImgB[index]);
       }
     }
   }

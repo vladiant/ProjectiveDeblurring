@@ -216,6 +216,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
            width * height * sizeof(float));
 
+    TVRegularizer regularizer;
     RLDeblurrerTVReg rLDeblurrerTVReg{blurGenerator, emptyErrorCalculator};
 
     // Gradually decrease the regularization weight, otherwise, the result will
@@ -228,19 +229,19 @@ int main(int /*argc*/, char* /*argv*/[]) {
     rLDeblurrerTVReg.ProjectiveMotionRLDeblurTVRegRgb(
         bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 1.0f);
+        height, 100, true, 1.0f, regularizer);
     rLDeblurrerTVReg.ProjectiveMotionRLDeblurTVRegRgb(
         bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 0.5f);
+        height, 100, true, 0.5f, regularizer);
     rLDeblurrerTVReg.ProjectiveMotionRLDeblurTVRegRgb(
         bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 0.25f);
+        height, 100, true, 0.25f, regularizer);
     rLDeblurrerTVReg.ProjectiveMotionRLDeblurTVRegRgb(
         bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 0.125f);
+        height, 100, true, 0.125f, regularizer);
 
     DeblurParameters rLParams{.Niter = 100, .bPoisson = true};
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),

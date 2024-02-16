@@ -5,6 +5,21 @@
 #include "IBlurImageGenerator.hpp"
 #include "IErrorCalculator.hpp"
 
+class IRegularizer {
+ public:
+  virtual ~IRegularizer() = default;
+
+  ////////////////////////////////////
+  // These functions are used to apply regularization
+  ////////////////////////////////////
+  virtual void applyRegularizationGray(float* DeblurImg, int width, int height,
+                                       bool bPoisson, float lambda) = 0;
+
+  virtual void applyRegularizationRgb(float* DeblurImgR, float* DeblurImgG,
+                                      float* DeblurImgB, int width, int height,
+                                      bool bPoisson, float lambda) = 0;
+};
+
 class RLDeblurrerTVReg {
  public:
   RLDeblurrerTVReg(IBlurImageGenerator& aBlurGenerator,
@@ -28,33 +43,16 @@ class RLDeblurrerTVReg {
   // 0.51f for normalized weight
   void ProjectiveMotionRLDeblurTVRegGray(float* BlurImg, int iwidth,
                                          int iheight, float* DeblurImg,
-                                         int width, int height, int Niter = 20,
-                                         bool bPoisson = true,
-                                         float lambda = 0.50f);
+                                         int width, int height, int Niter,
+                                         bool bPoisson, float lambda,
+                                         IRegularizer& regularizer);
   void ProjectiveMotionRLDeblurTVRegRgb(float* BlurImgR, float* BlurImgG,
                                         float* BlurImgB, int iwidth,
                                         int iheight, float* DeblurImgR,
                                         float* DeblurImgG, float* DeblurImgB,
-                                        int width, int height, int Niter = 20,
-                                        bool bPoisson = true,
-                                        float lambda = 0.50f);
-
-  ////////////////////////////////////
-  // These functions are used to compute derivatives for regularization
-  ////////////////////////////////////
-  void ComputeGradientXImageGray(float* Img, int width, int height,
-                                 float* DxImg, bool bflag = true);
-  void ComputeGradientYImageGray(float* Img, int width, int height,
-                                 float* DyImg, bool bflag = true);
-  void ComputeGradientImageGray(float* Img, int width, int height, float* DxImg,
-                                float* DyImg, bool bflag = true);
-
-  void applyRegularizationGray(float* DeblurImg, int width, int height,
-                               bool bPoisson, float lambda);
-
-  void applyRegularizationRgb(float* DeblurImgR, float* DeblurImgG,
-                              float* DeblurImgB, int width, int height,
-                              bool bPoisson, float lambda);
+                                        int width, int height, int Niter,
+                                        bool bPoisson, float lambda,
+                                        IRegularizer& regularizer);
 
  private:
   IBlurImageGenerator& mBlurGenerator;
@@ -73,4 +71,54 @@ class RLDeblurrerTVReg {
   std::vector<float> mErrorImgBufferB;
 
   std::vector<float> mErrorWeightBuffer;
+};
+
+class TVRegularizer : public IRegularizer {
+ public:
+  ~TVRegularizer() { ClearBuffer(); }
+
+  ////////////////////////////////////
+  // These functions are used to set Buffer for caching
+  ////////////////////////////////////
+  void SetBuffer(int width, int height);
+  void ClearBuffer();
+
+  ////////////////////////////////////
+  // These functions are used to apply regularization
+  ////////////////////////////////////
+  void applyRegularizationGray(float* DeblurImg, int width, int height,
+                               bool bPoisson, float lambda) override;
+
+  void applyRegularizationRgb(float* DeblurImgR, float* DeblurImgG,
+                              float* DeblurImgB, int width, int height,
+                              bool bPoisson, float lambda) override;
+
+ private:
+  ////////////////////////////////////
+  // These functions are used to compute derivatives for regularization
+  ////////////////////////////////////
+  void ComputeGradientXImageGray(float* Img, int width, int height,
+                                 float* DxImg, bool bflag = true);
+  void ComputeGradientYImageGray(float* Img, int width, int height,
+                                 float* DyImg, bool bflag = true);
+  void ComputeGradientImageGray(float* Img, int width, int height, float* DxImg,
+                                float* DyImg, bool bflag = true);
+
+  std::vector<float> mDxImg;
+  std::vector<float> mDyImg;
+  std::vector<float> mDxxImg;
+  std::vector<float> mDyyImg;
+
+  std::vector<float> mDxImgR;
+  std::vector<float> mDyImgR;
+  std::vector<float> mDxxImgR;
+  std::vector<float> mDyyImgR;
+  std::vector<float> mDxImgG;
+  std::vector<float> mDyImgG;
+  std::vector<float> mDxxImgG;
+  std::vector<float> mDyyImgG;
+  std::vector<float> mDxImgB;
+  std::vector<float> mDyImgB;
+  std::vector<float> mDxxImgB;
+  std::vector<float> mDyyImgB;
 };
