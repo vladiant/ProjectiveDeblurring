@@ -4,21 +4,7 @@
 
 #include "IBlurImageGenerator.hpp"
 #include "IErrorCalculator.hpp"
-
-class IRegularizer {
- public:
-  virtual ~IRegularizer() = default;
-
-  ////////////////////////////////////
-  // These functions are used to apply regularization
-  ////////////////////////////////////
-  virtual void applyRegularizationGray(float* DeblurImg, int width, int height,
-                                       bool bPoisson, float lambda) = 0;
-
-  virtual void applyRegularizationRgb(float* DeblurImgR, float* DeblurImgG,
-                                      float* DeblurImgB, int width, int height,
-                                      bool bPoisson, float lambda) = 0;
-};
+#include "IRegularizer.hpp"
 
 class RLDeblurrerTVReg {
  public:
@@ -38,9 +24,6 @@ class RLDeblurrerTVReg {
   ////////////////////////////////////
   // This are the deblurring algorithm with regularization
   // Details please refers to paper
-  // The lambda in TV regularization is 0.002, but it's un-normalized weight
-  // Intensity range is between 0 and 1, so, the actual weight is 0.002f * 255 =
-  // 0.51f for normalized weight
   void ProjectiveMotionRLDeblurTVRegGray(float* BlurImg, int iwidth,
                                          int iheight, float* DeblurImg,
                                          int width, int height, int Niter,
@@ -73,9 +56,12 @@ class RLDeblurrerTVReg {
   std::vector<float> mErrorWeightBuffer;
 };
 
+// The lambda in TV regularization is 0.002, but it's un-normalized weight
+// Intensity range is between 0 and 1, so, the actual weight is 0.002f * 255 =
+// 0.51f for normalized weight
 class TVRegularizer : public IRegularizer {
  public:
-  ~TVRegularizer() { ClearBuffer(); }
+  ~TVRegularizer() override { ClearBuffer(); }
 
   ////////////////////////////////////
   // These functions are used to set Buffer for caching

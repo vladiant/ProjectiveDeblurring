@@ -30,6 +30,7 @@ add_executable(
     include/DeblurParameters.hpp
     include/RLDeblurrer.hpp
     src/RLDeblurrer.cpp
+    include/IRegularizer.hpp
     include/RLDeblurrerTVReg.hpp
     src/RLDeblurrerTVReg.cpp
     include/RLDeblurrerLaplReg.hpp
