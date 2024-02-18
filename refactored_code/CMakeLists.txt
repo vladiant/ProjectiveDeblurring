@@ -31,6 +31,8 @@ add_executable(
     include/RLDeblurrer.hpp
     src/RLDeblurrer.cpp
     include/IRegularizer.hpp
+    include/EmptyRegularizer.hpp
+    src/EmptyRegularizer.cpp
     include/RLDeblurrerTVReg.hpp
     src/RLDeblurrerTVReg.cpp
     include/RLDeblurrerLaplReg.hpp
