@@ -4,6 +4,7 @@
 
 #include "IBlurImageGenerator.hpp"
 #include "IErrorCalculator.hpp"
+#include "IRegularizer.hpp"
 
 struct DeblurParameters;
 
@@ -27,11 +28,13 @@ class RLDeblurrer {
   // DeblurImg: the Input itself is initialization, so you can load
   // yBilateralLap own initialization
   void deblurGray(float* BlurImg, int iwidth, int iheight, float* DeblurImg,
-                  int width, int height, const DeblurParameters& aParameters);
+                  int width, int height, const DeblurParameters& aParameters,
+                  IRegularizer& regularizer, float lambda);
   void deblurRgb(float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth,
                  int iheight, float* DeblurImgR, float* DeblurImgG,
                  float* DeblurImgB, int width, int height,
-                 const DeblurParameters& aParameters);
+                 const DeblurParameters& aParameters, IRegularizer& regularizer,
+                 float lambda);
 
  private:
   IBlurImageGenerator& mBlurGenerator;

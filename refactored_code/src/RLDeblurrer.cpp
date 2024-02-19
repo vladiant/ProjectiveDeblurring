@@ -47,7 +47,8 @@ void RLDeblurrer::ClearBuffer() {
 
 void RLDeblurrer::deblurGray(float* BlurImg, int iwidth, int iheight,
                              float* DeblurImg, int width, int height,
-                             const DeblurParameters& aParameters) {
+                             const DeblurParameters& aParameters,
+                             IRegularizer& regularizer, float lambda) {
   int x = 0, y = 0, index = 0, itr = 0;
   float* InputWeight = nullptr;
 
@@ -79,6 +80,10 @@ void RLDeblurrer::deblurGray(float* BlurImg, int iwidth, int iheight,
     mBlurGenerator.blurGray(DeltaImg.data(), mBlurWeightBuffer.data(), iwidth,
                             iheight, mErrorImgBuffer.data(),
                             mErrorWeightBuffer.data(), width, height, false);
+
+    regularizer.applyRegularizationGray(DeblurImg, width, height,
+                                        aParameters.bPoisson, lambda);
+
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
         if (aParameters.bPoisson) {
@@ -97,7 +102,8 @@ void RLDeblurrer::deblurGray(float* BlurImg, int iwidth, int iheight,
 void RLDeblurrer::deblurRgb(float* BlurImgR, float* BlurImgG, float* BlurImgB,
                             int iwidth, int iheight, float* DeblurImgR,
                             float* DeblurImgG, float* DeblurImgB, int width,
-                            int height, const DeblurParameters& aParameters) {
+                            int height, const DeblurParameters& aParameters,
+                            IRegularizer& regularizer, float lambda) {
   int x = 0, y = 0, index = 0, itr = 0;
   float* InputWeight = nullptr;
 
@@ -146,6 +152,11 @@ void RLDeblurrer::deblurRgb(float* BlurImgR, float* BlurImgG, float* BlurImgB,
                            mErrorImgBufferR.data(), mErrorImgBufferG.data(),
                            mErrorImgBufferB.data(), mErrorWeightBuffer.data(),
                            width, height, false);
+
+    regularizer.applyRegularizationRgb(DeblurImgR, DeblurImgG, DeblurImgB,
+                                       width, height, aParameters.bPoisson,
+                                       lambda);
+
     for (y = 0, index = 0; y < height; y++) {
       for (x = 0; x < width; x++, index++) {
         if (aParameters.bPoisson) {

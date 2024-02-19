@@ -6,6 +6,7 @@
 
 #include "DeblurParameters.hpp"
 #include "EmptyErrorCalculator.hpp"
+#include "EmptyRegularizer.hpp"
 #include "GaussianNoiseGenerator.hpp"
 #include "ImResize.h"
 #include "MotionBlurImageGenerator.hpp"
@@ -155,6 +156,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
 
   ///////////////////////////////////
   // Main Deblurring algorithm
+  EmptyRegularizer emptyRegularizer;
   RLDeblurrer rLDeblurrer{blurGenerator, emptyErrorCalculator};
 
   {
@@ -195,7 +197,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
                           blurwidth, blurheight, deblurImg[0].data(),
                           deblurImg[1].data(), deblurImg[2].data(), width,
-                          height, rLParams);
+                          height, rLParams, emptyRegularizer, 0.0);
     RMSError = errorCalculator.calculateErrorRgb(
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
         height);
@@ -247,7 +249,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
                           blurwidth, blurheight, deblurImg[0].data(),
                           deblurImg[1].data(), deblurImg[2].data(), width,
-                          height, rLParams);
+                          height, rLParams, emptyRegularizer, 0.0);
     RMSError = errorCalculator.calculateErrorRgb(
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
         height);
@@ -295,7 +297,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
                           blurwidth, blurheight, deblurImg[0].data(),
                           deblurImg[1].data(), deblurImg[2].data(), width,
-                          height, rLParams);
+                          height, rLParams, emptyRegularizer, 0.0);
     RMSError = errorCalculator.calculateErrorRgb(
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
         height);
@@ -344,7 +346,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
                           blurwidth, blurheight, deblurImg[0].data(),
                           deblurImg[1].data(), deblurImg[2].data(), width,
-                          height, rLParams);
+                          height, rLParams, emptyRegularizer, 0.0);
     RMSError = errorCalculator.calculateErrorRgb(
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
         height);
@@ -394,7 +396,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
                           blurwidth, blurheight, deblurImg[0].data(),
                           deblurImg[1].data(), deblurImg[2].data(), width,
-                          height, rLParams);
+                          height, rLParams, emptyRegularizer, 0.0);
     RMSError = errorCalculator.calculateErrorRgb(
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
         height);
@@ -456,7 +458,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
         rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
                               blurwidth, blurheight, deblurImg[0].data(),
                               deblurImg[1].data(), deblurImg[2].data(), width,
-                              height, rLParams);
+                              height, rLParams, emptyRegularizer, 0.0);
         RMSError = errorCalculator.calculateErrorRgb(
             deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(),
             width, height);
@@ -487,7 +489,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
         rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
                               blurwidth, blurheight, deblurImg[0].data(),
                               deblurImg[1].data(), deblurImg[2].data(), width,
-                              height, rLParams);
+                              height, rLParams, emptyRegularizer, 0.0);
         RMSError = errorCalculator.calculateErrorRgb(
             deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(),
             width, height);
