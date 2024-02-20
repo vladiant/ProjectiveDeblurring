@@ -15,8 +15,8 @@
 #include "RLDeblurrerBilateralLaplReg.hpp"
 #include "RLDeblurrerBilateralReg.hpp"
 #include "RLDeblurrerLaplReg.hpp"
-#include "RLDeblurrerTVReg.hpp"
 #include "RMSErrorCalculator.hpp"
+#include "TVRegularizer.hpp"
 #include "bitmap.h"
 
 int main(int /*argc*/, char* /*argv*/[]) {
@@ -218,32 +218,34 @@ int main(int /*argc*/, char* /*argv*/[]) {
     memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
            width * height * sizeof(float));
 
-    TVRegularizer regularizer;
-    RLDeblurrerTVReg rLDeblurrerTVReg{blurGenerator, emptyErrorCalculator};
+    TVRegularizer tvRegularizer;
+    DeblurParameters tvRLParams{.Niter = 100, .bPoisson = true};
+    RLDeblurrer rLDeblurrerTVReg{blurGenerator, emptyErrorCalculator};
 
     // Gradually decrease the regularization weight, otherwise, the result will
     // be over smooth. Actually, the following regularization produce similar
     // results....
-    //   rLDeblurrerTVReg.ProjectiveMotionRLDeblurTVReg(
-    //       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
-    //       blurheight, deblurImg[0].data(), deblurImg[1].data(),
-    //       deblurImg[2].data(), width, height, 500, true, 0.5f);
-    rLDeblurrerTVReg.ProjectiveMotionRLDeblurTVRegRgb(
-        bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 1.0f, regularizer);
-    rLDeblurrerTVReg.ProjectiveMotionRLDeblurTVRegRgb(
-        bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 0.5f, regularizer);
-    rLDeblurrerTVReg.ProjectiveMotionRLDeblurTVRegRgb(
-        bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 0.25f, regularizer);
-    rLDeblurrerTVReg.ProjectiveMotionRLDeblurTVRegRgb(
-        bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 0.125f, regularizer);
+    // rLDeblurrerTVReg.deblurRgb(
+    //     bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
+    //     blurheight, deblurImg[0].data(), deblurImg[1].data(),
+    //     deblurImg[2].data(), width, height, DeblurParameters{.Niter = 100,
+    //     .bPoisson = true}, tvRegularizer, 0.5f);
+    rLDeblurrerTVReg.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
+                               blurwidth, blurheight, deblurImg[0].data(),
+                               deblurImg[1].data(), deblurImg[2].data(), width,
+                               height, tvRLParams, tvRegularizer, 1.0f);
+    rLDeblurrerTVReg.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
+                               blurwidth, blurheight, deblurImg[0].data(),
+                               deblurImg[1].data(), deblurImg[2].data(), width,
+                               height, tvRLParams, tvRegularizer, 0.5f);
+    rLDeblurrerTVReg.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
+                               blurwidth, blurheight, deblurImg[0].data(),
+                               deblurImg[1].data(), deblurImg[2].data(), width,
+                               height, tvRLParams, tvRegularizer, 0.25f);
+    rLDeblurrerTVReg.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
+                               blurwidth, blurheight, deblurImg[0].data(),
+                               deblurImg[1].data(), deblurImg[2].data(), width,
+                               height, tvRLParams, tvRegularizer, 0.125f);
 
     DeblurParameters rLParams{.Niter = 100, .bPoisson = true};
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
