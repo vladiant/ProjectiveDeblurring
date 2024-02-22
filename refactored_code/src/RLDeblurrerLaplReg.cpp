@@ -355,6 +355,8 @@ void RLDeblurrerLaplReg::ComputeGradientYImageGray(float* Img, int width,
   }
 }
 
+LaplacianRegularizer::LaplacianRegularizer() { SetSpsTable(); }
+
 float LaplacianRegularizer::getSpsWeight(float aValue) const {
   if (!std::isfinite(aValue)) {
     return 0.0f;

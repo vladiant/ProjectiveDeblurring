@@ -76,6 +76,7 @@ class RLDeblurrerLaplReg {
 // regularization for better comparison
 class LaplacianRegularizer : public IRegularizer {
  public:
+  LaplacianRegularizer();
   ~LaplacianRegularizer() override { ClearBuffer(); }
 
   ////////////////////////////////////
