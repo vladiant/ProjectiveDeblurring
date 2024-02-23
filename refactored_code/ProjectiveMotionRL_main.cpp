@@ -272,28 +272,31 @@ int main(int /*argc*/, char* /*argv*/[]) {
     memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
            width * height * sizeof(float));
 
-    RLDeblurrerLaplReg rLDeblurrerLaplReg{blurGenerator, emptyErrorCalculator};
+    LaplacianRegularizer laplRegularizer;
+    DeblurParameters laplRLParams{.Niter = 100, .bPoisson = true};
+    RLDeblurrer rLDeblurrerLaplReg{blurGenerator, emptyErrorCalculator};
 
-    //   rLDeblurrerLaplReg.ProjectiveMotionRLDeblurSpsReg(
+    //   rLDeblurrerLaplReg.deblurRgb(
     //       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
     //       blurheight, deblurImg[0].data(), deblurImg[1].data(),
-    //       deblurImg[2].data(), width, height, 500, true, 0.5f);
-    rLDeblurrerLaplReg.ProjectiveMotionRLDeblurSpsRegRgb(
+    //       deblurImg[2].data(), width, height, DeblurParameters{.Niter = 100,
+    //     .bPoisson = true}, laplRegularizer, 0.5f);
+    rLDeblurrerLaplReg.deblurRgb(
         bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 1.0f);
-    rLDeblurrerLaplReg.ProjectiveMotionRLDeblurSpsRegRgb(
+        height, laplRLParams, laplRegularizer, 1.0f);
+    rLDeblurrerLaplReg.deblurRgb(
         bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 0.5f);
-    rLDeblurrerLaplReg.ProjectiveMotionRLDeblurSpsRegRgb(
+        height, laplRLParams, laplRegularizer, 0.5f);
+    rLDeblurrerLaplReg.deblurRgb(
         bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 0.25f);
-    rLDeblurrerLaplReg.ProjectiveMotionRLDeblurSpsRegRgb(
+        height, laplRLParams, laplRegularizer, 0.25f);
+    rLDeblurrerLaplReg.deblurRgb(
         bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 0.125f);
+        height, laplRLParams, laplRegularizer, 0.125f);
 
     DeblurParameters rLParams{.Niter = 100, .bPoisson = true};
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
