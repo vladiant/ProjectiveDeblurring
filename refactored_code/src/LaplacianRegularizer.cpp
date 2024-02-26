@@ -1,4 +1,4 @@
-#include "RLDeblurrerLaplReg.hpp"
+#include "LaplacianRegularizer.hpp"
 
 #include <cmath>
 

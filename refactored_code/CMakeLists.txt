@@ -35,8 +35,8 @@ add_executable(
     src/EmptyRegularizer.cpp
     include/TVRegularizer.hpp
     src/TVRegularizer.cpp
-    include/RLDeblurrerLaplReg.hpp
-    src/RLDeblurrerLaplReg.cpp
+    include/LaplacianRegularizer.hpp
+    src/LaplacianRegularizer.cpp
     include/RLDeblurrerBilateralReg.hpp
     src/RLDeblurrerBilateralReg.cpp
     include/RLDeblurrerBilateralLaplReg.hpp
