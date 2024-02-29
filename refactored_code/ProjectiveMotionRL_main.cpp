@@ -323,29 +323,31 @@ int main(int /*argc*/, char* /*argv*/[]) {
     memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
            width * height * sizeof(float));
 
-    RLDeblurrerBilateralReg rLDeblurrerBilateralReg{blurGenerator,
-                                                    emptyErrorCalculator};
+    BilateralRegularizer bilateralRegularizer;
+    DeblurParameters bilateralRLParams{.Niter = 100, .bPoisson = true};
+    RLDeblurrer rLDeblurrerBilateralReg{blurGenerator, emptyErrorCalculator};
 
-    //   rLDeblurrerBilateralReg.ProjectiveMotionRLDeblurBilateralReg(
-    //       bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
-    //       blurheight, deblurImg[0].data(), deblurImg[1].data(),
-    //       deblurImg[2].data(), width, height, 500, true, 0.5f);
-    rLDeblurrerBilateralReg.ProjectiveMotionRLDeblurBilateralRegRgb(
+    // rLDeblurrerBilateralReg.deblurRgb(
+    //     bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
+    //     blurheight, deblurImg[0].data(), deblurImg[1].data(),
+    //     deblurImg[2].data(), width, height, DeblurParameters{.Niter = 100,
+    //     .bPoisson = true}, bilateralRegularizer, 0.5f);
+    rLDeblurrerBilateralReg.deblurRgb(
         bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 1.0f);
-    rLDeblurrerBilateralReg.ProjectiveMotionRLDeblurBilateralRegRgb(
+        height, bilateralRLParams, bilateralRegularizer, 1.0f);
+    rLDeblurrerBilateralReg.deblurRgb(
         bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 0.5f);
-    rLDeblurrerBilateralReg.ProjectiveMotionRLDeblurBilateralRegRgb(
+        height, bilateralRLParams, bilateralRegularizer, 0.5f);
+    rLDeblurrerBilateralReg.deblurRgb(
         bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 0.25f);
-    rLDeblurrerBilateralReg.ProjectiveMotionRLDeblurBilateralRegRgb(
+        height, bilateralRLParams, bilateralRegularizer, 0.25f);
+    rLDeblurrerBilateralReg.deblurRgb(
         bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, 100, true, 0.125f);
+        height, bilateralRLParams, bilateralRegularizer, 0.125f);
 
     DeblurParameters rLParams{.Niter = 100, .bPoisson = true};
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
