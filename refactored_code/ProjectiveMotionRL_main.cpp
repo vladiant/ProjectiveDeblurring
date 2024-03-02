@@ -14,7 +14,7 @@
 #include "ProjectiveMotionRLMultiScaleGray.hpp"
 #include "RLDeblurrer.hpp"
 #include "RLDeblurrerBilateralLaplReg.hpp"
-#include "RLDeblurrerBilateralReg.hpp"
+#include "BilateralRegularizer.hpp"
 #include "RMSErrorCalculator.hpp"
 #include "TVRegularizer.hpp"
 #include "bitmap.h"
