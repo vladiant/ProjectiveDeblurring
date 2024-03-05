@@ -2,8 +2,6 @@
 
 #include <vector>
 
-#include "IBlurImageGenerator.hpp"
-#include "IErrorCalculator.hpp"
 #include "IRegularizer.hpp"
 
 // Value of lambda used in Levin et al is also un-normalized by minWeight,

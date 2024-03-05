@@ -2,8 +2,6 @@
 
 #include <vector>
 
-#include "IBlurImageGenerator.hpp"
-#include "IErrorCalculator.hpp"
 #include "IRegularizer.hpp"
 
 // The lambda in TV regularization is 0.002, but it's un-normalized weight
