@@ -51,14 +51,13 @@ class RLDeblurrerBilateralLaplReg {
   std::vector<float> mErrorImgBufferB;
   std::vector<float> mErrorWeightBuffer;
 
-  void ProjectiveMotionRLDeblurBilateralRegGray(
-      float* BlurImg, int iwidth, int iheight, float* DeblurImg, int width,
-      int height, int Niter = 20, bool bPoisson = true, float lambda = 0.50f);
-  void ProjectiveMotionRLDeblurBilateralRegRgb(
-      float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth,
-      int iheight, float* DeblurImgR, float* DeblurImgG, float* DeblurImgB,
-      int width, int height, int Niter = 20, bool bPoisson = true,
-      float lambda = 0.50f);
+  void ProcessGray(float* BlurImg, int iwidth, int iheight, float* DeblurImg,
+                   int width, int height, int Niter = 20, bool bPoisson = true,
+                   float lambda = 0.50f);
+  void ProcessRgb(float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth,
+                  int iheight, float* DeblurImgR, float* DeblurImgG,
+                  float* DeblurImgB, int width, int height, int Niter = 20,
+                  bool bPoisson = true, float lambda = 0.50f);
 
   void SetBilateralTable();
 

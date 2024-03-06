@@ -15,37 +15,43 @@ RLDeblurrerBilateralLaplReg::RLDeblurrerBilateralLaplReg(
   SetBilateralTable();
 }
 
-void RLDeblurrerBilateralLaplReg::SetBilateralTable() {
-  int i = 0;
-  // Parameters are set according to Levin et al Siggraph'07
-  // Better result can be obtained by using smaller noiseVar, but for
-  // fairness, we use the same setting.
-  float noiseVar = 0.005f;
+void RLDeblurrerBilateralLaplReg::SetBuffer(int width, int height) {
+  mBlurGenerator.SetBuffer(width, height);
 
-  // Standard Bilateral Weight
-  for (i = 0; i < 256; i++) {
-    mBilateralTable[i] = exp(-i * i / (noiseVar * 65025.0f));
-  }
-
-  // Bilateral Laplician Regularization
-  // int t = 1;
-  // float powD = 0.8f;
-  // float epilson = t / 255.0f;
-  // float minWeight =
-  //     exp(-pow(epilson, powD) / noiseVar) * pow(epilson, powD - 1.0f);
-  // for (i = 0; i <= t; i++) {
-  //   mBilateralTable[i] = 1.0f;
-  // }
-  // for (i = t + 1; i < 256; i++) {
-  //   mBilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
-  //                        pow(i / 255.0f, powD - 1.0f)) /
-  //                       minWeight;
-  // }
+  mBlurImgBuffer.resize(width * height);
+  mBlurImgBufferR.resize(width * height);
+  mBlurImgBufferG.resize(width * height);
+  mBlurImgBufferB.resize(width * height);
+  mBlurWeightBuffer.resize(width * height);
+  mErrorImgBuffer.resize(width * height);
+  mErrorImgBufferR.resize(width * height);
+  mErrorImgBufferG.resize(width * height);
+  mErrorImgBufferB.resize(width * height);
+  mErrorWeightBuffer.resize(width * height);
 }
 
-void RLDeblurrerBilateralLaplReg::ProjectiveMotionRLDeblurBilateralRegGray(
-    float* BlurImg, int iwidth, int iheight, float* DeblurImg, int width,
-    int height, int Niter, bool bPoisson, float lambda) {
+void RLDeblurrerBilateralLaplReg::ClearBuffer() {
+  mBlurGenerator.ClearBuffer();
+
+  mBlurImgBuffer.clear();
+  mBlurImgBufferR.clear();
+  mBlurImgBufferG.clear();
+  mBlurImgBufferB.clear();
+
+  mBlurWeightBuffer.clear();
+
+  mErrorImgBuffer.clear();
+  mErrorImgBufferR.clear();
+  mErrorImgBufferG.clear();
+  mErrorImgBufferB.clear();
+
+  mErrorWeightBuffer.clear();
+}
+
+void RLDeblurrerBilateralLaplReg::ProcessGray(float* BlurImg, int iwidth,
+                                              int iheight, float* DeblurImg,
+                                              int width, int height, int Niter,
+                                              bool bPoisson, float lambda) {
   int x = 0, y = 0, index = 0, itr = 0;
   float* InputWeight = nullptr;
 
@@ -98,7 +104,7 @@ void RLDeblurrerBilateralLaplReg::ProjectiveMotionRLDeblurBilateralRegGray(
   }
 }
 
-void RLDeblurrerBilateralLaplReg::ProjectiveMotionRLDeblurBilateralRegRgb(
+void RLDeblurrerBilateralLaplReg::ProcessRgb(
     float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth, int iheight,
     float* DeblurImgR, float* DeblurImgG, float* DeblurImgB, int width,
     int height, int Niter, bool bPoisson, float lambda) {
@@ -208,9 +214,8 @@ void RLDeblurrerBilateralLaplReg::ProjectiveMotionRLDeblurBilateralLapRegGray(
                          minWeight;
   }
 
-  ProjectiveMotionRLDeblurBilateralRegGray(BlurImg, iwidth, iheight, DeblurImg,
-                                           width, height, Niter, bPoisson,
-                                           lambda);
+  ProcessGray(BlurImg, iwidth, iheight, DeblurImg, width, height, Niter,
+              bPoisson, lambda);
 
   // Restore the original table
   for (i = 0; i < 256; i++) {
@@ -238,9 +243,8 @@ void RLDeblurrerBilateralLaplReg::ProjectiveMotionRLDeblurBilateralLapRegRgb(
                          minWeight;
   }
 
-  ProjectiveMotionRLDeblurBilateralRegRgb(
-      BlurImgR, BlurImgG, BlurImgB, iwidth, iheight, DeblurImgR, DeblurImgG,
-      DeblurImgB, width, height, Niter, bPoisson, lambda);
+  ProcessRgb(BlurImgR, BlurImgG, BlurImgB, iwidth, iheight, DeblurImgR,
+             DeblurImgG, DeblurImgB, width, height, Niter, bPoisson, lambda);
 
   // Restore the original table
   for (i = 0; i < 256; i++) {
@@ -286,35 +290,30 @@ void RLDeblurrerBilateralLaplReg::ComputeBilaterRegImageGray(float* Img,
   }
 }
 
-void RLDeblurrerBilateralLaplReg::SetBuffer(int width, int height) {
-  mBlurGenerator.SetBuffer(width, height);
+void RLDeblurrerBilateralLaplReg::SetBilateralTable() {
+  int i = 0;
+  // Parameters are set according to Levin et al Siggraph'07
+  // Better result can be obtained by using smaller noiseVar, but for
+  // fairness, we use the same setting.
+  float noiseVar = 0.005f;
 
-  mBlurImgBuffer.resize(width * height);
-  mBlurImgBufferR.resize(width * height);
-  mBlurImgBufferG.resize(width * height);
-  mBlurImgBufferB.resize(width * height);
-  mBlurWeightBuffer.resize(width * height);
-  mErrorImgBuffer.resize(width * height);
-  mErrorImgBufferR.resize(width * height);
-  mErrorImgBufferG.resize(width * height);
-  mErrorImgBufferB.resize(width * height);
-  mErrorWeightBuffer.resize(width * height);
-}
+  // Standard Bilateral Weight
+  for (i = 0; i < 256; i++) {
+    mBilateralTable[i] = exp(-i * i / (noiseVar * 65025.0f));
+  }
 
-void RLDeblurrerBilateralLaplReg::ClearBuffer() {
-  mBlurGenerator.ClearBuffer();
-
-  mBlurImgBuffer.clear();
-  mBlurImgBufferR.clear();
-  mBlurImgBufferG.clear();
-  mBlurImgBufferB.clear();
-
-  mBlurWeightBuffer.clear();
-
-  mErrorImgBuffer.clear();
-  mErrorImgBufferR.clear();
-  mErrorImgBufferG.clear();
-  mErrorImgBufferB.clear();
-
-  mErrorWeightBuffer.clear();
+  // Bilateral Laplician Regularization
+  // int t = 1;
+  // float powD = 0.8f;
+  // float epilson = t / 255.0f;
+  // float minWeight =
+  //     exp(-pow(epilson, powD) / noiseVar) * pow(epilson, powD - 1.0f);
+  // for (i = 0; i <= t; i++) {
+  //   mBilateralTable[i] = 1.0f;
+  // }
+  // for (i = t + 1; i < 256; i++) {
+  //   mBilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
+  //                        pow(i / 255.0f, powD - 1.0f)) /
+  //                       minWeight;
+  // }
 }

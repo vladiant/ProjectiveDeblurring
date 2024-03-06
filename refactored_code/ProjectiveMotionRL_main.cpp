@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "BilateralRegularizer.hpp"
 #include "DeblurParameters.hpp"
 #include "EmptyErrorCalculator.hpp"
 #include "EmptyRegularizer.hpp"
@@ -14,7 +15,6 @@
 #include "ProjectiveMotionRLMultiScaleGray.hpp"
 #include "RLDeblurrer.hpp"
 #include "RLDeblurrerBilateralLaplReg.hpp"
-#include "BilateralRegularizer.hpp"
 #include "RMSErrorCalculator.hpp"
 #include "TVRegularizer.hpp"
 #include "bitmap.h"
