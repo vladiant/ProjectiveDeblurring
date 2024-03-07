@@ -61,6 +61,8 @@ class RLDeblurrerBilateralLaplReg {
 
   void SetBilateralTable();
 
+  void SetPreProcessBilateralTable();
+
   ////////////////////////////////////
   // These functions are used to compute derivatives for regularization
   ////////////////////////////////////

@@ -198,58 +198,26 @@ void RLDeblurrerBilateralLaplReg::ProcessRgb(
 void RLDeblurrerBilateralLaplReg::ProjectiveMotionRLDeblurBilateralLapRegGray(
     float* BlurImg, int iwidth, int iheight, float* DeblurImg, int width,
     int height, int Niter, bool bPoisson, float lambda) {
-  int i = 0, t = 1;
-  // Parameters are set according to Levin et al Siggraph'07
-  float powD = 0.8f, noiseVar = 0.0005f, epilson = t / 255.0f;
-  float minWeight =
-      exp(-pow(epilson, powD) / noiseVar) * pow(epilson, powD - 1.0f);
-
-  // Bilateral Laplician Regularization
-  for (i = 0; i <= t; i++) {
-    mBilateralTable[i] = 1.0f;
-  }
-  for (i = t + 1; i < 256; i++) {
-    mBilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
-                          pow(i / 255.0f, powD - 1.0f)) /
-                         minWeight;
-  }
+  SetPreProcessBilateralTable();
 
   ProcessGray(BlurImg, iwidth, iheight, DeblurImg, width, height, Niter,
               bPoisson, lambda);
 
   // Restore the original table
-  for (i = 0; i < 256; i++) {
-    mBilateralTable[i] = exp(-i * i / (noiseVar * 65025.0f));
-  }
+  SetBilateralTable();
 }
 
 void RLDeblurrerBilateralLaplReg::ProjectiveMotionRLDeblurBilateralLapRegRgb(
     float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth, int iheight,
     float* DeblurImgR, float* DeblurImgG, float* DeblurImgB, int width,
     int height, int Niter, bool bPoisson, float lambda) {
-  int i = 0, t = 1;
-  // Parameters are set according to Levin et al Siggraph'07
-  float powD = 0.8f, noiseVar = 0.005f, epilson = t / 255.0f;
-  float minWeight =
-      exp(-pow(epilson, powD) / noiseVar) * pow(epilson, powD - 1.0f);
-
-  // Bilateral Laplician Regularization
-  for (i = 0; i <= t; i++) {
-    mBilateralTable[i] = 1.0f;
-  }
-  for (i = t + 1; i < 256; i++) {
-    mBilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
-                          pow(i / 255.0f, powD - 1.0f)) /
-                         minWeight;
-  }
+  SetPreProcessBilateralTable();
 
   ProcessRgb(BlurImgR, BlurImgG, BlurImgB, iwidth, iheight, DeblurImgR,
              DeblurImgG, DeblurImgB, width, height, Niter, bPoisson, lambda);
 
   // Restore the original table
-  for (i = 0; i < 256; i++) {
-    mBilateralTable[i] = exp(-i * i / (noiseVar * 65025.0f));
-  }
+  SetBilateralTable();
 }
 
 void RLDeblurrerBilateralLaplReg::ComputeBilaterRegImageGray(float* Img,
@@ -290,6 +258,24 @@ void RLDeblurrerBilateralLaplReg::ComputeBilaterRegImageGray(float* Img,
   }
 }
 
+void RLDeblurrerBilateralLaplReg::SetPreProcessBilateralTable() {
+  int i = 0, t = 1;
+  // Parameters are set according to Levin et al Siggraph'07
+  const float powD = 0.8f, noiseVar = 0.005f, epilson = t / 255.0f;
+  const float minWeight =
+      exp(-pow(epilson, powD) / noiseVar) * pow(epilson, powD - 1.0f);
+
+  // Bilateral Laplician Regularization
+  for (i = 0; i <= t; i++) {
+    mBilateralTable[i] = 1.0f;
+  }
+  for (i = t + 1; i < 256; i++) {
+    mBilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
+                          pow(i / 255.0f, powD - 1.0f)) /
+                         minWeight;
+  }
+}
+
 void RLDeblurrerBilateralLaplReg::SetBilateralTable() {
   int i = 0;
   // Parameters are set according to Levin et al Siggraph'07
@@ -301,19 +287,4 @@ void RLDeblurrerBilateralLaplReg::SetBilateralTable() {
   for (i = 0; i < 256; i++) {
     mBilateralTable[i] = exp(-i * i / (noiseVar * 65025.0f));
   }
-
-  // Bilateral Laplician Regularization
-  // int t = 1;
-  // float powD = 0.8f;
-  // float epilson = t / 255.0f;
-  // float minWeight =
-  //     exp(-pow(epilson, powD) / noiseVar) * pow(epilson, powD - 1.0f);
-  // for (i = 0; i <= t; i++) {
-  //   mBilateralTable[i] = 1.0f;
-  // }
-  // for (i = t + 1; i < 256; i++) {
-  //   mBilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
-  //                        pow(i / 255.0f, powD - 1.0f)) /
-  //                       minWeight;
-  // }
 }
