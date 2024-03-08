@@ -198,32 +198,24 @@ void RLDeblurrerBilateralLaplReg::ProcessRgb(
 void RLDeblurrerBilateralLaplReg::ProjectiveMotionRLDeblurBilateralLapRegGray(
     float* BlurImg, int iwidth, int iheight, float* DeblurImg, int width,
     int height, int Niter, bool bPoisson, float lambda) {
-  SetPreProcessBilateralTable();
+  // SetBilateralTable();
 
   ProcessGray(BlurImg, iwidth, iheight, DeblurImg, width, height, Niter,
               bPoisson, lambda);
-
-  // Restore the original table
-  SetBilateralTable();
 }
 
 void RLDeblurrerBilateralLaplReg::ProjectiveMotionRLDeblurBilateralLapRegRgb(
     float* BlurImgR, float* BlurImgG, float* BlurImgB, int iwidth, int iheight,
     float* DeblurImgR, float* DeblurImgG, float* DeblurImgB, int width,
     int height, int Niter, bool bPoisson, float lambda) {
-  SetPreProcessBilateralTable();
+  // SetBilateralTable();
 
   ProcessRgb(BlurImgR, BlurImgG, BlurImgB, iwidth, iheight, DeblurImgR,
              DeblurImgG, DeblurImgB, width, height, Niter, bPoisson, lambda);
-
-  // Restore the original table
-  SetBilateralTable();
 }
 
-void RLDeblurrerBilateralLaplReg::ComputeBilaterRegImageGray(float* Img,
-                                                             int width,
-                                                             int height,
-                                                             float* BRImg) {
+void RLDeblurrerBilateralLaplReg::ComputeBilaterRegImageGray(
+    float* Img, int width, int height, float* BRImg) const {
   // Sigma approximately equal to 1
   float GauFilter[5][5] = {{0.01f, 0.02f, 0.03f, 0.02f, 0.01f},
                            {0.02f, 0.03f, 0.04f, 0.03f, 0.02f},
@@ -258,7 +250,7 @@ void RLDeblurrerBilateralLaplReg::ComputeBilaterRegImageGray(float* Img,
   }
 }
 
-void RLDeblurrerBilateralLaplReg::SetPreProcessBilateralTable() {
+void RLDeblurrerBilateralLaplReg::SetBilateralTable() {
   int i = 0, t = 1;
   // Parameters are set according to Levin et al Siggraph'07
   const float powD = 0.8f, noiseVar = 0.005f, epilson = t / 255.0f;
@@ -273,18 +265,5 @@ void RLDeblurrerBilateralLaplReg::SetPreProcessBilateralTable() {
     mBilateralTable[i] = (exp(-pow(i / 255.0f, powD) / noiseVar) *
                           pow(i / 255.0f, powD - 1.0f)) /
                          minWeight;
-  }
-}
-
-void RLDeblurrerBilateralLaplReg::SetBilateralTable() {
-  int i = 0;
-  // Parameters are set according to Levin et al Siggraph'07
-  // Better result can be obtained by using smaller noiseVar, but for
-  // fairness, we use the same setting.
-  float noiseVar = 0.005f;
-
-  // Standard Bilateral Weight
-  for (i = 0; i < 256; i++) {
-    mBilateralTable[i] = exp(-i * i / (noiseVar * 65025.0f));
   }
 }
