@@ -3,9 +3,6 @@
 #include <cmath>
 #include <cstring>
 
-#include "BicubicInterpolation.h"
-#include "ImResize.h"
-#include "bitmap.h"
 #include "warping.h"
 
 MotionBlurImageGenerator::MotionBlurImageGenerator() {

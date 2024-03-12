@@ -1,7 +1,5 @@
 #include "Homography.hpp"
 
-#include <cmath>
-
 #include "svdcmp.h"
 
 void Homography::ComputeHomography(const double (&correspondants)[4][4]) {
