@@ -39,8 +39,8 @@ add_executable(
     src/LaplacianRegularizer.cpp
     include/BilateralRegularizer.hpp
     src/BilateralRegularizer.cpp
-    include/RLDeblurrerBilateralLaplReg.hpp
-    src/RLDeblurrerBilateralLaplReg.cpp
+    include/BilateralLaplacianRegularizer.hpp
+    src/BilateralLaplacianRegularizer.cpp
     include/ProjectiveMotionRLMultiScaleGray.hpp
     src/ProjectiveMotionRLMultiScaleGray.cpp
     ProjectiveMotionRL_main.cpp

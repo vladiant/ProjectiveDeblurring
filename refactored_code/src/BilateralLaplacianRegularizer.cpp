@@ -1,4 +1,4 @@
-#include "RLDeblurrerBilateralLaplReg.hpp"
+#include "BilateralLaplacianRegularizer.hpp"
 
 #include <cmath>
 #include <cstring>
