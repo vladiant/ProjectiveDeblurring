@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(ProjectiveDeblur)
 
-add_executable(
+add_library(
     ${PROJECT_NAME}
     include/BicubicInterpolation.h
     src/BicubicInterpolation.cpp
@@ -43,7 +43,6 @@ add_executable(
     src/BilateralLaplacianRegularizer.cpp
     include/ProjectiveMotionRLMultiScaleGray.hpp
     src/ProjectiveMotionRLMultiScaleGray.cpp
-    ProjectiveMotionRL_main.cpp
 )
 
 set_target_properties(
@@ -72,4 +71,23 @@ target_link_libraries(
    ${PROJECT_NAME}
    PRIVATE
       $<$<CXX_COMPILER_ID:Clang>:-fsanitize=address>
+)
+
+add_executable(
+    Example
+    ProjectiveMotionRL_main.cpp
+)
+
+set_target_properties(
+    Example
+    PROPERTIES
+        CXX_STANDARD 20
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+)
+
+target_link_libraries(
+   Example
+   PRIVATE
+      ${PROJECT_NAME}
 )
