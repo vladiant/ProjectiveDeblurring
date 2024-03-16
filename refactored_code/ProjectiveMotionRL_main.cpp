@@ -52,12 +52,23 @@ int main(int /*argc*/, char* /*argv*/[]) {
   RMSErrorCalculator errorCalculator;
   EmptyErrorCalculator emptyErrorCalculator;
 
-  blurGenerator.SetGlobalParameters(
-      10, 1.2f, 0.0003f, 0.0006f, 10,
-      20);  // This is parameter setting for doll example
+  blurGenerator.SetGlobalParameters(  //
+      10,                             // rotation degree
+      1.2f,                           // scale factor
+      0.0003f,                        // perspective step x
+      0.0006f,                        // perspective step y
+      10,                             // translation step x
+      20                              // translation step y
+  );  // This is parameter setting for doll example
 
-  // blurGenerator.SetGlobalParameters(-10, 1.1f, 0.0004f,0.0002f, 20,
-  // -15); //This is parameter setting for Cameraman convergence example
+  //   blurGenerator.SetGlobalParameters(  //
+  //       -10,                            // rotation degree
+  //       1.1f,                           // scale factor
+  //       0.0004f,                        //
+  //       0.0002f,                        //
+  //       20,                             //
+  //       -15                             //
+  //   );  // This is parameter setting for Cameraman convergence example
 
   // Testing case for rotational motion
   // blurGenerator.SetGlobalRotation(10);
