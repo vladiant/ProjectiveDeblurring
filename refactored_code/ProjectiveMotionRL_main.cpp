@@ -19,16 +19,32 @@
 #include "TVRegularizer.hpp"
 #include "bitmap.h"
 
-int main(int /*argc*/, char* /*argv*/[]) {
+int main(int argc, char* argv[]) {
+  if (argc < 2) {
+    printf("Usage: %s image_filename\n", argv[0]);
+    return EXIT_SUCCESS;
+  }
+
+  std::string fname{argv[1]};
+  constexpr auto fileExtension = ".bmp";
+  const auto pos = fname.find(fileExtension);
+  if (pos == std::string::npos) {
+    printf("Expected %s to end with %s\n", fname.c_str(), fileExtension);
+    return EXIT_SUCCESS;
+  }
+  std::string prefix = fname.substr(0, pos);
+
   int width = 0, height = 0;
   std::vector<float> fImg[3];
-  std::string prefix = "doll";
   // memcpy(prefix, argv[1], strlen(argv[1])+1);
-  std::string fname;
-  fname = prefix + ".bmp";
   printf("Load Image: %s\n", fname.c_str());
   readBMPchannels(fname, fImg[0], fImg[1], fImg[2], width, height);
   int blurwidth = width, blurheight = height;
+
+  if (fImg[0].empty()) {
+    printf("Error reading %s\n", fname.c_str());
+    return EXIT_SUCCESS;
+  }
 
   std::vector<float> bImg[3];
   std::vector<float> deblurImg[3];
@@ -146,7 +162,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
   RMSError = errorCalculator.calculateErrorRgb(bImg[0].data(), bImg[1].data(),
                                                bImg[2].data(), width, height);
   //   sprintf(fname, "%s_blur_%.6f.bmp", prefix, RMSError * 255.0f);
-  fname = prefix + "_blur_" + std::to_string(RMSError * 255.0f) + ".bmp";
+  fname = prefix + "_blur_" + std::to_string(RMSError * 255.0f) + fileExtension;
   printf("Save Blurred Image to: %s\n", fname.c_str());
   writeBMPchannels(fname, blurwidth, blurheight, bImg[0], bImg[1], bImg[2]);
 
@@ -161,7 +177,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
   //   sprintf(fname, "%s_blur_noise_sigma%.2f_%.6f.bmp", prefix, sigma,
   //   RMSError * 255.0f);
   fname = prefix + "_blur_noise_sigma" + std::to_string(sigma) + "_" +
-          std::to_string(RMSError * 255.0f) + ".bmp";
+          std::to_string(RMSError * 255.0f) + fileExtension;
   printf("Save Blurred Image to: %s\n", fname.c_str());
   writeBMPchannels(fname, blurwidth, blurheight, bImg[0], bImg[1], bImg[2]);
 
@@ -213,8 +229,8 @@ int main(int /*argc*/, char* /*argv*/[]) {
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
         height);
     //   sprintf(fname, "%s_deblurBasic_%f.bmp", prefix, RMSError * 255.0f);
-    fname =
-        prefix + "_deblurBasic_" + std::to_string(RMSError * 255.0f) + ".bmp";
+    fname = prefix + "_deblurBasic_" + std::to_string(RMSError * 255.0f) +
+            fileExtension;
     printf("Done, RMS Error: %f\n", RMSError * 255.0f);
     writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
                      deblurImg[2]);
@@ -267,8 +283,8 @@ int main(int /*argc*/, char* /*argv*/[]) {
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
         height);
     //   sprintf(fname, "%s_deblurTVReg_%f.bmp", prefix, RMSError * 255.0f);
-    fname =
-        prefix + "_deblurTVReg_" + std::to_string(RMSError * 255.0f) + ".bmp";
+    fname = prefix + "_deblurTVReg_" + std::to_string(RMSError * 255.0f) +
+            fileExtension;
     printf("Done, RMS Error: %f\n", RMSError * 255.0f);
     writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
                      deblurImg[2]);
@@ -318,8 +334,8 @@ int main(int /*argc*/, char* /*argv*/[]) {
         deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
         height);
     //   sprintf(fname, "%s_deblurSpsReg_%f.bmp", prefix, RMSError * 255.0f);
-    fname =
-        prefix + "_deblurSpsReg_" + std::to_string(RMSError * 255.0f) + ".bmp";
+    fname = prefix + "_deblurSpsReg_" + std::to_string(RMSError * 255.0f) +
+            fileExtension;
     printf("Done, RMS Error: %f\n", RMSError * 255.0f);
     writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
                      deblurImg[2]);
@@ -371,7 +387,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     //   sprintf(fname, "%s_deblurBilateralReg_%f.bmp", prefix, RMSError *
     //   255.0f);
     fname = prefix + "_deblurBilateralReg_" +
-            std::to_string(RMSError * 255.0f) + ".bmp";
+            std::to_string(RMSError * 255.0f) + fileExtension;
     printf("Done, RMS Error: %f\n", RMSError * 255.0f);
     writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
                      deblurImg[2]);
@@ -428,7 +444,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     //   sprintf(fname, "%s_deblurBilateralLapReg_%f.bmp", prefix, RMSError *
     //   255.0f);
     fname = prefix + "_deblurBilateralLapReg_" +
-            std::to_string(RMSError * 255.0f) + ".bmp";
+            std::to_string(RMSError * 255.0f) + fileExtension;
     printf("Done, RMS Error: %f\n", RMSError * 255.0f);
     writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
                      deblurImg[2]);
@@ -458,7 +474,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
         height, 100, 5, true);
 
     fname = prefix + "_deblurMultiscale_" + std::to_string(RMSError * 255.0f) +
-            ".bmp";
+            fileExtension;
     printf("Done, RMS Error: %f\n", RMSError * 255.0f);
     writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[0],
                      deblurImg[0]);
@@ -492,7 +508,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
           //   sprintf(fname.c_str(), "%s_deblurBasic_pitr%d_%f.bmp", prefix,
           //   iteration, RMSError * 255.0f);
           fname = prefix + "_deblurBasic_pitr" + std::to_string(iteration) +
-                  "_" + std::to_string(RMSError * 255.0f) + ".bmp";
+                  "_" + std::to_string(RMSError * 255.0f) + fileExtension;
           writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
                            deblurImg[2]);
         }
@@ -523,7 +539,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
           //   sprintf(fname, "%s_deblurBasic_gitr%d_%f.bmp", prefix, iteration,
           //   RMSError * 255.0f);
           fname = prefix + "_deblurBasic_gitr" + std::to_string(iteration) +
-                  "_" + std::to_string(RMSError * 255.0f) + ".bmp";
+                  "_" + std::to_string(RMSError * 255.0f) + fileExtension;
           writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
                            deblurImg[2]);
         }
