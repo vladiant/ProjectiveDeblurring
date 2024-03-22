@@ -21,6 +21,35 @@
 #include "TVRegularizer.hpp"
 #include "bitmap.h"
 
+constexpr auto fileExtension = ".bmp";
+
+void generateMotionBlurredImage(std::vector<float> (&fImg)[3],
+                                std::vector<float>& aInputWeight,
+                                std::vector<float>& aOutputWeight, int aWidth,
+                                int aHeight, int blurwidth, int blurheight,
+                                const std::string& aPrefix,
+                                IBlurImageGenerator& blurGenerator,
+                                IErrorCalculator& errorCalculator,
+                                std::vector<float> (&bImg)[3]) {
+  printf("Generate Motion Blurred Image\n");
+  blurGenerator.blurGray(fImg[0].data(), aInputWeight.data(), aWidth, aHeight,
+                         bImg[0].data(), aOutputWeight.data(), blurwidth,
+                         blurheight, true);
+  blurGenerator.blurGray(fImg[1].data(), aInputWeight.data(), aWidth, aHeight,
+                         bImg[1].data(), aOutputWeight.data(), blurwidth,
+                         blurheight, true);
+  blurGenerator.blurGray(fImg[2].data(), aInputWeight.data(), aWidth, aHeight,
+                         bImg[2].data(), aOutputWeight.data(), blurwidth,
+                         blurheight, true);
+
+  const float RMSError = errorCalculator.calculateErrorRgb(
+      bImg[0].data(), bImg[1].data(), bImg[2].data(), aWidth, aHeight);
+  const std::string fname =
+      aPrefix + "_blur_" + std::to_string(RMSError * 255.0f) + fileExtension;
+  printf("Save Blurred Image to: %s\n", fname.c_str());
+  writeBMPchannels(fname, blurwidth, blurheight, bImg[0], bImg[1], bImg[2]);
+}
+
 int main(int argc, char* argv[]) {
   if (argc < 2) {
     printf("Usage: %s image_filename [blur_type]\n", argv[0]);
@@ -28,7 +57,6 @@ int main(int argc, char* argv[]) {
   }
 
   std::string fname{argv[1]};
-  constexpr auto fileExtension = ".bmp";
   const auto pos = fname.find(fileExtension);
   if (pos == std::string::npos) {
     printf("Expected %s to end with %s\n", fname.c_str(), fileExtension);
@@ -91,23 +119,9 @@ int main(int argc, char* argv[]) {
       height);  // This is for error computation
 
   ///////////////////////////////////
-  printf("Generate Motion Blurred Image\n");
-  blurGenerator.blurGray(fImg[0].data(), inputWeight.data(), width, height,
-                         bImg[0].data(), outputWeight.data(), blurwidth,
-                         blurheight, true);
-  blurGenerator.blurGray(fImg[1].data(), inputWeight.data(), width, height,
-                         bImg[1].data(), outputWeight.data(), blurwidth,
-                         blurheight, true);
-  blurGenerator.blurGray(fImg[2].data(), inputWeight.data(), width, height,
-                         bImg[2].data(), outputWeight.data(), blurwidth,
-                         blurheight, true);
-
-  RMSError = errorCalculator.calculateErrorRgb(bImg[0].data(), bImg[1].data(),
-                                               bImg[2].data(), width, height);
-  //   sprintf(fname, "%s_blur_%.6f.bmp", prefix, RMSError * 255.0f);
-  fname = prefix + "_blur_" + std::to_string(RMSError * 255.0f) + fileExtension;
-  printf("Save Blurred Image to: %s\n", fname.c_str());
-  writeBMPchannels(fname, blurwidth, blurheight, bImg[0], bImg[1], bImg[2]);
+  generateMotionBlurredImage(fImg, inputWeight, outputWeight, width, height,
+                             blurwidth, blurheight, prefix, blurGenerator,
+                             errorCalculator, bImg);
 
   // Add noise
   const float sigma = 2.0f;
