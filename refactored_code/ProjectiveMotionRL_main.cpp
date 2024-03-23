@@ -23,31 +23,35 @@
 
 constexpr auto fileExtension = ".bmp";
 
-void generateMotionBlurredImage(std::vector<float> (&fImg)[3],
+void generateMotionBlurredImage(std::vector<float> (&aInitialImage)[3],
                                 std::vector<float>& aInputWeight,
                                 std::vector<float>& aOutputWeight, int aWidth,
-                                int aHeight, int blurwidth, int blurheight,
+                                int aHeight, int aBlurWidth, int aBlurHeight,
                                 const std::string& aPrefix,
-                                IBlurImageGenerator& blurGenerator,
-                                IErrorCalculator& errorCalculator,
-                                std::vector<float> (&bImg)[3]) {
+                                IBlurImageGenerator& aBlurGenerator,
+                                IErrorCalculator& aErrorCalculator,
+                                std::vector<float> (&aBlurredImage)[3]) {
   printf("Generate Motion Blurred Image\n");
-  blurGenerator.blurGray(fImg[0].data(), aInputWeight.data(), aWidth, aHeight,
-                         bImg[0].data(), aOutputWeight.data(), blurwidth,
-                         blurheight, true);
-  blurGenerator.blurGray(fImg[1].data(), aInputWeight.data(), aWidth, aHeight,
-                         bImg[1].data(), aOutputWeight.data(), blurwidth,
-                         blurheight, true);
-  blurGenerator.blurGray(fImg[2].data(), aInputWeight.data(), aWidth, aHeight,
-                         bImg[2].data(), aOutputWeight.data(), blurwidth,
-                         blurheight, true);
+  aBlurGenerator.blurGray(aInitialImage[0].data(), aInputWeight.data(), aWidth,
+                          aHeight, aBlurredImage[0].data(),
+                          aOutputWeight.data(), aBlurWidth, aBlurHeight, true);
+  aBlurGenerator.blurGray(aInitialImage[1].data(), aInputWeight.data(), aWidth,
+                          aHeight, aBlurredImage[1].data(),
+                          aOutputWeight.data(), aBlurWidth, aBlurHeight, true);
+  aBlurGenerator.blurGray(aInitialImage[2].data(), aInputWeight.data(), aWidth,
+                          aHeight, aBlurredImage[2].data(),
+                          aOutputWeight.data(), aBlurWidth, aBlurHeight, true);
 
-  const float RMSError = errorCalculator.calculateErrorRgb(
-      bImg[0].data(), bImg[1].data(), bImg[2].data(), aWidth, aHeight);
-  const std::string fname =
-      aPrefix + "_blur_" + std::to_string(RMSError * 255.0f) + fileExtension;
-  printf("Save Blurred Image to: %s\n", fname.c_str());
-  writeBMPchannels(fname, blurwidth, blurheight, bImg[0], bImg[1], bImg[2]);
+  if (!aPrefix.empty()) {
+    const float RMSError = aErrorCalculator.calculateErrorRgb(
+        aBlurredImage[0].data(), aBlurredImage[1].data(),
+        aBlurredImage[2].data(), aWidth, aHeight);
+    const std::string fname =
+        aPrefix + "_blur_" + std::to_string(RMSError * 255.0f) + fileExtension;
+    printf("Save Blurred Image to: %s\n", fname.c_str());
+    writeBMPchannels(fname, aBlurWidth, aBlurHeight, aBlurredImage[0],
+                     aBlurredImage[1], aBlurredImage[2]);
+  }
 }
 
 int main(int argc, char* argv[]) {
@@ -125,6 +129,8 @@ int main(int argc, char* argv[]) {
 
   // Add noise
   const float sigma = 2.0f;
+  const std::string noisePrefix =
+      "_blur_noise_sigma" + std::to_string(sigma) + "_";
   GaussianNoiseGenerator noiseGenerator(sigma);
   noiseGenerator.addNoiseGray(bImg[0].data(), width, height, bImg[0].data());
   noiseGenerator.addNoiseGray(bImg[1].data(), width, height, bImg[1].data());
@@ -133,8 +139,8 @@ int main(int argc, char* argv[]) {
                                                bImg[2].data(), width, height);
   //   sprintf(fname, "%s_blur_noise_sigma%.2f_%.6f.bmp", prefix, sigma,
   //   RMSError * 255.0f);
-  fname = prefix + "_blur_noise_sigma" + std::to_string(sigma) + "_" +
-          std::to_string(RMSError * 255.0f) + fileExtension;
+  fname =
+      prefix + noisePrefix + std::to_string(RMSError * 255.0f) + fileExtension;
   printf("Save Blurred Image to: %s\n", fname.c_str());
   writeBMPchannels(fname, blurwidth, blurheight, bImg[0], bImg[1], bImg[2]);
 
