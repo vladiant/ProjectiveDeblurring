@@ -56,7 +56,6 @@ void generateMotionBlurredImage(std::vector<float> (&aInitialImage)[3],
 
 void addNoiseToImage(std::vector<float> (&bImg)[3], int width, int height,
                      int blurWidth, int blurHeight, const std::string& prefix,
-                     const std::string& noisePrefix,
                      INoiseGenerator& noiseGenerator,
                      IErrorCalculator& errorCalculator) {
   noiseGenerator.addNoiseGray(bImg[0].data(), width, height, bImg[0].data());
@@ -67,7 +66,7 @@ void addNoiseToImage(std::vector<float> (&bImg)[3], int width, int height,
   //   sprintf(fname, "%s_blur_noise_sigma%.2f_%.6f.bmp", prefix, sigma,
   //   RMSError * 255.0f);
   const std::string fname =
-      prefix + noisePrefix + std::to_string(RMSError * 255.0f) + fileExtension;
+      prefix + std::to_string(RMSError * 255.0f) + fileExtension;
   printf("Save Blurred Image to: %s\n", fname.c_str());
   writeBMPchannels(fname, blurWidth, blurHeight, bImg[0], bImg[1], bImg[2]);
 }
@@ -148,10 +147,10 @@ int main(int argc, char* argv[]) {
   // Add noise
   const float sigma = 2.0f;
   const std::string noisePrefix =
-      "_blur_noise_sigma" + std::to_string(sigma) + "_";
+      prefix + "_blur_noise_sigma" + std::to_string(sigma) + "_";
   GaussianNoiseGenerator noiseGenerator(sigma);
-  addNoiseToImage(bImg, width, height, blurwidth, blurheight, prefix,
-                  noisePrefix, noiseGenerator, errorCalculator);
+  addNoiseToImage(bImg, width, height, blurwidth, blurheight, noisePrefix,
+                  noiseGenerator, errorCalculator);
 
   ///////////////////////////////////
   // Main Deblurring algorithm
