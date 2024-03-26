@@ -61,14 +61,15 @@ void addNoiseToImage(std::vector<float> (&bImg)[3], int width, int height,
   noiseGenerator.addNoiseGray(bImg[0].data(), width, height, bImg[0].data());
   noiseGenerator.addNoiseGray(bImg[1].data(), width, height, bImg[1].data());
   noiseGenerator.addNoiseGray(bImg[2].data(), width, height, bImg[2].data());
-  const float RMSError = errorCalculator.calculateErrorRgb(
-      bImg[0].data(), bImg[1].data(), bImg[2].data(), width, height);
-  //   sprintf(fname, "%s_blur_noise_sigma%.2f_%.6f.bmp", prefix, sigma,
-  //   RMSError * 255.0f);
-  const std::string fname =
-      prefix + std::to_string(RMSError * 255.0f) + fileExtension;
-  printf("Save Blurred Image to: %s\n", fname.c_str());
-  writeBMPchannels(fname, blurWidth, blurHeight, bImg[0], bImg[1], bImg[2]);
+
+  if (!prefix.empty()) {
+    const float RMSError = errorCalculator.calculateErrorRgb(
+        bImg[0].data(), bImg[1].data(), bImg[2].data(), width, height);
+    const std::string fname =
+        prefix + std::to_string(RMSError * 255.0f) + fileExtension;
+    printf("Save Blurred Image to: %s\n", fname.c_str());
+    writeBMPchannels(fname, blurWidth, blurHeight, bImg[0], bImg[1], bImg[2]);
+  }
 }
 
 int main(int argc, char* argv[]) {
