@@ -29,6 +29,8 @@ add_library(
     src/MotionBlurImageGenerator.cpp
     include/MotionBlurMaker.hpp
     src/MotionBlurMaker.cpp
+    include/BlurUtils.hpp
+    src/BlurUtils.cpp
     include/DeblurParameters.hpp
     include/RLDeblurrer.hpp
     src/RLDeblurrer.cpp

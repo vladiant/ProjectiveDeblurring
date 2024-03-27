@@ -7,6 +7,7 @@
 
 #include "BilateralLaplacianRegularizer.hpp"
 #include "BilateralRegularizer.hpp"
+#include "BlurUtils.hpp"
 #include "DeblurParameters.hpp"
 #include "EmptyErrorCalculator.hpp"
 #include "EmptyRegularizer.hpp"
