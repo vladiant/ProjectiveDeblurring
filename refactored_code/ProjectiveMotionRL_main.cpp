@@ -24,55 +24,6 @@
 
 constexpr auto fileExtension = ".bmp";
 
-void generateMotionBlurredImage(std::vector<float> (&aInitialImage)[3],
-                                std::vector<float>& aInputWeight,
-                                std::vector<float>& aOutputWeight, int aWidth,
-                                int aHeight, int aBlurWidth, int aBlurHeight,
-                                const std::string& aPrefix,
-                                IBlurImageGenerator& aBlurGenerator,
-                                IErrorCalculator& aErrorCalculator,
-                                std::vector<float> (&aBlurredImage)[3]) {
-  printf("Generate Motion Blurred Image\n");
-  aBlurGenerator.blurGray(aInitialImage[0].data(), aInputWeight.data(), aWidth,
-                          aHeight, aBlurredImage[0].data(),
-                          aOutputWeight.data(), aBlurWidth, aBlurHeight, true);
-  aBlurGenerator.blurGray(aInitialImage[1].data(), aInputWeight.data(), aWidth,
-                          aHeight, aBlurredImage[1].data(),
-                          aOutputWeight.data(), aBlurWidth, aBlurHeight, true);
-  aBlurGenerator.blurGray(aInitialImage[2].data(), aInputWeight.data(), aWidth,
-                          aHeight, aBlurredImage[2].data(),
-                          aOutputWeight.data(), aBlurWidth, aBlurHeight, true);
-
-  if (!aPrefix.empty()) {
-    const float RMSError = aErrorCalculator.calculateErrorRgb(
-        aBlurredImage[0].data(), aBlurredImage[1].data(),
-        aBlurredImage[2].data(), aWidth, aHeight);
-    const std::string fname =
-        aPrefix + "_blur_" + std::to_string(RMSError * 255.0f) + fileExtension;
-    printf("Save Blurred Image to: %s\n", fname.c_str());
-    writeBMPchannels(fname, aBlurWidth, aBlurHeight, aBlurredImage[0],
-                     aBlurredImage[1], aBlurredImage[2]);
-  }
-}
-
-void addNoiseToImage(std::vector<float> (&bImg)[3], int width, int height,
-                     int blurWidth, int blurHeight, const std::string& prefix,
-                     INoiseGenerator& noiseGenerator,
-                     IErrorCalculator& errorCalculator) {
-  noiseGenerator.addNoiseGray(bImg[0].data(), width, height, bImg[0].data());
-  noiseGenerator.addNoiseGray(bImg[1].data(), width, height, bImg[1].data());
-  noiseGenerator.addNoiseGray(bImg[2].data(), width, height, bImg[2].data());
-
-  if (!prefix.empty()) {
-    const float RMSError = errorCalculator.calculateErrorRgb(
-        bImg[0].data(), bImg[1].data(), bImg[2].data(), width, height);
-    const std::string fname =
-        prefix + std::to_string(RMSError * 255.0f) + fileExtension;
-    printf("Save Blurred Image to: %s\n", fname.c_str());
-    writeBMPchannels(fname, blurWidth, blurHeight, bImg[0], bImg[1], bImg[2]);
-  }
-}
-
 int main(int argc, char* argv[]) {
   if (argc < 2) {
     printf("Usage: %s image_filename [blur_type]\n", argv[0]);
@@ -155,59 +106,8 @@ int main(int argc, char* argv[]) {
                   noiseGenerator, errorCalculator);
 
   ///////////////////////////////////
-  // Main Deblurring algorithm
   EmptyRegularizer emptyRegularizer;
   RLDeblurrer rLDeblurrer{blurGenerator, emptyErrorCalculator};
-
-  {
-    printf("Initial Estimation is the blur image\n");
-    ImChoppingGray(bImg[0].data(), blurwidth, blurheight, deblurImg[0].data(),
-                   width, height);
-    ImChoppingGray(bImg[1].data(), blurwidth, blurheight, deblurImg[1].data(),
-                   width, height);
-    ImChoppingGray(bImg[2].data(), blurwidth, blurheight, deblurImg[2].data(),
-                   width, height);
-    //	memset(deblurImg[0].data(), 0, width*height*sizeof(float));
-    //	memset(deblurImg[1].data(), 0, width*height*sizeof(float));
-    //	memset(deblurImg[2].data(), 0, width*height*sizeof(float));
-
-    // Levin et. al. Siggraph07's matlab implementation also take around 400
-    // iterations Sadly, the algorithm needs such a lot of iterations to produce
-    // good results Most running time were spent on bicubic interpolation, it
-    // would be much faster if this step was implemented in GPU...
-
-    // Load Initial Guess, if you have...
-    //   readBMP("", deblurImg[0], deblurImg[1], deblurImg[2], width, height);
-    memcpy(intermediatedeblurImg[0].data(), deblurImg[0].data(),
-           width * height * sizeof(float));
-    memcpy(intermediatedeblurImg[1].data(), deblurImg[1].data(),
-           width * height * sizeof(float));
-    memcpy(intermediatedeblurImg[2].data(), deblurImg[2].data(),
-           width * height * sizeof(float));
-
-    printf("Basic Algorithm:\n");
-    memcpy(deblurImg[0].data(), intermediatedeblurImg[0].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[1].data(), intermediatedeblurImg[1].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
-           width * height * sizeof(float));
-
-    DeblurParameters rLParams{.Niter = 500, .bPoisson = true};
-    rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
-                          blurwidth, blurheight, deblurImg[0].data(),
-                          deblurImg[1].data(), deblurImg[2].data(), width,
-                          height, rLParams, emptyRegularizer, 0.0);
-    RMSError = errorCalculator.calculateErrorRgb(
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height);
-    //   sprintf(fname, "%s_deblurBasic_%f.bmp", prefix, RMSError * 255.0f);
-    fname = prefix + "_deblurBasic_" + std::to_string(RMSError * 255.0f) +
-            fileExtension;
-    printf("Done, RMS Error: %f\n", RMSError * 255.0f);
-    writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
-                     deblurImg[2]);
-  }
 
   {
     printf("TV Regularization Algorithm:\n");
