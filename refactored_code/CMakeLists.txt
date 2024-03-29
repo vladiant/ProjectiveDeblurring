@@ -112,6 +112,26 @@ set_target_properties(
 
 target_link_libraries(
     BasicDeblur
-   PRIVATE
+    PRIVATE
+      ${PROJECT_NAME}
+)
+
+
+add_executable(
+    TVRegDeblur
+    TVRegDeblur.cpp
+)
+
+set_target_properties(
+    TVRegDeblur
+    PROPERTIES
+        CXX_STANDARD 20
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+)
+
+target_link_libraries(
+    TVRegDeblur
+    PRIVATE
       ${PROJECT_NAME}
 )

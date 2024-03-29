@@ -19,7 +19,6 @@
 #include "ProjectiveMotionRLMultiScaleGray.hpp"
 #include "RLDeblurrer.hpp"
 #include "RMSErrorCalculator.hpp"
-#include "TVRegularizer.hpp"
 #include "bitmap.h"
 
 constexpr auto fileExtension = ".bmp";
@@ -108,60 +107,6 @@ int main(int argc, char* argv[]) {
   ///////////////////////////////////
   EmptyRegularizer emptyRegularizer;
   RLDeblurrer rLDeblurrer{blurGenerator, emptyErrorCalculator};
-
-  {
-    printf("TV Regularization Algorithm:\n");
-    memcpy(deblurImg[0].data(), intermediatedeblurImg[0].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[1].data(), intermediatedeblurImg[1].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
-           width * height * sizeof(float));
-
-    TVRegularizer tvRegularizer;
-    DeblurParameters tvRLParams{.Niter = 100, .bPoisson = true};
-    RLDeblurrer rLDeblurrerTVReg{blurGenerator, emptyErrorCalculator};
-
-    // Gradually decrease the regularization weight, otherwise, the result will
-    // be over smooth. Actually, the following regularization produce similar
-    // results....
-    // rLDeblurrerTVReg.deblurRgb(
-    //     bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
-    //     blurheight, deblurImg[0].data(), deblurImg[1].data(),
-    //     deblurImg[2].data(), width, height, DeblurParameters{.Niter = 100,
-    //     .bPoisson = true}, tvRegularizer, 0.5f);
-    rLDeblurrerTVReg.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
-                               blurwidth, blurheight, deblurImg[0].data(),
-                               deblurImg[1].data(), deblurImg[2].data(), width,
-                               height, tvRLParams, tvRegularizer, 1.0f);
-    rLDeblurrerTVReg.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
-                               blurwidth, blurheight, deblurImg[0].data(),
-                               deblurImg[1].data(), deblurImg[2].data(), width,
-                               height, tvRLParams, tvRegularizer, 0.5f);
-    rLDeblurrerTVReg.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
-                               blurwidth, blurheight, deblurImg[0].data(),
-                               deblurImg[1].data(), deblurImg[2].data(), width,
-                               height, tvRLParams, tvRegularizer, 0.25f);
-    rLDeblurrerTVReg.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
-                               blurwidth, blurheight, deblurImg[0].data(),
-                               deblurImg[1].data(), deblurImg[2].data(), width,
-                               height, tvRLParams, tvRegularizer, 0.125f);
-
-    DeblurParameters rLParams{.Niter = 100, .bPoisson = true};
-    rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
-                          blurwidth, blurheight, deblurImg[0].data(),
-                          deblurImg[1].data(), deblurImg[2].data(), width,
-                          height, rLParams, emptyRegularizer, 0.0);
-    RMSError = errorCalculator.calculateErrorRgb(
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height);
-    //   sprintf(fname, "%s_deblurTVReg_%f.bmp", prefix, RMSError * 255.0f);
-    fname = prefix + "_deblurTVReg_" + std::to_string(RMSError * 255.0f) +
-            fileExtension;
-    printf("Done, RMS Error: %f\n", RMSError * 255.0f);
-    writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
-                     deblurImg[2]);
-  }
 
   {
     printf("Laplacian Regularization Algorithm:\n");
