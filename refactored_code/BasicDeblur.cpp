@@ -47,7 +47,6 @@ int main(int argc, char* argv[]) {
 
   std::vector<float> bImg[3];
   std::vector<float> deblurImg[3];
-  std::vector<float> intermediatedeblurImg[3];
   std::vector<float> inputWeight;
   std::vector<float> outputWeight(width * height);
   float RMSError = NAN;
@@ -57,9 +56,6 @@ int main(int argc, char* argv[]) {
   deblurImg[0].resize(width * height);
   deblurImg[1].resize(width * height);
   deblurImg[2].resize(width * height);
-  intermediatedeblurImg[0].resize(width * height);
-  intermediatedeblurImg[1].resize(width * height);
-  intermediatedeblurImg[2].resize(width * height);
 
   ///////////////////////////////////
   printf("Set Projective Model Parameter\n");
@@ -124,20 +120,8 @@ int main(int argc, char* argv[]) {
 
     // Load Initial Guess, if you have...
     //   readBMP("", deblurImg[0], deblurImg[1], deblurImg[2], width, height);
-    memcpy(intermediatedeblurImg[0].data(), deblurImg[0].data(),
-           width * height * sizeof(float));
-    memcpy(intermediatedeblurImg[1].data(), deblurImg[1].data(),
-           width * height * sizeof(float));
-    memcpy(intermediatedeblurImg[2].data(), deblurImg[2].data(),
-           width * height * sizeof(float));
 
     printf("Basic Algorithm:\n");
-    memcpy(deblurImg[0].data(), intermediatedeblurImg[0].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[1].data(), intermediatedeblurImg[1].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
-           width * height * sizeof(float));
 
     DeblurParameters rLParams{.Niter = 500, .bPoisson = true};
     rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
