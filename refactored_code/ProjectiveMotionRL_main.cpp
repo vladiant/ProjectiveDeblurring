@@ -299,12 +299,6 @@ int main(int argc, char* argv[]) {
       }
     }
 
-    memcpy(deblurImg[0].data(), intermediatedeblurImg[0].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[1].data(), intermediatedeblurImg[1].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
-           width * height * sizeof(float));
     //   sprintf(fname, "ConvergenceGaussian%s.txt", prefix);
     fname = "ConvergenceGaussian" + prefix + ".txt";
     {
