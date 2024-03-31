@@ -51,7 +51,6 @@ int main(int argc, char* argv[]) {
 
   std::vector<float> bImg[3];
   std::vector<float> deblurImg[3];
-  std::vector<float> intermediatedeblurImg[3];
   std::vector<float> inputWeight;
   std::vector<float> outputWeight(width * height);
   float RMSError = NAN;
@@ -61,9 +60,6 @@ int main(int argc, char* argv[]) {
   deblurImg[0].resize(width * height);
   deblurImg[1].resize(width * height);
   deblurImg[2].resize(width * height);
-  intermediatedeblurImg[0].resize(width * height);
-  intermediatedeblurImg[1].resize(width * height);
-  intermediatedeblurImg[2].resize(width * height);
 
   ///////////////////////////////////
   printf("Set Projective Model Parameter\n");
@@ -110,12 +106,6 @@ int main(int argc, char* argv[]) {
 
   {
     printf("Laplacian Regularization Algorithm:\n");
-    memcpy(deblurImg[0].data(), intermediatedeblurImg[0].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[1].data(), intermediatedeblurImg[1].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
-           width * height * sizeof(float));
 
     LaplacianRegularizer laplRegularizer;
     DeblurParameters laplRLParams{.Niter = 100, .bPoisson = true};
@@ -161,12 +151,6 @@ int main(int argc, char* argv[]) {
 
   {
     printf("Bilateral Regularization Algorithm:\n");
-    memcpy(deblurImg[0].data(), intermediatedeblurImg[0].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[1].data(), intermediatedeblurImg[1].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
-           width * height * sizeof(float));
 
     BilateralRegularizer bilateralRegularizer;
     DeblurParameters bilateralRLParams{.Niter = 100, .bPoisson = true};
@@ -213,12 +197,6 @@ int main(int argc, char* argv[]) {
 
   {
     printf("Bilateral Laplacian Regularization Algorithm:\n");
-    memcpy(deblurImg[0].data(), intermediatedeblurImg[0].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[1].data(), intermediatedeblurImg[1].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
-           width * height * sizeof(float));
 
     BilateralLaplacianRegularizer bilateralLaplacianRegularizer;
     DeblurParameters bilateralLaplacianRLParams{.Niter = 100, .bPoisson = true};
@@ -272,12 +250,6 @@ int main(int argc, char* argv[]) {
   // Projective Motion RL Multi Scale Gray
   {
     printf("Multiscale Algorithm:\n");
-    memcpy(deblurImg[0].data(), intermediatedeblurImg[0].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[1].data(), intermediatedeblurImg[1].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
-           width * height * sizeof(float));
 
     ProjectiveMotionRLMultiScaleGray rLDeblurrerMultiscale;
 
@@ -301,12 +273,6 @@ int main(int argc, char* argv[]) {
   ///////////////////////////////////
   if (false) {
     printf("Testing for Convergence\n");
-    memcpy(deblurImg[0].data(), intermediatedeblurImg[0].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[1].data(), intermediatedeblurImg[1].data(),
-           width * height * sizeof(float));
-    memcpy(deblurImg[2].data(), intermediatedeblurImg[2].data(),
-           width * height * sizeof(float));
 
     //   sprintf(fname, "ConvergencePoisson%s.txt", prefix);
     fname = "ConvergencePoisson" + prefix + ".txt";
