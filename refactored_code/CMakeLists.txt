@@ -135,3 +135,22 @@ target_link_libraries(
     PRIVATE
       ${PROJECT_NAME}
 )
+
+add_executable(
+    LaplRegDeblur
+    LaplRegDeblur.cpp
+)
+
+set_target_properties(
+    LaplRegDeblur
+    PROPERTIES
+        CXX_STANDARD 20
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+)
+
+target_link_libraries(
+    LaplRegDeblur
+    PRIVATE
+      ${PROJECT_NAME}
+)
