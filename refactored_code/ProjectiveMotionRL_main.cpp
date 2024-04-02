@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "BilateralLaplacianRegularizer.hpp"
-#include "BilateralRegularizer.hpp"
 #include "BlurUtils.hpp"
 #include "DeblurParameters.hpp"
 #include "EmptyErrorCalculator.hpp"
@@ -102,52 +101,6 @@ int main(int argc, char* argv[]) {
   ///////////////////////////////////
   EmptyRegularizer emptyRegularizer;
   RLDeblurrer rLDeblurrer{blurGenerator, emptyErrorCalculator};
-
-  {
-    printf("Bilateral Regularization Algorithm:\n");
-
-    BilateralRegularizer bilateralRegularizer;
-    DeblurParameters bilateralRLParams{.Niter = 100, .bPoisson = true};
-    RLDeblurrer rLDeblurrerBilateralReg{blurGenerator, emptyErrorCalculator};
-
-    // rLDeblurrerBilateralReg.deblurRgb(
-    //     bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
-    //     blurheight, deblurImg[0].data(), deblurImg[1].data(),
-    //     deblurImg[2].data(), width, height, DeblurParameters{.Niter = 100,
-    //     .bPoisson = true}, bilateralRegularizer, 0.5f);
-    rLDeblurrerBilateralReg.deblurRgb(
-        bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, bilateralRLParams, bilateralRegularizer, 1.0f);
-    rLDeblurrerBilateralReg.deblurRgb(
-        bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, bilateralRLParams, bilateralRegularizer, 0.5f);
-    rLDeblurrerBilateralReg.deblurRgb(
-        bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, bilateralRLParams, bilateralRegularizer, 0.25f);
-    rLDeblurrerBilateralReg.deblurRgb(
-        bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, bilateralRLParams, bilateralRegularizer, 0.125f);
-
-    DeblurParameters rLParams{.Niter = 100, .bPoisson = true};
-    rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
-                          blurwidth, blurheight, deblurImg[0].data(),
-                          deblurImg[1].data(), deblurImg[2].data(), width,
-                          height, rLParams, emptyRegularizer, 0.0);
-    RMSError = errorCalculator.calculateErrorRgb(
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height);
-    //   sprintf(fname, "%s_deblurBilateralReg_%f.bmp", prefix, RMSError *
-    //   255.0f);
-    fname = prefix + "_deblurBilateralReg_" +
-            std::to_string(RMSError * 255.0f) + fileExtension;
-    printf("Done, RMS Error: %f\n", RMSError * 255.0f);
-    writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
-                     deblurImg[2]);
-  }
 
   {
     printf("Bilateral Laplacian Regularization Algorithm:\n");
