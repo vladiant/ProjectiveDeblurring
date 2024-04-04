@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "BilateralLaplacianRegularizer.hpp"
 #include "BlurUtils.hpp"
 #include "DeblurParameters.hpp"
 #include "EmptyErrorCalculator.hpp"
@@ -101,81 +100,6 @@ int main(int argc, char* argv[]) {
   ///////////////////////////////////
   EmptyRegularizer emptyRegularizer;
   RLDeblurrer rLDeblurrer{blurGenerator, emptyErrorCalculator};
-
-  {
-    printf("Bilateral Laplacian Regularization Algorithm:\n");
-
-    BilateralLaplacianRegularizer bilateralLaplacianRegularizer;
-    DeblurParameters bilateralLaplacianRLParams{.Niter = 100, .bPoisson = true};
-    RLDeblurrer rLDeblurrerBilateralLaplReg{blurGenerator,
-                                            emptyErrorCalculator};
-
-    // rLDeblurrerBilateralLaplReg.deblurRgb(
-    //     bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth,
-    //     blurheight, deblurImg[0].data(), deblurImg[1].data(),
-    //     deblurImg[2].data(), width, height, DeblurParameters{.Niter = 500,
-    //     .bPoisson = true}, bilateralLaplacianRegularizer, 0.5f);
-    rLDeblurrerBilateralLaplReg.deblurRgb(
-        bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, bilateralLaplacianRLParams, bilateralLaplacianRegularizer,
-        1.0f);
-    rLDeblurrerBilateralLaplReg.deblurRgb(
-        bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, bilateralLaplacianRLParams, bilateralLaplacianRegularizer,
-        0.5f);
-    rLDeblurrerBilateralLaplReg.deblurRgb(
-        bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, bilateralLaplacianRLParams, bilateralLaplacianRegularizer,
-        0.25f);
-    rLDeblurrerBilateralLaplReg.deblurRgb(
-        bImg[0].data(), bImg[1].data(), bImg[2].data(), blurwidth, blurheight,
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height, bilateralLaplacianRLParams, bilateralLaplacianRegularizer,
-        0.125f);
-
-    DeblurParameters rLParams{.Niter = 100, .bPoisson = true};
-    rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
-                          blurwidth, blurheight, deblurImg[0].data(),
-                          deblurImg[1].data(), deblurImg[2].data(), width,
-                          height, rLParams, emptyRegularizer, 0.0);
-    RMSError = errorCalculator.calculateErrorRgb(
-        deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-        height);
-    //   sprintf(fname, "%s_deblurBilateralLapReg_%f.bmp", prefix, RMSError *
-    //   255.0f);
-    fname = prefix + "_deblurBilateralLapReg_" +
-            std::to_string(RMSError * 255.0f) + fileExtension;
-    printf("Done, RMS Error: %f\n", RMSError * 255.0f);
-    writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
-                     deblurImg[2]);
-  }
-
-  ///////////////////////////////////
-  // Projective Motion RL Multi Scale Gray
-  {
-    printf("Multiscale Algorithm:\n");
-
-    ProjectiveMotionRLMultiScaleGray rLDeblurrerMultiscale;
-
-    for (int i = 0; i < MotionBlurImageGenerator::NumSamples; i++) {
-      rLDeblurrerMultiscale.Hmatrix[i] = blurGenerator.Hmatrix[i];
-      Homography::MatrixInverse(rLDeblurrerMultiscale.Hmatrix[i].Hmatrix,
-                                rLDeblurrerMultiscale.IHmatrix[i].Hmatrix);
-    }
-
-    rLDeblurrerMultiscale.ProjectiveMotionRLDeblurMultiScaleGray(
-        bImg[0].data(), blurwidth, blurheight, deblurImg[0].data(), width,
-        height, 100, 5, true);
-
-    fname = prefix + "_deblurMultiscale_" + std::to_string(RMSError * 255.0f) +
-            fileExtension;
-    printf("Done, RMS Error: %f\n", RMSError * 255.0f);
-    writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[0],
-                     deblurImg[0]);
-  }
 
   ///////////////////////////////////
   if (false) {

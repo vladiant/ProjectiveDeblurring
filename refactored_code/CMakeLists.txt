@@ -173,3 +173,41 @@ target_link_libraries(
     PRIVATE
       ${PROJECT_NAME}
 )
+
+add_executable(
+    BilateralLaplRegDeblur
+    BilateralLaplRegDeblur.cpp
+)
+
+set_target_properties(
+    BilateralLaplRegDeblur
+    PROPERTIES
+        CXX_STANDARD 20
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+)
+
+target_link_libraries(
+    BilateralLaplRegDeblur
+    PRIVATE
+      ${PROJECT_NAME}
+)
+
+add_executable(
+    BasicMultiscaleDeblur
+    BasicMultiscaleDeblur.cpp
+)
+
+set_target_properties(
+    BasicMultiscaleDeblur
+    PROPERTIES
+        CXX_STANDARD 20
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+)
+
+target_link_libraries(
+    BasicMultiscaleDeblur
+    PRIVATE
+      ${PROJECT_NAME}
+)
