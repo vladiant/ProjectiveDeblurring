@@ -7,14 +7,11 @@
 
 #include "BlurUtils.hpp"
 #include "DeblurParameters.hpp"
-#include "EmptyErrorCalculator.hpp"
-#include "EmptyRegularizer.hpp"
 #include "GaussianNoiseGenerator.hpp"
 #include "ImResize.h"
 #include "MotionBlurImageGenerator.hpp"
 #include "MotionBlurMaker.hpp"
 #include "ProjectiveMotionRLMultiScaleGray.hpp"
-#include "RLDeblurrer.hpp"
 #include "RMSErrorCalculator.hpp"
 #include "bitmap.h"
 
@@ -50,7 +47,7 @@ int main(int argc, char* argv[]) {
   std::vector<float> deblurImg[3];
   std::vector<float> inputWeight;
   std::vector<float> outputWeight(width * height);
-  float RMSError = NAN;
+
   bImg[0].resize(width * height);
   bImg[1].resize(width * height);
   bImg[2].resize(width * height);
@@ -62,7 +59,6 @@ int main(int argc, char* argv[]) {
   printf("Set Projective Model Parameter\n");
   MotionBlurImageGenerator blurGenerator;
   RMSErrorCalculator errorCalculator;
-  EmptyErrorCalculator emptyErrorCalculator;
 
   int blurType = 0;
   if (argc > 2) {
@@ -121,6 +117,10 @@ int main(int argc, char* argv[]) {
     rLDeblurrerMultiscale.ProjectiveMotionRLDeblurMultiScaleGray(
         bImg[0].data(), blurwidth, blurheight, deblurImg[0].data(), width,
         height, 100, 5, true);
+
+    const float RMSError = errorCalculator.calculateErrorRgb(
+        deblurImg[0].data(), deblurImg[0].data(), deblurImg[0].data(), width,
+        height);
 
     fname = prefix + "_deblurMultiscale_" + std::to_string(RMSError * 255.0f) +
             fileExtension;
