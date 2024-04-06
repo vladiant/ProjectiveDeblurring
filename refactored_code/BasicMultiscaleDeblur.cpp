@@ -118,6 +118,14 @@ int main(int argc, char* argv[]) {
         bImg[0].data(), blurwidth, blurheight, deblurImg[0].data(), width,
         height, 100, 5, true);
 
+    rLDeblurrerMultiscale.ProjectiveMotionRLDeblurMultiScaleGray(
+        bImg[1].data(), blurwidth, blurheight, deblurImg[1].data(), width,
+        height, 100, 5, true);
+
+    rLDeblurrerMultiscale.ProjectiveMotionRLDeblurMultiScaleGray(
+        bImg[2].data(), blurwidth, blurheight, deblurImg[2].data(), width,
+        height, 100, 5, true);
+
     const float RMSError = errorCalculator.calculateErrorRgb(
         deblurImg[0].data(), deblurImg[0].data(), deblurImg[0].data(), width,
         height);
@@ -125,8 +133,8 @@ int main(int argc, char* argv[]) {
     fname = prefix + "_deblurMultiscale_" + std::to_string(RMSError * 255.0f) +
             fileExtension;
     printf("Done, RMS Error: %f\n", RMSError * 255.0f);
-    writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[0],
-                     deblurImg[0]);
+    writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
+                     deblurImg[2]);
   }
 
   return EXIT_SUCCESS;
