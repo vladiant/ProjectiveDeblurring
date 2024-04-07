@@ -13,7 +13,6 @@
 #include "ImResize.h"
 #include "MotionBlurImageGenerator.hpp"
 #include "MotionBlurMaker.hpp"
-#include "ProjectiveMotionRLMultiScaleGray.hpp"
 #include "RLDeblurrer.hpp"
 #include "RMSErrorCalculator.hpp"
 #include "bitmap.h"
@@ -102,7 +101,15 @@ int main(int argc, char* argv[]) {
   RLDeblurrer rLDeblurrer{blurGenerator, emptyErrorCalculator};
 
   ///////////////////////////////////
-  if (false) {
+  {
+    printf("Initial Estimation is the blur image\n");
+    ImChoppingGray(bImg[0].data(), blurwidth, blurheight, deblurImg[0].data(),
+                   width, height);
+    ImChoppingGray(bImg[1].data(), blurwidth, blurheight, deblurImg[1].data(),
+                   width, height);
+    ImChoppingGray(bImg[2].data(), blurwidth, blurheight, deblurImg[2].data(),
+                   width, height);
+
     printf("Testing for Convergence\n");
 
     //   sprintf(fname, "ConvergencePoisson%s.txt", prefix);

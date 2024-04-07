@@ -78,12 +78,12 @@ target_link_libraries(
 )
 
 add_executable(
-    Example
-    ProjectiveMotionRL_main.cpp
+    Convergence
+    Convergence.cpp
 )
 
 set_target_properties(
-    Example
+    Convergence
     PROPERTIES
         CXX_STANDARD 20
         CXX_STANDARD_REQUIRED YES
@@ -91,9 +91,9 @@ set_target_properties(
 )
 
 target_link_libraries(
-   Example
-   PRIVATE
-      ${PROJECT_NAME}
+    Convergence
+    PRIVATE
+        ${PROJECT_NAME}
 )
 
 
