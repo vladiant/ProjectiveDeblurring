@@ -27,6 +27,8 @@ add_library(
     include/IBlurImageGenerator.hpp
     include/MotionBlurImageGenerator.hpp
     src/MotionBlurImageGenerator.cpp
+    include/BlurKernelGenerator.hpp
+    src/BlurKernelGenerator.cpp
     include/MotionBlurMaker.hpp
     src/MotionBlurMaker.cpp
     include/BlurUtils.hpp
