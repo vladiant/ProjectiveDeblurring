@@ -13,6 +13,8 @@
 
 class BlurKernelGenerator : public IBlurImageGenerator {
  public:
+  enum class Border { ISOLATED, REPLICATE, REFLECT, WRAP };
+
   // bforward: true forward, false backward
   void blurGray(float* InputImg, float* inputWeight, int iwidth, int iheight,
                 float* BlurImg, float* outputWeight, int width, int height,
