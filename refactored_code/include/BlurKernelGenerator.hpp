@@ -15,8 +15,8 @@ class BlurKernelGenerator : public IBlurImageGenerator {
  public:
   enum class Border { ISOLATED, REPLICATE, REFLECT, WRAP };
 
-  BlurKernelGenerator(int aKernelWidth, int aKernelHeight, Border aBorder,
-                      float* aBaseImg, int aWidth, int aHeight);
+  BlurKernelGenerator(int aKernelHalfWidth, int aKernelHalfHeight,
+                      Border aBorder, float* aBaseImg, int aWidth, int aHeight);
 
   // bforward: true forward, false backward
   void blurGray(float* InputImg, float* inputWeight, int iwidth, int iheight,
@@ -31,11 +31,15 @@ class BlurKernelGenerator : public IBlurImageGenerator {
   void ClearBuffer() override;
 
  private:
-  int mKernelWidth{};
-  int mKernelHeight{};
+  int mKernelHalfWidth{};
+  int mKernelHalfHeight{};
   Border mBorder{};
 
   float* mBaseImg{};
   int mWidth{};
   int mHeight{};
+
+  float getKernelWeightedPoint(float* aKernelImg, int xCenter, int yCenter,
+                               int aXmin, int aXmax, int aYmin,
+                               int aYmax) const;
 };
