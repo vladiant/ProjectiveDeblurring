@@ -1,5 +1,7 @@
 #include "BlurKernelGenerator.hpp"
 
+#include <stdexcept>
+
 BlurKernelGenerator::BlurKernelGenerator(int aKernelHalfWidth,
                                          int aKernelHalfHeight, Border aBorder,
                                          float* aBaseImg, int aWidth,
@@ -10,7 +12,13 @@ BlurKernelGenerator::BlurKernelGenerator(int aKernelHalfWidth,
       mBaseImg{aBaseImg},
       mWidth{aWidth},
       mHeight{aHeight} {
-  // TODO: Add check here
+  if (mKernelHalfWidth * 2 + 1 > mWidth) {
+    throw std::runtime_error("mKernelHalfWidth * 2  + 1 > mWidth");
+  }
+
+  if (mKernelHalfHeight * 2 + 1 > mHeight) {
+    throw std::runtime_error("mKernelHalfHeight * 2  + 1 > mHeight");
+  }
 }
 
 float BlurKernelGenerator::getKernelWeightedPoint(float* aKernelImg,
