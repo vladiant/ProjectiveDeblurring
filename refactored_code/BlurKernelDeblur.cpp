@@ -13,13 +13,109 @@
 #include "EmptyRegularizer.hpp"
 #include "GaussianNoiseGenerator.hpp"
 #include "ImResize.h"
-#include "MotionBlurImageGenerator.hpp"
 #include "MotionBlurMaker.hpp"
 #include "RLDeblurrer.hpp"
 #include "RMSErrorCalculator.hpp"
 #include "bitmap.h"
 
 constexpr auto fileExtension = ".bmp";
+
+class BoxBlurImageGenerator : public IBlurImageGenerator {
+ public:
+  ~BoxBlurImageGenerator() override = default;
+
+  static constexpr int kBoxX = 4;
+  static constexpr int kBoxY = 4;
+  static constexpr float kBoxWeight = 1.0f / (kBoxX * kBoxY);
+
+  // bforward: true forward, false backward
+  void blurGray(float* InputImg, float* inputWeight, int iwidth, int iheight,
+                float* BlurImg, float* outputWeight, int width, int height,
+                bool bforward) override {
+    const float blurDirection = bforward ? 1.0f : -1.0f;
+
+    for (int y = 0, index = 0; y < height; y++) {
+      for (int x = 0; x < width; x++, index++) {
+        // TODO: Set x and y span
+        float weightSum = 0;
+        float blurSum = 0;
+        for (int fy = y; fy < y + kBoxX * blurDirection; fy++) {
+          for (int fx = x; fx < x + kBoxY * blurDirection; fx++) {
+            if (inputWeight && fx >= 0 && fx < iwidth - 1 && fy >= 0 &&
+                fy < iheight - 1) {
+              weightSum += inputWeight[fx + fy * iwidth] * kBoxWeight;
+            }
+
+            // TODO: Set border conditions
+            if (fx < 0) continue;
+            if (fy < 0) continue;
+            if (fx >= iwidth) continue;
+            if (fy >= iheight) continue;
+
+            blurSum += InputImg[fx + fy * iwidth] * kBoxWeight;
+          }
+        }
+
+        if (inputWeight) {
+          outputWeight[index] = weightSum;
+        } else {
+          outputWeight[index] = 1.0f;
+        }
+
+        BlurImg[index] = blurSum;
+      }
+    }
+  }
+
+  void blurRgb(float* InputImgR, float* InputImgG, float* InputImgB,
+               float* inputWeight, int iwidth, int iheight, float* BlurImgR,
+               float* BlurImgG, float* BlurImgB, float* outputWeight, int width,
+               int height, bool bforward) override {
+    const float blurDirection = bforward ? 1.0f : -1.0f;
+
+    for (int y = 0, index = 0; y < height; y++) {
+      for (int x = 0; x < width; x++, index++) {
+        // TODO: Set x and y span
+        float weightSum = 0;
+        float blurSumR = 0;
+        float blurSumG = 0;
+        float blurSumB = 0;
+        for (int fy = y; fy < y + kBoxX * blurDirection; fy++) {
+          for (int fx = x; fx < x + kBoxY * blurDirection; fx++) {
+            if (inputWeight && fx >= 0 && fx < iwidth - 1 && fy >= 0 &&
+                fy < iheight - 1) {
+              weightSum += inputWeight[fx + fy * iwidth] * kBoxWeight;
+            }
+
+            // TODO: Set border conditions
+            if (fx < 0) continue;
+            if (fy < 0) continue;
+            if (fx >= iwidth) continue;
+            if (fy >= iheight) continue;
+
+            blurSumR += InputImgR[fx + fy * iwidth] * kBoxWeight;
+            blurSumG += InputImgG[fx + fy * iwidth] * kBoxWeight;
+            blurSumB += InputImgB[fx + fy * iwidth] * kBoxWeight;
+          }
+        }
+
+        if (inputWeight) {
+          outputWeight[index] = weightSum;
+        } else {
+          outputWeight[index] = 1.0f;
+        }
+
+        BlurImgR[index] = blurSumR;
+        BlurImgG[index] = blurSumG;
+        BlurImgB[index] = blurSumB;
+      }
+    }
+  }
+
+  void SetBuffer(int width, int height) override {}
+
+  void ClearBuffer() override {}
+};
 
 int main(int argc, char* argv[]) {
   if (argc < 2) {
@@ -72,11 +168,7 @@ int main(int argc, char* argv[]) {
   RMSErrorCalculator errorCalculator;
   EmptyErrorCalculator emptyErrorCalculator;
 
-  int blurType = 4;  // Only motion blur can be tested
-  MotionBlurImageGenerator sampleGenerator;
-  if (!setBlur(blurType, sampleGenerator)) {
-    return EXIT_SUCCESS;
-  }
+  BoxBlurImageGenerator sampleGenerator;
 
   ///////////////////////////////////
   // Ground truth blur kernel setup
