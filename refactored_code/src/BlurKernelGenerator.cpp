@@ -57,7 +57,7 @@ float BlurKernelGenerator::getKernelWeightedPoint(float* aKernelImg,
         switch (mBorder) {
           case Border::ISOLATED:
             kernelWeight = 0;
-            xBase = 0;
+            xBase = mWidth - 1;
             break;
           case Border::REFLECT:
             xBase = mWidth - (xBase % mWidth);
@@ -94,7 +94,7 @@ float BlurKernelGenerator::getKernelWeightedPoint(float* aKernelImg,
         switch (mBorder) {
           case Border::ISOLATED:
             kernelWeight = 0;
-            yBase = 0;
+            yBase = mHeight - 1;
             break;
           case Border::REFLECT:
             yBase = mHeight - (yBase % mHeight);
