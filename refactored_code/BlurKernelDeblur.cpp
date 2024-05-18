@@ -179,25 +179,85 @@ int main(int argc, char* argv[]) {
   memset(kernelImg[0].data(), 0, width * height * sizeof(float));
   memset(kernelImg[1].data(), 0, width * height * sizeof(float));
   memset(kernelImg[2].data(), 0, width * height * sizeof(float));
-  kernelImg[0][0] = 1.0f;
-  kernelImg[1][0] = 1.0f;
-  kernelImg[2][0] = 1.0f;
+  // kernelImg[0][width/2 +  width * height/2] = 1.0f;
+  // kernelImg[1][width/2 + width * height/2] = 1.0f;
+  // kernelImg[2][width/2 + width * height/2] = 1.0f;
+
+  // Line x+
+  kernelImg[0][0] = 0.25f;
+  kernelImg[1][0] = 0.25f;
+  kernelImg[2][0] = 0.25f;
+  kernelImg[0][1] = 0.25f;
+  kernelImg[1][1] = 0.25f;
+  kernelImg[2][1] = 0.25f;
+  kernelImg[0][2] = 0.25f;
+  kernelImg[1][2] = 0.25f;
+  kernelImg[2][2] = 0.25f;
+  kernelImg[0][3] = 0.25f;
+  kernelImg[1][3] = 0.25f;
+  kernelImg[2][3] = 0.25f;
+
+  // Line x-
+  // kernelImg[0][0] = 0.25f;
+  // kernelImg[1][0] = 0.25f;
+  // kernelImg[2][0] = 0.25f;
+  // kernelImg[0][width-1] = 0.25f;
+  // kernelImg[1][width-1] = 0.25f;
+  // kernelImg[2][width-1] = 0.25f;
+  // kernelImg[0][width-2] = 0.25f;
+  // kernelImg[1][width-2] = 0.25f;
+  // kernelImg[2][width-2] = 0.25f;
+  // kernelImg[0][width-3] = 0.25f;
+  // kernelImg[1][width-3] = 0.25f;
+  // kernelImg[2][width-3] = 0.25f;
+
+  // Line y+
+  // kernelImg[0][0] = 0.25f;
+  // kernelImg[1][0] = 0.25f;
+  // kernelImg[2][0] = 0.25f;
+  // kernelImg[0][width] = 0.25f;
+  // kernelImg[1][width] = 0.25f;
+  // kernelImg[2][width] = 0.25f;
+  // kernelImg[0][2*width] = 0.25f;
+  // kernelImg[1][2*width] = 0.25f;
+  // kernelImg[2][2*width] = 0.25f;
+  // kernelImg[0][3*width] = 0.25f;
+  // kernelImg[1][3*width] = 0.25f;
+  // kernelImg[2][3*width] = 0.25f;
+
+  // Line y-
+  // kernelImg[0][0] = 0.25f;
+  // kernelImg[1][0] = 0.25f;
+  // kernelImg[2][0] = 0.25f;
+  // kernelImg[0][(height-1)*width] = 0.25f;
+  // kernelImg[1][(height-1)*width] = 0.25f;
+  // kernelImg[2][(height-1)*width] = 0.25f;
+  // kernelImg[0][(height-2)*width] = 0.25f;
+  // kernelImg[1][(height-2)*width] = 0.25f;
+  // kernelImg[2][(height-2)*width] = 0.25f;
+  // kernelImg[0][(height-3)*width] = 0.25f;
+  // kernelImg[1][(height-3)*width] = 0.25f;
+  // kernelImg[2][(height-3)*width] = 0.25f;
+
+  // kernelImg[0][0] = 1.0f;
+  // kernelImg[1][0] = 1.0f;
+  // kernelImg[2][0] = 1.0f;
 
   generateMotionBlurredImage(kernelImg, inputWeight, outputWeight, width,
                              height, blurwidth, blurheight, prefix,
-                             sampleGenerator, errorCalculator, deblurImg);
+                             blurGenerator, errorCalculator, deblurImg);
 
-  errorCalculator.SetGroundTruthImgRgb(
-      deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-      height);  // This is for error computation
+  // errorCalculator.SetGroundTruthImgRgb(
+  //     deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
+  //     height);  // This is for error computation
 
   // Scale up kernel
-  std::for_each(std::begin(deblurImg[0]), std::end(deblurImg[0]),
-                [](auto& aValue) { aValue *= 100; });
-  std::for_each(std::begin(deblurImg[1]), std::end(deblurImg[1]),
-                [](auto& aValue) { aValue *= 100; });
-  std::for_each(std::begin(deblurImg[2]), std::end(deblurImg[2]),
-                [](auto& aValue) { aValue *= 100; });
+  // std::for_each(std::begin(deblurImg[0]), std::end(deblurImg[0]),
+  //               [](auto& aValue) { aValue *= 200; });
+  // std::for_each(std::begin(deblurImg[1]), std::end(deblurImg[1]),
+  //               [](auto& aValue) { aValue *= 200; });
+  // std::for_each(std::begin(deblurImg[2]), std::end(deblurImg[2]),
+  //               [](auto& aValue) { aValue *= 200; });
 
   writeBMPchannels("ground_truth_kernel", width, height, deblurImg[0],
                    deblurImg[1], deblurImg[2]);
@@ -218,7 +278,7 @@ int main(int argc, char* argv[]) {
   ///////////////////////////////////
   // Main Deblurring algorithm
   EmptyRegularizer emptyRegularizer;
-  RLDeblurrer rLDeblurrer{blurGenerator, emptyErrorCalculator};
+  RLDeblurrer rLDeblurrer{sampleGenerator, emptyErrorCalculator};
 
   printf("Initial Estimation is a line kernel\n");
   memset(deblurImg[0].data(), 0, width * height * sizeof(float));
