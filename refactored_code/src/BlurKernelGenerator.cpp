@@ -25,14 +25,21 @@ float BlurKernelGenerator::getKernelWeightedPoint(float* aKernelImg,
                                                   int xCenter, int yCenter,
                                                   int aXmin, int aXmax,
                                                   int aYmin, int aYmax) const {
+  // TODO: Set as fields
+  const int kernelCenterX = mWidth / 2;
+  const int kernelCenterY = mHeight / 2;
+
+  const int kernelOriginX = aXmin == 0 ? 0 : aXmax;
+  const int kernelOriginY = aYmin == 0 ? 0 : aYmax;
+
   float sum = 0;
 
   for (int yK = aYmin; yK < aYmax; yK++) {
     float* kernelRow = &aKernelImg[yK * mWidth];
     for (int xK = aXmin; xK < aXmax; xK++) {
       auto kernelWeight = *kernelRow++;
-      int xBase = xK + xCenter;
-      int yBase = yK + yCenter;
+      int xBase = xK + xCenter - kernelOriginX;
+      int yBase = yK + yCenter - kernelOriginY;
 
       if (xBase < 0) {
         switch (mBorder) {
