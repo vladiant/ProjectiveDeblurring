@@ -35,7 +35,7 @@ float BlurKernelGenerator::getKernelWeightedPoint(float* aKernelImg,
   float sum = 0;
 
   for (int yK = aYmin; yK < aYmax; yK++) {
-    float* kernelRow = &aKernelImg[yK * mWidth];
+    float* kernelRow = &aKernelImg[yK * mWidth + aXmin];
     for (int xK = aXmin; xK < aXmax; xK++) {
       auto kernelWeight = *kernelRow++;
       int xBase = xK + xCenter - kernelOriginX;
