@@ -157,8 +157,8 @@ int main(int argc, char* argv[]) {
 
   ///////////////////////////////////
   printf("Set Blur Kernel Parameters\n");
-  constexpr int kernelHalfWidth = 10;
-  constexpr int kernelHalfHeight = 10;
+  constexpr int kernelHalfWidth = 5;
+  constexpr int kernelHalfHeight = 5;
   BlurKernelGenerator blurGenerator{kernelHalfWidth,
                                     kernelHalfHeight,
                                     BlurKernelGenerator::Border::ISOLATED,
