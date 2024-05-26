@@ -67,13 +67,13 @@ float BlurKernelGenerator::getKernelWeightedPoint(float* aKernelImg,
             xBase = mWidth - 1;
             break;
           case Border::REFLECT:
-            xBase = mWidth - (xBase % mWidth);
+            xBase = mWidth - 1 - (xBase % (mWidth - 1));
             break;
           case Border::REPLICATE:
             xBase = mWidth - 1;
             break;
           case Border::WRAP:
-            xBase = xBase % mWidth;
+            xBase = xBase % (mWidth - 1);
             break;
         }
       }
@@ -104,13 +104,13 @@ float BlurKernelGenerator::getKernelWeightedPoint(float* aKernelImg,
             yBase = mHeight - 1;
             break;
           case Border::REFLECT:
-            yBase = mHeight - (yBase % mHeight);
+            yBase = mHeight - 1 - (yBase % (mHeight - 1));
             break;
           case Border::REPLICATE:
             yBase = mHeight - 1;
             break;
           case Border::WRAP:
-            yBase = yBase % mHeight;
+            yBase = yBase % (mHeight - 1);
             break;
         }
       }

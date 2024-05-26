@@ -161,7 +161,7 @@ int main(int argc, char* argv[]) {
   constexpr int kernelHalfHeight = 5;
   BlurKernelGenerator blurGenerator{kernelHalfWidth,
                                     kernelHalfHeight,
-                                    BlurKernelGenerator::Border::ISOLATED,
+                                    BlurKernelGenerator::Border::WRAP,
                                     fImg[0].data(),
                                     width,
                                     height};
