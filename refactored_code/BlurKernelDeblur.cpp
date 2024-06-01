@@ -20,6 +20,8 @@
 
 constexpr auto fileExtension = ".bmp";
 
+void fillGaussian5x5Kernel(float* aKernelImg, int width, int height);
+
 class BoxBlurImageGenerator : public IBlurImageGenerator {
  public:
   ~BoxBlurImageGenerator() override = default;
@@ -198,18 +200,18 @@ int main(int argc, char* argv[]) {
   // kernelImg[2][3] = 0.25f;
 
   // Line x-
-  // kernelImg[0][0] = 0.25f;
-  // kernelImg[1][0] = 0.25f;
-  // kernelImg[2][0] = 0.25f;
-  // kernelImg[0][width-1] = 0.25f;
-  // kernelImg[1][width-1] = 0.25f;
-  // kernelImg[2][width-1] = 0.25f;
-  // kernelImg[0][width-2] = 0.25f;
-  // kernelImg[1][width-2] = 0.25f;
-  // kernelImg[2][width-2] = 0.25f;
-  // kernelImg[0][width-3] = 0.25f;
-  // kernelImg[1][width-3] = 0.25f;
-  // kernelImg[2][width-3] = 0.25f;
+  kernelImg[0][0] = 0.25f;
+  kernelImg[1][0] = 0.25f;
+  kernelImg[2][0] = 0.25f;
+  kernelImg[0][width-1] = 0.25f;
+  kernelImg[1][width-1] = 0.25f;
+  kernelImg[2][width-1] = 0.25f;
+  kernelImg[0][width-2] = 0.25f;
+  kernelImg[1][width-2] = 0.25f;
+  kernelImg[2][width-2] = 0.25f;
+  kernelImg[0][width-3] = 0.25f;
+  kernelImg[1][width-3] = 0.25f;
+  kernelImg[2][width-3] = 0.25f;
 
   // Line y+
   // kernelImg[0][0] = 0.25f;
@@ -244,93 +246,93 @@ int main(int argc, char* argv[]) {
   // kernelImg[2][0] = 1.0f;
 
   // Gaussian kernel 5x5
-  kernelImg[0][0] = 0.159f;          // R[0,0]
-  kernelImg[1][0] = 0.159f;          // G[0,0]
-  kernelImg[2][0] = 0.159f;          // B[0,0]
-  kernelImg[0][1] = 0.097f;          // R[1,0]
-  kernelImg[1][1] = 0.097f;          // G[1,0]
-  kernelImg[2][1] = 0.097f;          // B[1,0]
-  kernelImg[0][width - 1] = 0.097f;  // R[-1,0]
-  kernelImg[1][width - 1] = 0.097f;  // G[-1,0]
-  kernelImg[2][width - 1] = 0.097f;  // B[-1,0]
-  kernelImg[0][2] = 0.022f;          // R[2,0]
-  kernelImg[1][2] = 0.022f;          // G[2,0]
-  kernelImg[2][2] = 0.022f;          // B[2,0]
-  kernelImg[0][width - 2] = 0.022f;  // R[-2,0]
-  kernelImg[1][width - 2] = 0.022f;  // R[-2,0]
-  kernelImg[2][width - 2] = 0.022f;  // R[-2,0]
+  // kernelImg[0][0] = 0.159f;          // R[0,0]
+  // kernelImg[1][0] = 0.159f;          // G[0,0]
+  // kernelImg[2][0] = 0.159f;          // B[0,0]
+  // kernelImg[0][1] = 0.097f;          // R[1,0]
+  // kernelImg[1][1] = 0.097f;          // G[1,0]
+  // kernelImg[2][1] = 0.097f;          // B[1,0]
+  // kernelImg[0][width - 1] = 0.097f;  // R[-1,0]
+  // kernelImg[1][width - 1] = 0.097f;  // G[-1,0]
+  // kernelImg[2][width - 1] = 0.097f;  // B[-1,0]
+  // kernelImg[0][2] = 0.022f;          // R[2,0]
+  // kernelImg[1][2] = 0.022f;          // G[2,0]
+  // kernelImg[2][2] = 0.022f;          // B[2,0]
+  // kernelImg[0][width - 2] = 0.022f;  // R[-2,0]
+  // kernelImg[1][width - 2] = 0.022f;  // R[-2,0]
+  // kernelImg[2][width - 2] = 0.022f;  // R[-2,0]
 
-  kernelImg[0][width] = 0.097f;          // R[0,1]
-  kernelImg[1][width] = 0.097f;          // G[0,1]
-  kernelImg[2][width] = 0.097f;          // B[0,1]
-  kernelImg[0][width + 1] = 0.059f;      // R[1,1]
-  kernelImg[1][width + 1] = 0.059f;      // G[1,1]
-  kernelImg[2][width + 1] = 0.059f;      // B[1,1]
-  kernelImg[0][2 * width - 1] = 0.059f;  // R[-1,1]
-  kernelImg[1][2 * width - 1] = 0.059f;  // G[-1,1]
-  kernelImg[2][2 * width - 1] = 0.059f;  // B[-1,1]
-  kernelImg[0][width + 2] = 0.013f;      // R[2,1]
-  kernelImg[1][width + 2] = 0.013f;      // G[2,1]
-  kernelImg[2][width + 2] = 0.013f;      // B[2,1]
-  kernelImg[0][2 * width - 2] = 0.013f;  // R[-2,1]
-  kernelImg[1][2 * width - 2] = 0.013f;  // G[-2,1]
-  kernelImg[2][2 * width - 2] = 0.013f;  // B[-2,1]
+  // kernelImg[0][width] = 0.097f;          // R[0,1]
+  // kernelImg[1][width] = 0.097f;          // G[0,1]
+  // kernelImg[2][width] = 0.097f;          // B[0,1]
+  // kernelImg[0][width + 1] = 0.059f;      // R[1,1]
+  // kernelImg[1][width + 1] = 0.059f;      // G[1,1]
+  // kernelImg[2][width + 1] = 0.059f;      // B[1,1]
+  // kernelImg[0][2 * width - 1] = 0.059f;  // R[-1,1]
+  // kernelImg[1][2 * width - 1] = 0.059f;  // G[-1,1]
+  // kernelImg[2][2 * width - 1] = 0.059f;  // B[-1,1]
+  // kernelImg[0][width + 2] = 0.013f;      // R[2,1]
+  // kernelImg[1][width + 2] = 0.013f;      // G[2,1]
+  // kernelImg[2][width + 2] = 0.013f;      // B[2,1]
+  // kernelImg[0][2 * width - 2] = 0.013f;  // R[-2,1]
+  // kernelImg[1][2 * width - 2] = 0.013f;  // G[-2,1]
+  // kernelImg[2][2 * width - 2] = 0.013f;  // B[-2,1]
 
-  kernelImg[0][(height - 1) * width] = 0.097f;      // R[0,-1]
-  kernelImg[1][(height - 1) * width] = 0.097f;      // G[0,-1]
-  kernelImg[2][(height - 1) * width] = 0.097f;      // B[0,-1]
-  kernelImg[0][(height - 1) * width + 1] = 0.059f;  // R[1,-1]
-  kernelImg[1][(height - 1) * width + 1] = 0.059f;  // G[1,-1]
-  kernelImg[2][(height - 1) * width + 1] = 0.059f;  // B[1,-1]
-  kernelImg[0][height * width - 1] = 0.059f;        // R[-1,-1]
-  kernelImg[1][height * width - 1] = 0.059f;        // G[-1,-1]
-  kernelImg[2][height * width - 1] = 0.059f;        // B[-1,-1]
-  kernelImg[0][(height - 1) * width + 2] = 0.013f;  // R[2,-1]
-  kernelImg[1][(height - 1) * width + 2] = 0.013f;  // G[2,-1]
-  kernelImg[2][(height - 1) * width + 2] = 0.013f;  // B[2,-1]
-  kernelImg[0][height * width - 2] = 0.013f;        // R[-2,-1]
-  kernelImg[1][height * width - 2] = 0.013f;        // G[-2,-1]
-  kernelImg[2][height * width - 2] = 0.013f;        // B[-2,-1]
+  // kernelImg[0][(height - 1) * width] = 0.097f;      // R[0,-1]
+  // kernelImg[1][(height - 1) * width] = 0.097f;      // G[0,-1]
+  // kernelImg[2][(height - 1) * width] = 0.097f;      // B[0,-1]
+  // kernelImg[0][(height - 1) * width + 1] = 0.059f;  // R[1,-1]
+  // kernelImg[1][(height - 1) * width + 1] = 0.059f;  // G[1,-1]
+  // kernelImg[2][(height - 1) * width + 1] = 0.059f;  // B[1,-1]
+  // kernelImg[0][height * width - 1] = 0.059f;        // R[-1,-1]
+  // kernelImg[1][height * width - 1] = 0.059f;        // G[-1,-1]
+  // kernelImg[2][height * width - 1] = 0.059f;        // B[-1,-1]
+  // kernelImg[0][(height - 1) * width + 2] = 0.013f;  // R[2,-1]
+  // kernelImg[1][(height - 1) * width + 2] = 0.013f;  // G[2,-1]
+  // kernelImg[2][(height - 1) * width + 2] = 0.013f;  // B[2,-1]
+  // kernelImg[0][height * width - 2] = 0.013f;        // R[-2,-1]
+  // kernelImg[1][height * width - 2] = 0.013f;        // G[-2,-1]
+  // kernelImg[2][height * width - 2] = 0.013f;        // B[-2,-1]
 
-  kernelImg[0][2 * width] = 0.022f;      // R[0,2]
-  kernelImg[1][2 * width] = 0.022f;      // G[0,2]
-  kernelImg[2][2 * width] = 0.022f;      // B[0,2]
-  kernelImg[0][2 * width + 1] = 0.013f;  // R[1,2]
-  kernelImg[1][2 * width + 1] = 0.013f;  // G[1,2]
-  kernelImg[2][2 * width + 1] = 0.013f;  // B[1,2]
-  kernelImg[0][3 * width - 1] = 0.013f;  // R[-1,2]
-  kernelImg[1][3 * width - 1] = 0.013f;  // G[-1,2]
-  kernelImg[2][3 * width - 1] = 0.013f;  // B[-1,2]
-  kernelImg[0][2 * width + 2] = 0.003f;  // R[2,2]
-  kernelImg[1][2 * width + 2] = 0.003f;  // G[2,2]
-  kernelImg[2][2 * width + 2] = 0.003f;  // B[2,2]
-  kernelImg[0][3 * width - 2] = 0.003f;  // R[-2,2]
-  kernelImg[1][3 * width - 2] = 0.003f;  // G[-2,2]
-  kernelImg[2][3 * width - 2] = 0.003f;  // B[-2,2]
+  // kernelImg[0][2 * width] = 0.022f;      // R[0,2]
+  // kernelImg[1][2 * width] = 0.022f;      // G[0,2]
+  // kernelImg[2][2 * width] = 0.022f;      // B[0,2]
+  // kernelImg[0][2 * width + 1] = 0.013f;  // R[1,2]
+  // kernelImg[1][2 * width + 1] = 0.013f;  // G[1,2]
+  // kernelImg[2][2 * width + 1] = 0.013f;  // B[1,2]
+  // kernelImg[0][3 * width - 1] = 0.013f;  // R[-1,2]
+  // kernelImg[1][3 * width - 1] = 0.013f;  // G[-1,2]
+  // kernelImg[2][3 * width - 1] = 0.013f;  // B[-1,2]
+  // kernelImg[0][2 * width + 2] = 0.003f;  // R[2,2]
+  // kernelImg[1][2 * width + 2] = 0.003f;  // G[2,2]
+  // kernelImg[2][2 * width + 2] = 0.003f;  // B[2,2]
+  // kernelImg[0][3 * width - 2] = 0.003f;  // R[-2,2]
+  // kernelImg[1][3 * width - 2] = 0.003f;  // G[-2,2]
+  // kernelImg[2][3 * width - 2] = 0.003f;  // B[-2,2]
 
-  kernelImg[0][(height - 2) * width] = 0.022f;      // R[0,-2]
-  kernelImg[1][(height - 2) * width] = 0.022f;      // G[0,-2]
-  kernelImg[2][(height - 2) * width] = 0.022f;      // B[0,-2]
-  kernelImg[0][(height - 2) * width + 1] = 0.013f;  // R[1,-2]
-  kernelImg[1][(height - 2) * width + 1] = 0.013f;  // G[1,-2]
-  kernelImg[2][(height - 2) * width + 1] = 0.013f;  // B[1,-2]
-  kernelImg[0][(height - 1) * width - 1] = 0.013f;  // R[-1,-2]
-  kernelImg[1][(height - 1) * width - 1] = 0.013f;  // G[-1,-2]
-  kernelImg[2][(height - 1) * width - 1] = 0.013f;  // B[-1,-2]
-  kernelImg[0][(height - 2) * width + 2] = 0.003f;  // R[2,-2]
-  kernelImg[1][(height - 2) * width + 2] = 0.003f;  // G[2,-2]
-  kernelImg[2][(height - 2) * width + 2] = 0.003f;  // B[2,-2]
-  kernelImg[0][(height - 1) * width - 2] = 0.003f;  // R[-2,-2]
-  kernelImg[1][(height - 1) * width - 2] = 0.003f;  // G[-2,-2]
-  kernelImg[2][(height - 1) * width - 2] = 0.003f;  // B[-2,-2]
+  // kernelImg[0][(height - 2) * width] = 0.022f;      // R[0,-2]
+  // kernelImg[1][(height - 2) * width] = 0.022f;      // G[0,-2]
+  // kernelImg[2][(height - 2) * width] = 0.022f;      // B[0,-2]
+  // kernelImg[0][(height - 2) * width + 1] = 0.013f;  // R[1,-2]
+  // kernelImg[1][(height - 2) * width + 1] = 0.013f;  // G[1,-2]
+  // kernelImg[2][(height - 2) * width + 1] = 0.013f;  // B[1,-2]
+  // kernelImg[0][(height - 1) * width - 1] = 0.013f;  // R[-1,-2]
+  // kernelImg[1][(height - 1) * width - 1] = 0.013f;  // G[-1,-2]
+  // kernelImg[2][(height - 1) * width - 1] = 0.013f;  // B[-1,-2]
+  // kernelImg[0][(height - 2) * width + 2] = 0.003f;  // R[2,-2]
+  // kernelImg[1][(height - 2) * width + 2] = 0.003f;  // G[2,-2]
+  // kernelImg[2][(height - 2) * width + 2] = 0.003f;  // B[2,-2]
+  // kernelImg[0][(height - 1) * width - 2] = 0.003f;  // R[-2,-2]
+  // kernelImg[1][(height - 1) * width - 2] = 0.003f;  // G[-2,-2]
+  // kernelImg[2][(height - 1) * width - 2] = 0.003f;  // B[-2,-2]
 
   generateMotionBlurredImage(kernelImg, inputWeight, outputWeight, width,
                              height, blurwidth, blurheight, prefix,
                              blurGenerator, errorCalculator, deblurImg);
 
-  // errorCalculator.SetGroundTruthImgRgb(
-  //     deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,
-  //     height);  // This is for error computation
+  errorCalculator.SetGroundTruthImgRgb(
+      kernelImg[0].data(), kernelImg[1].data(), kernelImg[2].data(), width,
+      height);  // This is for error computation
 
   // Scale up kernel
   // std::for_each(std::begin(deblurImg[0]), std::end(deblurImg[0]),
@@ -344,8 +346,8 @@ int main(int argc, char* argv[]) {
                    deblurImg[1], deblurImg[2]);
 
   ///////////////////////////////////
-  generateMotionBlurredImage(fImg, inputWeight, outputWeight, width, height,
-                             blurwidth, blurheight, prefix, sampleGenerator,
+  generateMotionBlurredImage(kernelImg, inputWeight, outputWeight, width, height,
+                             blurwidth, blurheight, prefix, blurGenerator,
                              emptyErrorCalculator, bImg);
 
   // Add noise
@@ -359,25 +361,29 @@ int main(int argc, char* argv[]) {
   ///////////////////////////////////
   // Main Deblurring algorithm
   EmptyRegularizer emptyRegularizer;
-  RLDeblurrer rLDeblurrer{sampleGenerator, emptyErrorCalculator};
+  RLDeblurrer rLDeblurrer{blurGenerator, emptyErrorCalculator};
 
-  printf("Initial Estimation is a line kernel\n");
+  printf("Initial Estimation is a gaussian kernel\n");
   memset(deblurImg[0].data(), 0, width * height * sizeof(float));
   memset(deblurImg[1].data(), 0, width * height * sizeof(float));
   memset(deblurImg[2].data(), 0, width * height * sizeof(float));
 
-  deblurImg[0][0] = 0.25f;
-  deblurImg[0][0] = 0.25f;
-  deblurImg[0][0] = 0.25f;
-  deblurImg[0][0] = 0.25f;
-  deblurImg[1][0] = 0.25f;
-  deblurImg[1][0] = 0.25f;
-  deblurImg[1][0] = 0.25f;
-  deblurImg[1][0] = 0.25f;
-  deblurImg[2][0] = 0.25f;
-  deblurImg[2][0] = 0.25f;
-  deblurImg[2][0] = 0.25f;
-  deblurImg[2][0] = 0.25f;
+  fillGaussian5x5Kernel(deblurImg[0].data(), width, height);
+  fillGaussian5x5Kernel(deblurImg[1].data(), width, height);
+  fillGaussian5x5Kernel(deblurImg[2].data(), width, height);
+
+  // deblurImg[0][0] = 0.25f;
+  // deblurImg[1][0] = 0.25f;
+  // deblurImg[2][0] = 0.25f;
+  // deblurImg[0][1] = 0.25f;
+  // deblurImg[1][1] = 0.25f;
+  // deblurImg[2][1] = 0.25f;
+  // deblurImg[0][2] = 0.25f;
+  // deblurImg[1][2] = 0.25f;
+  // deblurImg[2][2] = 0.25f;
+  // deblurImg[0][3] = 0.25f;
+  // deblurImg[1][3] = 0.25f;
+  // deblurImg[2][3] = 0.25f;
 
   // Levin et. al. Siggraph07's matlab implementation also take around 400
   // iterations Sadly, the algorithm needs such a lot of iterations to produce
@@ -387,9 +393,15 @@ int main(int argc, char* argv[]) {
   // Load Initial Guess, if you have...
   //   readBMP("", deblurImg[0], deblurImg[1], deblurImg[2], width, height);
 
+  // Add noise to kernel
+  // const float sigma = 0.01f;
+  // GaussianNoiseGenerator noiseGenerator(sigma);
+  // addNoiseToImage(deblurImg, width, height, blurwidth, blurheight, {},
+  //                 noiseGenerator, errorCalculator);
+
   printf("Basic Algorithm:\n");
 
-  DeblurParameters rLParams{.Niter = 500, .bPoisson = true};
+  DeblurParameters rLParams{.Niter = 1, .bPoisson = false};
   // rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
   //                       blurwidth, blurheight, deblurImg[0].data(),
   //                       deblurImg[1].data(), deblurImg[2].data(), width,
@@ -417,15 +429,48 @@ int main(int argc, char* argv[]) {
   printf("Done, RMS Error: %f\n", RMSError * 255.0f);
 
   // Scale up kernel
-  std::for_each(std::begin(deblurImg[0]), std::end(deblurImg[0]),
-                [](auto& aValue) { aValue *= 100; });
-  std::for_each(std::begin(deblurImg[1]), std::end(deblurImg[1]),
-                [](auto& aValue) { aValue *= 100; });
-  std::for_each(std::begin(deblurImg[2]), std::end(deblurImg[2]),
-                [](auto& aValue) { aValue *= 100; });
+  // std::for_each(std::begin(deblurImg[0]), std::end(deblurImg[0]),
+  //               [](auto& aValue) { aValue *= 200; });
+  // std::for_each(std::begin(deblurImg[1]), std::end(deblurImg[1]),
+  //               [](auto& aValue) { aValue *= 200; });
+  // std::for_each(std::begin(deblurImg[2]), std::end(deblurImg[2]),
+  //               [](auto& aValue) { aValue *= 200; });
 
   writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
                    deblurImg[2]);
 
   return EXIT_SUCCESS;
+}
+
+
+void fillGaussian5x5Kernel(float* aKernelImg, int width, int height) {
+  aKernelImg[0] = 0.159f;          // [0,0]
+  aKernelImg[1] = 0.097f;          // [1,0]
+  aKernelImg[width - 1] = 0.097f;  // [-1,0]
+  aKernelImg[2] = 0.022f;          // [2,0]
+  aKernelImg[width - 2] = 0.022f;  // [-2,0]
+
+  aKernelImg[width] = 0.097f;          // [0,1]
+  aKernelImg[width + 1] = 0.059f;      // [1,1]
+  aKernelImg[2 * width - 1] = 0.059f;  // [-1,1]
+  aKernelImg[width + 2] = 0.013f;      // [2,1]
+  aKernelImg[2 * width - 2] = 0.013f;  // [-2,1]
+
+  aKernelImg[(height - 1) * width] = 0.097f;      // [0,-1]
+  aKernelImg[(height - 1) * width + 1] = 0.059f;  // [1,-1]
+  aKernelImg[height * width - 1] = 0.059f;        // [-1,-1]
+  aKernelImg[(height - 1) * width + 2] = 0.013f;  // [2,-1]
+  aKernelImg[height * width - 2] = 0.013f;        // [-2,-1]
+
+  aKernelImg[2 * width] = 0.022f;      // [0,2]
+  aKernelImg[2 * width + 1] = 0.013f;  // [1,2]
+  aKernelImg[3 * width - 1] = 0.013f;  // [-1,2]
+  aKernelImg[2 * width + 2] = 0.003f;  // [2,2]
+  aKernelImg[3 * width - 2] = 0.003f;  // [-2,2]
+
+  aKernelImg[(height - 2) * width] = 0.022f;      // [0,-2]
+  aKernelImg[(height - 2) * width + 1] = 0.013f;  // [1,-2]
+  aKernelImg[(height - 1) * width - 1] = 0.013f;  // [-1,-2]
+  aKernelImg[(height - 2) * width + 2] = 0.003f;  // [2,-2]
+  aKernelImg[(height - 1) * width - 2] = 0.003f;  // [-2,-2]
 }
