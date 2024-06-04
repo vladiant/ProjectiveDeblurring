@@ -22,6 +22,8 @@ constexpr auto fileExtension = ".bmp";
 
 void fillGaussian5x5Kernel(float* aKernelImg, int width, int height);
 
+void positiveXlineKernel(int aLength, float* aKernelImg, int width, int height);
+
 class BoxBlurImageGenerator : public IBlurImageGenerator {
  public:
   ~BoxBlurImageGenerator() override = default;
@@ -163,7 +165,7 @@ int main(int argc, char* argv[]) {
   constexpr int kernelHalfHeight = 5;
   BlurKernelGenerator blurGenerator{kernelHalfWidth,
                                     kernelHalfHeight,
-                                    BlurKernelGenerator::Border::WRAP,
+                                    BlurKernelGenerator::Border::ISOLATED,
                                     fImg[0].data(),
                                     width,
                                     height};
@@ -186,32 +188,23 @@ int main(int argc, char* argv[]) {
   // kernelImg[2][width/2 + width * height/2] = 1.0f;
 
   // Line x+
+  positiveXlineKernel(4, kernelImg[0].data(), width, height);
+  positiveXlineKernel(4, kernelImg[1].data(), width, height);
+  positiveXlineKernel(4, kernelImg[2].data(), width, height);
+
+  // Line x-
   // kernelImg[0][0] = 0.25f;
   // kernelImg[1][0] = 0.25f;
   // kernelImg[2][0] = 0.25f;
-  // kernelImg[0][1] = 0.25f;
-  // kernelImg[1][1] = 0.25f;
-  // kernelImg[2][1] = 0.25f;
-  // kernelImg[0][2] = 0.25f;
-  // kernelImg[1][2] = 0.25f;
-  // kernelImg[2][2] = 0.25f;
-  // kernelImg[0][3] = 0.25f;
-  // kernelImg[1][3] = 0.25f;
-  // kernelImg[2][3] = 0.25f;
-
-  // Line x-
-  kernelImg[0][0] = 0.25f;
-  kernelImg[1][0] = 0.25f;
-  kernelImg[2][0] = 0.25f;
-  kernelImg[0][width-1] = 0.25f;
-  kernelImg[1][width-1] = 0.25f;
-  kernelImg[2][width-1] = 0.25f;
-  kernelImg[0][width-2] = 0.25f;
-  kernelImg[1][width-2] = 0.25f;
-  kernelImg[2][width-2] = 0.25f;
-  kernelImg[0][width-3] = 0.25f;
-  kernelImg[1][width-3] = 0.25f;
-  kernelImg[2][width-3] = 0.25f;
+  // kernelImg[0][width-1] = 0.25f;
+  // kernelImg[1][width-1] = 0.25f;
+  // kernelImg[2][width-1] = 0.25f;
+  // kernelImg[0][width-2] = 0.25f;
+  // kernelImg[1][width-2] = 0.25f;
+  // kernelImg[2][width-2] = 0.25f;
+  // kernelImg[0][width-3] = 0.25f;
+  // kernelImg[1][width-3] = 0.25f;
+  // kernelImg[2][width-3] = 0.25f;
 
   // Line y+
   // kernelImg[0][0] = 0.25f;
@@ -346,9 +339,9 @@ int main(int argc, char* argv[]) {
                    deblurImg[1], deblurImg[2]);
 
   ///////////////////////////////////
-  generateMotionBlurredImage(kernelImg, inputWeight, outputWeight, width, height,
-                             blurwidth, blurheight, prefix, blurGenerator,
-                             emptyErrorCalculator, bImg);
+  generateMotionBlurredImage(kernelImg, inputWeight, outputWeight, width,
+                             height, blurwidth, blurheight, prefix,
+                             blurGenerator, emptyErrorCalculator, bImg);
 
   // Add noise
   // const float sigma = 2.0f;
@@ -368,22 +361,22 @@ int main(int argc, char* argv[]) {
   memset(deblurImg[1].data(), 0, width * height * sizeof(float));
   memset(deblurImg[2].data(), 0, width * height * sizeof(float));
 
-  fillGaussian5x5Kernel(deblurImg[0].data(), width, height);
-  fillGaussian5x5Kernel(deblurImg[1].data(), width, height);
-  fillGaussian5x5Kernel(deblurImg[2].data(), width, height);
+  // fillGaussian5x5Kernel(deblurImg[0].data(), width, height);
+  // fillGaussian5x5Kernel(deblurImg[1].data(), width, height);
+  // fillGaussian5x5Kernel(deblurImg[2].data(), width, height);
 
-  // deblurImg[0][0] = 0.25f;
-  // deblurImg[1][0] = 0.25f;
-  // deblurImg[2][0] = 0.25f;
-  // deblurImg[0][1] = 0.25f;
-  // deblurImg[1][1] = 0.25f;
-  // deblurImg[2][1] = 0.25f;
-  // deblurImg[0][2] = 0.25f;
-  // deblurImg[1][2] = 0.25f;
-  // deblurImg[2][2] = 0.25f;
-  // deblurImg[0][3] = 0.25f;
-  // deblurImg[1][3] = 0.25f;
-  // deblurImg[2][3] = 0.25f;
+  deblurImg[0][0] = 0.25f;
+  deblurImg[1][0] = 0.25f;
+  deblurImg[2][0] = 0.25f;
+  deblurImg[0][1] = 0.25f;
+  deblurImg[1][1] = 0.25f;
+  deblurImg[2][1] = 0.25f;
+  deblurImg[0][2] = 0.25f;
+  deblurImg[1][2] = 0.25f;
+  deblurImg[2][2] = 0.25f;
+  deblurImg[0][3] = 0.25f;
+  deblurImg[1][3] = 0.25f;
+  deblurImg[2][3] = 0.25f;
 
   // Levin et. al. Siggraph07's matlab implementation also take around 400
   // iterations Sadly, the algorithm needs such a lot of iterations to produce
@@ -401,7 +394,7 @@ int main(int argc, char* argv[]) {
 
   printf("Basic Algorithm:\n");
 
-  DeblurParameters rLParams{.Niter = 1, .bPoisson = false};
+  DeblurParameters rLParams{.Niter = 20, .bPoisson = true};
   // rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
   //                       blurwidth, blurheight, deblurImg[0].data(),
   //                       deblurImg[1].data(), deblurImg[2].data(), width,
@@ -442,7 +435,6 @@ int main(int argc, char* argv[]) {
   return EXIT_SUCCESS;
 }
 
-
 void fillGaussian5x5Kernel(float* aKernelImg, int width, int height) {
   aKernelImg[0] = 0.159f;          // [0,0]
   aKernelImg[1] = 0.097f;          // [1,0]
@@ -473,4 +465,12 @@ void fillGaussian5x5Kernel(float* aKernelImg, int width, int height) {
   aKernelImg[(height - 1) * width - 1] = 0.013f;  // [-1,-2]
   aKernelImg[(height - 2) * width + 2] = 0.003f;  // [2,-2]
   aKernelImg[(height - 1) * width - 2] = 0.003f;  // [-2,-2]
+}
+
+void positiveXlineKernel(int aLength, float* aKernelImg,
+                         [[maybe_unused]] int width,
+                         [[maybe_unused]] int height) {
+  for (int i = 0; i < aLength; i++) {
+    aKernelImg[i] = 1.0f / aLength;
+  }
 }
