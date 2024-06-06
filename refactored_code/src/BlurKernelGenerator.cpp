@@ -132,6 +132,9 @@ void BlurKernelGenerator::blurGray(float* InputImg, float* inputWeight,
 
   for (int y = 0, index = 0; y < mHeight; y++) {
     for (int x = 0; x < mWidth; x++, index++) {
+      // TODO: Test
+      // const int xCenter = notTransposed * x + transposed * (index / mHeight);
+      // const int yCenter = notTransposed * y + transposed * (index % mHeight);
       const int xCenter = notTransposed * x + transposed * y;
       const int yCenter = notTransposed * y + transposed * x;
 
