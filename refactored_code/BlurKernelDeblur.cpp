@@ -26,6 +26,8 @@ void positiveXlineKernel(int aLength, float* aKernelImg, int width, int height);
 
 void negativeXlineKernel(int aLength, float* aKernelImg, int width, int height);
 
+void positiveYlineKernel(int aLength, float* aKernelImg, int width, int height);
+
 class BoxBlurImageGenerator : public IBlurImageGenerator {
  public:
   ~BoxBlurImageGenerator() override = default;
@@ -195,23 +197,14 @@ int main(int argc, char* argv[]) {
   // positiveXlineKernel(4, kernelImg[2].data(), width, height);
 
   // Line x-
-  negativeXlineKernel(4, kernelImg[0].data(), width, height);
-  negativeXlineKernel(4, kernelImg[1].data(), width, height);
-  negativeXlineKernel(4, kernelImg[2].data(), width, height);
+  // negativeXlineKernel(4, kernelImg[0].data(), width, height);
+  // negativeXlineKernel(4, kernelImg[1].data(), width, height);
+  // negativeXlineKernel(4, kernelImg[2].data(), width, height);
 
   // Line y+
-  // kernelImg[0][0] = 0.25f;
-  // kernelImg[1][0] = 0.25f;
-  // kernelImg[2][0] = 0.25f;
-  // kernelImg[0][width] = 0.25f;
-  // kernelImg[1][width] = 0.25f;
-  // kernelImg[2][width] = 0.25f;
-  // kernelImg[0][2*width] = 0.25f;
-  // kernelImg[1][2*width] = 0.25f;
-  // kernelImg[2][2*width] = 0.25f;
-  // kernelImg[0][3*width] = 0.25f;
-  // kernelImg[1][3*width] = 0.25f;
-  // kernelImg[2][3*width] = 0.25f;
+  positiveYlineKernel(4, kernelImg[0].data(), width, height);
+  positiveYlineKernel(4, kernelImg[1].data(), width, height);
+  positiveYlineKernel(4, kernelImg[2].data(), width, height);
 
   // Line y-
   // kernelImg[0][0] = 0.25f;
@@ -472,5 +465,12 @@ void negativeXlineKernel(int aLength, float* aKernelImg, int width,
                          [[maybe_unused]] int height) {
   for (int i = 0; i < aLength; i++) {
     aKernelImg[width - 1 - i] = 1.0f / aLength;
+  }
+}
+
+void positiveYlineKernel(int aLength, float* aKernelImg, int width,
+                         int height) {
+  for (int i = 0; i < aLength; i++) {
+    aKernelImg[width * (i + 1)] = 1.0f / aLength;
   }
 }
