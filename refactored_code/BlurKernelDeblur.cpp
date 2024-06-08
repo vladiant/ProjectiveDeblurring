@@ -28,6 +28,8 @@ void negativeXlineKernel(int aLength, float* aKernelImg, int width, int height);
 
 void positiveYlineKernel(int aLength, float* aKernelImg, int width, int height);
 
+void negativeYlineKernel(int aLength, float* aKernelImg, int width, int height);
+
 class BoxBlurImageGenerator : public IBlurImageGenerator {
  public:
   ~BoxBlurImageGenerator() override = default;
@@ -202,23 +204,14 @@ int main(int argc, char* argv[]) {
   // negativeXlineKernel(4, kernelImg[2].data(), width, height);
 
   // Line y+
-  positiveYlineKernel(4, kernelImg[0].data(), width, height);
-  positiveYlineKernel(4, kernelImg[1].data(), width, height);
-  positiveYlineKernel(4, kernelImg[2].data(), width, height);
+  // positiveYlineKernel(4, kernelImg[0].data(), width, height);
+  // positiveYlineKernel(4, kernelImg[1].data(), width, height);
+  // positiveYlineKernel(4, kernelImg[2].data(), width, height);
 
   // Line y-
-  // kernelImg[0][0] = 0.25f;
-  // kernelImg[1][0] = 0.25f;
-  // kernelImg[2][0] = 0.25f;
-  // kernelImg[0][(height-1)*width] = 0.25f;
-  // kernelImg[1][(height-1)*width] = 0.25f;
-  // kernelImg[2][(height-1)*width] = 0.25f;
-  // kernelImg[0][(height-2)*width] = 0.25f;
-  // kernelImg[1][(height-2)*width] = 0.25f;
-  // kernelImg[2][(height-2)*width] = 0.25f;
-  // kernelImg[0][(height-3)*width] = 0.25f;
-  // kernelImg[1][(height-3)*width] = 0.25f;
-  // kernelImg[2][(height-3)*width] = 0.25f;
+  negativeYlineKernel(4, kernelImg[0].data(), width, height);
+  negativeYlineKernel(4, kernelImg[1].data(), width, height);
+  negativeYlineKernel(4, kernelImg[2].data(), width, height);
 
   // kernelImg[0][0] = 1.0f;
   // kernelImg[1][0] = 1.0f;
@@ -470,7 +463,16 @@ void negativeXlineKernel(int aLength, float* aKernelImg, int width,
 
 void positiveYlineKernel(int aLength, float* aKernelImg, int width,
                          int height) {
-  for (int i = 0; i < aLength; i++) {
-    aKernelImg[width * (i + 1)] = 1.0f / aLength;
+  aKernelImg[0] = 1.0f / aLength;
+  for (int i = 1; i < aLength; i++) {
+    aKernelImg[width * i] = 1.0f / aLength;
+  }
+}
+
+void negativeYlineKernel(int aLength, float* aKernelImg, int width,
+                         int height) {
+  aKernelImg[0] = 1.0f / aLength;
+  for (int i = 1; i < aLength; i++) {
+    aKernelImg[(height - i) * width] = 1.0f / aLength;
   }
 }
