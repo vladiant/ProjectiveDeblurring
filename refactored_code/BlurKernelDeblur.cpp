@@ -256,18 +256,9 @@ int main(int argc, char* argv[]) {
   // fillGaussian5x5Kernel(deblurImg[1].data(), width, height);
   // fillGaussian5x5Kernel(deblurImg[2].data(), width, height);
 
-  deblurImg[0][0] = 0.25f;
-  deblurImg[1][0] = 0.25f;
-  deblurImg[2][0] = 0.25f;
-  deblurImg[0][1] = 0.25f;
-  deblurImg[1][1] = 0.25f;
-  deblurImg[2][1] = 0.25f;
-  deblurImg[0][2] = 0.25f;
-  deblurImg[1][2] = 0.25f;
-  deblurImg[2][2] = 0.25f;
-  deblurImg[0][3] = 0.25f;
-  deblurImg[1][3] = 0.25f;
-  deblurImg[2][3] = 0.25f;
+  positiveXlineKernel(4, deblurImg[0].data(), width, height);
+  positiveXlineKernel(4, deblurImg[1].data(), width, height);
+  positiveXlineKernel(4, deblurImg[2].data(), width, height);
 
   // Levin et. al. Siggraph07's matlab implementation also take around 400
   // iterations Sadly, the algorithm needs such a lot of iterations to produce
