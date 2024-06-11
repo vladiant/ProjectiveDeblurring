@@ -13,6 +13,7 @@
 #include "EmptyRegularizer.hpp"
 #include "GaussianNoiseGenerator.hpp"
 #include "ImResize.h"
+#include "KernelRegularizer.hpp"
 #include "MotionBlurMaker.hpp"
 #include "RLDeblurrer.hpp"
 #include "RMSErrorCalculator.hpp"
@@ -244,7 +245,7 @@ int main(int argc, char* argv[]) {
 
   ///////////////////////////////////
   // Main Deblurring algorithm
-  EmptyRegularizer emptyRegularizer;
+  KernelRegularizer kernelRegularizer;
   RLDeblurrer rLDeblurrer{blurGenerator, emptyErrorCalculator};
 
   printf("Initial Estimation is a gaussian kernel\n");
@@ -280,20 +281,20 @@ int main(int argc, char* argv[]) {
   // rLDeblurrer.deblurRgb(bImg[0].data(), bImg[1].data(), bImg[2].data(),
   //                       blurwidth, blurheight, deblurImg[0].data(),
   //                       deblurImg[1].data(), deblurImg[2].data(), width,
-  //                       height, rLParams, emptyRegularizer, 0.0);
+  //                       height, rLParams, kernelRegularizer, 0.0);
 
   // Gray deblur
   rLDeblurrer.deblurGray(bImg[0].data(), blurwidth, blurheight,
                          deblurImg[0].data(), width, height, rLParams,
-                         emptyRegularizer, 0.0);
+                         kernelRegularizer, 0.0);
 
   rLDeblurrer.deblurGray(bImg[1].data(), blurwidth, blurheight,
                          deblurImg[1].data(), width, height, rLParams,
-                         emptyRegularizer, 0.0);
+                         kernelRegularizer, 0.0);
 
   rLDeblurrer.deblurGray(bImg[2].data(), blurwidth, blurheight,
                          deblurImg[2].data(), width, height, rLParams,
-                         emptyRegularizer, 0.0);
+                         kernelRegularizer, 0.0);
 
   RMSError = errorCalculator.calculateErrorRgb(
       deblurImg[0].data(), deblurImg[1].data(), deblurImg[2].data(), width,

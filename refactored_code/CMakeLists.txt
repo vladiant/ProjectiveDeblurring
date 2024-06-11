@@ -47,6 +47,8 @@ add_library(
     src/BilateralRegularizer.cpp
     include/BilateralLaplacianRegularizer.hpp
     src/BilateralLaplacianRegularizer.cpp
+    include/KernelRegularizer.hpp
+    src/KernelRegularizer.cpp
     include/ProjectiveMotionRLMultiScaleGray.hpp
     src/ProjectiveMotionRLMultiScaleGray.cpp
 )
