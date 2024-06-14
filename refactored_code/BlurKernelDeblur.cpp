@@ -219,14 +219,6 @@ int main(int argc, char* argv[]) {
       kernelImg[0].data(), kernelImg[1].data(), kernelImg[2].data(), width,
       height);  // This is for error computation
 
-  // Scale up kernel
-  // std::for_each(std::begin(deblurImg[0]), std::end(deblurImg[0]),
-  //               [](auto& aValue) { aValue *= 200; });
-  // std::for_each(std::begin(deblurImg[1]), std::end(deblurImg[1]),
-  //               [](auto& aValue) { aValue *= 200; });
-  // std::for_each(std::begin(deblurImg[2]), std::end(deblurImg[2]),
-  //               [](auto& aValue) { aValue *= 200; });
-
   writeBMPchannels("ground_truth_kernel", width, height, deblurImg[0],
                    deblurImg[1], deblurImg[2]);
 
@@ -260,11 +252,6 @@ int main(int argc, char* argv[]) {
   positiveXlineKernel(4, deblurImg[0].data(), width, height);
   positiveXlineKernel(4, deblurImg[1].data(), width, height);
   positiveXlineKernel(4, deblurImg[2].data(), width, height);
-
-  // Levin et. al. Siggraph07's matlab implementation also take around 400
-  // iterations Sadly, the algorithm needs such a lot of iterations to produce
-  // good results Most running time were spent on bicubic interpolation, it
-  // would be much faster if this step was implemented in GPU...
 
   // Load Initial Guess, if you have...
   //   readBMP("", deblurImg[0], deblurImg[1], deblurImg[2], width, height);
