@@ -245,13 +245,9 @@ int main(int argc, char* argv[]) {
   memset(deblurImg[1].data(), 0, width * height * sizeof(float));
   memset(deblurImg[2].data(), 0, width * height * sizeof(float));
 
-  // fillGaussian5x5Kernel(deblurImg[0].data(), width, height);
-  // fillGaussian5x5Kernel(deblurImg[1].data(), width, height);
-  // fillGaussian5x5Kernel(deblurImg[2].data(), width, height);
-
-  positiveXlineKernel(4, deblurImg[0].data(), width, height);
-  positiveXlineKernel(4, deblurImg[1].data(), width, height);
-  positiveXlineKernel(4, deblurImg[2].data(), width, height);
+  fillGaussian5x5Kernel(deblurImg[0].data(), width, height);
+  fillGaussian5x5Kernel(deblurImg[1].data(), width, height);
+  fillGaussian5x5Kernel(deblurImg[2].data(), width, height);
 
   // Load Initial Guess, if you have...
   //   readBMP("", deblurImg[0], deblurImg[1], deblurImg[2], width, height);
@@ -291,14 +287,7 @@ int main(int argc, char* argv[]) {
           fileExtension;
   printf("Done, RMS Error: %f\n", RMSError * 255.0f);
 
-  // Scale up kernel
-  // std::for_each(std::begin(deblurImg[0]), std::end(deblurImg[0]),
-  //               [](auto& aValue) { aValue *= 200; });
-  // std::for_each(std::begin(deblurImg[1]), std::end(deblurImg[1]),
-  //               [](auto& aValue) { aValue *= 200; });
-  // std::for_each(std::begin(deblurImg[2]), std::end(deblurImg[2]),
-  //               [](auto& aValue) { aValue *= 200; });
-
+  // TODO: Restore when algorithm is fixed
   writeBMPchannels(fname, width, height, deblurImg[0], deblurImg[1],
                    deblurImg[2]);
 
