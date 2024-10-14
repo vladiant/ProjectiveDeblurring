@@ -1,7 +1,7 @@
 #include "TVRegularizer.hpp"
 
 void TVRegularizer::SetBuffer(int width, int height) {
-  const size_t newSize = width * height;
+  const std::size_t newSize = width * height;
 
   if (newSize <= mDxImg.size()) {
     return;

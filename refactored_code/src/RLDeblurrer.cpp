@@ -1,5 +1,7 @@
 #include "RLDeblurrer.hpp"
 
+#include <algorithm>
+
 #include "DeblurParameters.hpp"
 
 RLDeblurrer::RLDeblurrer(IBlurImageGenerator& aBlurGenerator,
@@ -9,7 +11,7 @@ RLDeblurrer::RLDeblurrer(IBlurImageGenerator& aBlurGenerator,
 void RLDeblurrer::SetBuffer(int width, int height) {
   mBlurGenerator.SetBuffer(width, height);
 
-  const size_t newSize = width * height;
+  const std::size_t newSize = width * height;
 
   if (newSize <= mBlurImgBuffer.size()) {
     return;

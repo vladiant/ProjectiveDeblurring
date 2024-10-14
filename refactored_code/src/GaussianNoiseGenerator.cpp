@@ -1,5 +1,7 @@
 #include "GaussianNoiseGenerator.hpp"
 
+#include <algorithm>
+
 GaussianNoiseGenerator::GaussianNoiseGenerator(float aSigma) : mSigma(aSigma) {
   mRandomEngine.seed(kSeed);
 }
